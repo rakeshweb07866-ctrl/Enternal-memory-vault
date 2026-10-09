@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const fs = require('fs');
+const os = require('os');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -9,22 +10,32 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(__dirname));
 
-// Persistent Storage Directories
-const DATA_DIR = path.join(__dirname, 'data');
-if (!fs.existsSync(DATA_DIR)) {
-  try { fs.mkdirSync(DATA_DIR, { recursive: true }); } catch (e) {}
+// Persistent Storage Directory (Use os.tmpdir() on Vercel to avoid read-only filesystem EROFS error)
+let DATA_DIR;
+try {
+  if (process.env.VERCEL || fs.existsSync('/tmp')) {
+    DATA_DIR = path.join(os.tmpdir(), 'vanshika_data');
+  } else {
+    DATA_DIR = path.join(__dirname, 'data');
+  }
+  if (!fs.existsSync(DATA_DIR)) {
+    fs.mkdirSync(DATA_DIR, { recursive: true });
+  }
+} catch (e) {
+  DATA_DIR = os.tmpdir();
 }
 
 const MESSAGES_FILE = path.join(DATA_DIR, 'messages.json');
 const WISHES_FILE = path.join(DATA_DIR, 'wishes.json');
 
-// Memory fallbacks for serverless environments (Vercel)
+// Memory fallbacks
 let inMemoryMessages = [
   {
     id: 'msg_welcome_1',
-    sender: 'Soulmate 🤵',
-    message: 'Dearest Vanshika, this is our private live chat room. Here we can talk to each other anytime! ❤️',
+    sender: 'Soulmate ??',
+    message: 'Dearest Vanshika, welcome to our private live chat room! Here we can talk anytime! ???',
     timestamp: new Date().toISOString(),
     formattedTime: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true }),
     formattedDate: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
@@ -33,7 +44,6 @@ let inMemoryMessages = [
 
 let inMemoryWishes = [];
 
-// Helper functions for reading & writing data
 function getMessages() {
   try {
     if (fs.existsSync(MESSAGES_FILE)) {
@@ -46,11 +56,13 @@ function getMessages() {
 
 function saveMessage(msgObj) {
   let list = getMessages();
-  list.push(msgObj); // append chronologically for chat
+  list.push(msgObj);
   inMemoryMessages = list;
   try {
     fs.writeFileSync(MESSAGES_FILE, JSON.stringify(list, null, 2));
-  } catch (err) {}
+  } catch (err) {
+    console.error('File write error:', err);
+  }
 }
 
 function getWishes() {
@@ -69,33 +81,43 @@ function saveWish(wishObj) {
   } catch (err) {}
 }
 
-// ================= REST API ENDPOINTS =================
+// REST API ENDPOINTS
 
-// 1. Send Chat Message (Supports both Vanshika and Him!)
+// 1. Send Chat Message
 app.post('/api/messages', (req, res) => {
-  const { sender, message } = req.body;
-  if (!message || !message.trim()) {
-    return res.status(400).json({ success: false, error: 'Message cannot be empty' });
+  try {
+    const { sender, message } = req.body;
+    if (!message || !message.trim()) {
+      return res.status(400).json({ success: false, error: 'Message cannot be empty' });
+    }
+
+    const now = new Date();
+    const formattedTime = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+
+    const newMsg = {
+      id: 'msg_' + Date.now(),
+      sender: sender || 'Vanshika ??',
+      message: message.trim(),
+      timestamp: now.toISOString(),
+      formattedTime: formattedTime,
+      formattedDate: now.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+    };
+
+    saveMessage(newMsg);
+    return res.json({ success: true, message: 'Message sent!', data: newMsg });
+  } catch (err) {
+    return res.status(500).json({ success: false, error: err.message });
   }
-
-  const newMsg = {
-    id: 'msg_' + Date.now(),
-    sender: sender || 'Vanshika ❤️',
-    message: message.trim(),
-    timestamp: new Date().toISOString(),
-    formattedTime: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true }),
-    formattedDate: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
-  };
-
-  saveMessage(newMsg);
-  console.log(`💬 [CHAT] ${newMsg.sender}: ${newMsg.message}`);
-  return res.json({ success: true, message: 'Message sent!', data: newMsg });
 });
 
 // 2. Fetch Full Chat Conversation History
 app.get('/api/messages', (req, res) => {
-  const messages = getMessages();
-  return res.json({ success: true, count: messages.length, data: messages });
+  try {
+    const messages = getMessages();
+    return res.json({ success: true, count: messages.length, data: messages });
+  } catch (err) {
+    return res.status(500).json({ success: false, error: err.message });
+  }
 });
 
 // 3. Clear Chat History
@@ -111,34 +133,36 @@ app.post('/api/messages/clear', (req, res) => {
 
 // 4. Save Sky Lantern Wish
 app.post('/api/wishes', (req, res) => {
-  const { wishText, sender } = req.body;
-  if (!wishText || !wishText.trim()) {
-    return res.status(400).json({ success: false, error: 'Wish text required' });
+  try {
+    const { wishText, sender } = req.body;
+    if (!wishText || !wishText.trim()) {
+      return res.status(400).json({ success: false, error: 'Wish text required' });
+    }
+
+    const newWish = {
+      id: 'wish_' + Date.now(),
+      sender: sender || 'Vanshika ??',
+      text: wishText.trim(),
+      timestamp: new Date().toISOString(),
+      formattedTime: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })
+    };
+
+    saveWish(newWish);
+    return res.json({ success: true, data: newWish });
+  } catch (err) {
+    return res.status(500).json({ success: false, error: err.message });
   }
-
-  const newWish = {
-    id: 'wish_' + Date.now(),
-    sender: sender || 'Vanshika',
-    text: wishText.trim(),
-    timestamp: new Date().toISOString(),
-    formattedTime: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
-  };
-
-  saveWish(newWish);
-  return res.json({ success: true, data: newWish });
 });
 
 // 5. Get Sky Lantern Wishes
 app.get('/api/wishes', (req, res) => {
-  const wishes = getWishes();
-  return res.json({ success: true, count: wishes.length, data: wishes });
+  try {
+    const wishes = getWishes();
+    return res.json({ success: true, count: wishes.length, data: wishes });
+  } catch (err) {
+    return res.status(500).json({ success: false, error: err.message });
+  }
 });
-
-// Serve frontend files (Supports both root directory and public folder uploads)
-if (fs.existsSync(path.join(__dirname, 'public'))) {
-  app.use(express.static(path.join(__dirname, 'public')));
-}
-app.use(express.static(__dirname));
 
 app.get('/admin', (req, res) => {
   const publicAdmin = path.join(__dirname, 'public', 'admin.html');
@@ -154,11 +178,9 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// Start Server locally
 if (process.env.NODE_ENV !== 'production') {
   app.listen(PORT, () => {
-    console.log(`🚀 Vanshika Live Fullstack Chat Server running on http://localhost:${PORT}`);
-    console.log(`📌 Admin Inbox available at http://localhost:${PORT}/admin.html`);
+    console.log(`Vanshika Live Chat Server running on http://localhost:${PORT}`);
   });
 }
 
