@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Partner Inbox — Messages from Vanshika ❤️</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Sacramento&display=swap" rel="stylesheet">
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: #08020c;
+      background-image: 
+        radial-gradient(circle at 20% 20%, rgba(255, 59, 119, 0.15) 0%, transparent 40%),
+        radial-gradient(circle at 80% 80%, rgba(168, 85, 247, 0.15) 0%, transparent 40%);
+      color: #f8fafc;
+      min-height: 100vh;
+    }
+    .font-cinzel { font-family: 'Cinzel', serif; }
+    .font-sacramento { font-family: 'Sacramento', cursive; }
+
+    .glass-box {
+      background: rgba(20, 8, 30, 0.7);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 59, 119, 0.25);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+      border-radius: 20px;
+    }
+
+    .msg-card {
+      background: linear-gradient(135deg, rgba(255, 59, 119, 0.15) 0%, rgba(168, 85, 247, 0.1) 100%);
+      border: 1px solid rgba(255, 59, 119, 0.3);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+      transition: all 0.3s ease;
+    }
+    .msg-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(255, 215, 0, 0.5);
+    }
+  </style>
+</head>
+<body class="p-4 md:p-8">
+
+  <div class="max-w-5xl mx-auto">
+    <!-- Header -->
+    <header class="glass-box p-6 flex flex-wrap items-center justify-between gap-4 mb-8">
+      <div class="flex items-center gap-3">
+        <div class="w-12 h-12 rounded-full bg-gradient-to-tr from-rose-500 to-amber-300 flex items-center justify-center text-2xl shadow-lg shadow-rose-500/40 animate-pulse">
+          💌
+        </div>
+        <div>
+          <h1 class="font-cinzel font-bold text-2xl bg-gradient-to-r from-rose-400 via-pink-400 to-amber-300 bg-clip-text text-transparent">
+            VANSHIKA'S LOVE INBOX
+          </h1>
+          <p class="text-xs text-amber-300">Live Backend Messages & Sky Lantern Wishes from Her</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <button onclick="fetchMessagesAndWishes()" class="px-4 py-2 rounded-full bg-rose-500 hover:bg-rose-600 text-white font-bold text-xs shadow-lg shadow-rose-500/30 flex items-center gap-2">
+          🔄 Refresh Inbox
+        </button>
+        <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-xs font-semibold">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span> Live Connected
+        </span>
+      </div>
+    </header>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <!-- MAIN MESSAGES LIST (2 COLS) -->
+      <div class="lg:col-span-2 space-y-6">
+        <div class="glass-box p-6">
+          <h2 class="font-cinzel font-bold text-xl text-rose-300 mb-2 flex items-center gap-2">
+            <span>💖</span> Messages Sent by Vanshika (<span id="msg-count">0</span>)
+          </h2>
+          <p class="text-xs text-slate-400 mb-6">Whenever Vanshika types a love reply on the website, it appears right here in real time!</p>
+
+          <div id="messages-container" class="space-y-4">
+            <div class="text-center py-12 text-slate-500 text-xs italic">
+              Loading received messages from backend...
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SIDEBAR: SKY LANTERN WISHES (1 COL) -->
+      <div class="space-y-6">
+        <div class="glass-box p-6">
+          <h2 class="font-cinzel font-bold text-lg text-amber-300 mb-2 flex items-center gap-2">
+            <span>🏮</span> Sky Wishes Launched (<span id="wish-count">0</span>)
+          </h2>
+          <p class="text-xs text-slate-400 mb-4">All wishes saved in backend database</p>
+
+          <div id="wishes-container" class="space-y-3 max-h-[500px] overflow-y-auto pr-1">
+            <div class="text-center py-8 text-slate-500 text-xs italic">
+              Loading wishes...
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    async function fetchMessagesAndWishes() {
+      try {
+        // Fetch Messages
+        const msgRes = await fetch('/api/messages');
+        const msgData = await msgRes.json();
+        
+        if (msgData.success) {
+          renderMessages(msgData.data);
+        }
+
+        // Fetch Wishes
+        const wishRes = await fetch('/api/wishes');
+        const wishData = await wishRes.json();
+
+        if (wishData.success) {
+          renderWishes(wishData.data);
+        }
+      } catch (err) {
+        console.error('Failed to fetch backend data:', err);
+      }
+    }
+
+    function renderMessages(messages) {
+      const container = document.getElementById('messages-container');
+      const count = document.getElementById('msg-count');
+
+      count.innerText = messages.length;
+
+      if (!messages || messages.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-12 text-slate-500 text-xs italic">
+            No messages received yet. When Vanshika sends a reply on the site, it will pop up here!
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = messages.map(m => `
+        <div class="msg-card rounded-2xl p-5 relative overflow-hidden">
+          <div class="flex justify-between items-center mb-3 border-b border-rose-500/20 pb-2">
+            <div class="flex items-center gap-2">
+              <span class="text-xl">👩‍❤️‍👨</span>
+              <span class="font-bold text-rose-300 text-sm">${m.sender}</span>
+            </div>
+            <span class="text-[11px] text-amber-300/80 font-mono">${m.formattedDate || ''} • ${m.formattedTime || ''}</span>
+          </div>
+
+          <p class="text-slate-100 text-sm leading-relaxed font-medium">
+            "${m.message}"
+          </p>
+        </div>
+      `).join('');
+    }
+
+    function renderWishes(wishes) {
+      const container = document.getElementById('wishes-container');
+      const count = document.getElementById('wish-count');
+
+      count.innerText = wishes.length;
+
+      if (!wishes || wishes.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-6 text-slate-500 text-xs italic">
+            No wishes launched yet.
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = wishes.map(w => `
+        <div class="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/30">
+          <div class="flex items-start gap-2 mb-1">
+            <span class="text-base">🏮</span>
+            <p class="text-xs text-amber-200 font-medium">"${w.text}"</p>
+          </div>
+          <p class="text-[10px] text-amber-400/60 text-right font-mono">${w.formattedTime || ''}</p>
+        </div>
+      `).join('');
+    }
+
+    // Auto Refresh every 5 seconds for live real-time sync
+    setInterval(fetchMessagesAndWishes, 5000);
+    window.addEventListener('DOMContentLoaded', fetchMessagesAndWishes);
+  </script>
+</body>
+</html>
