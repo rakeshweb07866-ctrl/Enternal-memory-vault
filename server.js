@@ -134,9 +134,24 @@ app.get('/api/wishes', (req, res) => {
   return res.json({ success: true, count: wishes.length, data: wishes });
 });
 
-// Serve frontend files
+// Serve frontend files (Supports both root directory and public folder uploads)
+if (fs.existsSync(path.join(__dirname, 'public'))) {
+  app.use(express.static(path.join(__dirname, 'public')));
+}
+app.use(express.static(__dirname));
+
+app.get('/admin', (req, res) => {
+  const publicAdmin = path.join(__dirname, 'public', 'admin.html');
+  if (fs.existsSync(publicAdmin)) return res.sendFile(publicAdmin);
+  const rootAdmin = path.join(__dirname, 'admin.html');
+  if (fs.existsSync(rootAdmin)) return res.sendFile(rootAdmin);
+  res.send('Admin Inbox file pending upload.');
+});
+
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  const publicIndex = path.join(__dirname, 'public', 'index.html');
+  if (fs.existsSync(publicIndex)) return res.sendFile(publicIndex);
+  res.sendFile(path.join(__dirname, 'index.html'));
 });
 
 // Start Server locally
