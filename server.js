@@ -23,7 +23,7 @@ const WISHES_FILE = path.join(DATA_DIR, 'wishes.json');
 let inMemoryMessages = [
   {
     id: 'msg_welcome_1',
-    sender: 'Humsafar 🤵',
+    sender: 'Soulmate 🤵',
     message: 'Dearest Vanshika, this is our private live chat room. Here we can talk to each other anytime! ❤️',
     timestamp: new Date().toISOString(),
     formattedTime: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true }),

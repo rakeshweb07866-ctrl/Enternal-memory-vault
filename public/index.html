@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Cinzel:wght@600;700;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Sacramento&display=swap" rel="stylesheet">
   
-  <!-- Official Tailwind CDN for Live Server -->
+  <!-- Official Tailwind CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
 
   <!-- Complete Embedded Modern CSS -->
@@ -113,16 +113,16 @@
     }
 
     /* Chat Bubbles */
-    .chat-bubble-vanshika {
+    .chat-bubble-mine {
+      background: linear-gradient(135deg, rgba(255, 215, 0, 0.25) 0%, rgba(255, 59, 119, 0.25) 100%);
+      border: 1px solid rgba(255, 215, 0, 0.4);
+      border-radius: 18px 18px 4px 18px;
+    }
+
+    .chat-bubble-partner {
       background: linear-gradient(135deg, rgba(255, 59, 119, 0.25) 0%, rgba(168, 85, 247, 0.2) 100%);
       border: 1px solid rgba(255, 59, 119, 0.4);
       border-radius: 18px 18px 18px 4px;
-    }
-
-    .chat-bubble-humsafar {
-      background: linear-gradient(135deg, rgba(255, 215, 0, 0.2) 0%, rgba(255, 59, 119, 0.2) 100%);
-      border: 1px solid rgba(255, 215, 0, 0.4);
-      border-radius: 18px 18px 4px 18px;
     }
 
     /* Floating Hearts Canvas */
@@ -380,6 +380,32 @@
   <!-- Interactive Background Canvas for Heart Rain -->
   <canvas id="canvas-container"></canvas>
 
+  <!-- POPUP NAME LOGIN MODAL -->
+  <div id="name-login-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4">
+    <div class="glass-box p-8 max-w-md w-full border-rose-500/40 text-center relative animate-float shadow-2xl">
+      <div class="w-16 h-16 rounded-full bg-gradient-to-tr from-rose-500 to-amber-300 flex items-center justify-center text-3xl mx-auto mb-4 shadow-lg shadow-rose-500/40 animate-bounce">
+        👤
+      </div>
+      <h3 class="font-cinzel text-2xl text-gradient-rose font-bold mb-2">Join Private Chat</h3>
+      <p class="text-xs text-slate-300 mb-6">Enter your name so your messages appear under your identity! 💕</p>
+
+      <input type="text" id="login-name-input" placeholder="e.g. Vanshika or Rakesh" onkeydown="if(event.key==='Enter') confirmNameLogin()" class="w-full px-5 py-3.5 rounded-full bg-slate-900 border border-rose-500/40 text-sm text-white focus:outline-none focus:border-rose-400 mb-4 shadow-inner text-center">
+
+      <div class="flex gap-2 justify-center mb-6">
+        <button onclick="quickSetLoginName('Vanshika 👸')" class="px-4 py-2 rounded-full bg-rose-500/20 hover:bg-rose-500/40 border border-rose-500/40 text-xs font-bold text-rose-300">
+          👸 I am Vanshika
+        </button>
+        <button onclick="quickSetLoginName('Rakesh 🤵')" class="px-4 py-2 rounded-full bg-amber-500/20 hover:bg-amber-500/40 border border-amber-500/40 text-xs font-bold text-amber-300">
+          🤵 I am Rakesh
+        </button>
+      </div>
+
+      <button onclick="confirmNameLogin()" class="w-full btn-rose py-3.5 rounded-full text-xs font-bold uppercase tracking-wider shadow-lg shadow-rose-500/40">
+        Start Chatting 🚀
+      </button>
+    </div>
+  </div>
+
   <div class="relative z-10 max-w-6xl mx-auto px-4 py-6 md:py-10">
 
     <!-- TOP NAVIGATION BAR -->
@@ -390,15 +416,25 @@
         </div>
         <div>
           <h1 class="font-cinzel font-bold text-lg text-gradient-rose tracking-wider">VANSHIKA & ME</h1>
-          <p class="text-[11px] text-amber-300 font-medium">నా ప్రాణం • Forever Love Story</p>
+          <p class="text-[11px] text-amber-300 font-medium">నా ప్రాణం • Forever Love</p>
         </div>
       </div>
 
       <div class="flex items-center gap-3 flex-wrap">
-        <!-- Audio Synth Toggle -->
-        <button id="music-btn" onclick="toggleAudioEngine()" class="btn-glass px-4 py-2 rounded-full text-xs font-semibold flex items-center gap-2">
-          <span id="music-icon">🎵</span> <span id="music-text">Play Romantic Music</span>
-        </button>
+        <!-- REAL ROMANTIC AUDIO MUSIC PLAYER -->
+        <div class="flex items-center gap-2 bg-slate-900/90 px-4 py-2 rounded-full border border-rose-500/30">
+          <button id="music-toggle-btn" onclick="toggleRomanticMusic()" class="w-8 h-8 rounded-full bg-gradient-to-tr from-rose-500 to-amber-400 flex items-center justify-center text-sm shadow-md hover:scale-105 transition-all text-white font-bold">
+            ▶️
+          </button>
+          <div class="text-[11px]">
+            <p id="music-title" class="font-bold text-amber-300">🎵 Romantic Love Melody</p>
+            <p id="music-status" class="text-[10px] text-slate-400">Click ▶ to Play Music</p>
+          </div>
+          <audio id="bg-music-player" loop preload="auto">
+            <source src="music/love-song.mp3" type="audio/mpeg">
+            <source src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=romantic-piano-112199.mp3" type="audio/mpeg">
+          </audio>
+        </div>
 
         <!-- Shortcut to Live Chat -->
         <button onclick="scrollToElement('live-chat-room')" class="btn-rose px-4 py-2 rounded-full text-xs font-bold flex items-center gap-1 shadow-lg shadow-rose-500/30">
@@ -457,18 +493,16 @@
           </div>
           <div>
             <h2 class="font-cinzel text-xl md:text-2xl text-gradient-rose font-bold">Private Live Chat Room</h2>
-            <p class="text-xs text-slate-300">Chat in real-time between Vanshika & Her Humsafar ❤️</p>
+            <p class="text-xs text-slate-300">Real-time chat between Vanshika & Rakesh ❤️</p>
           </div>
         </div>
 
-        <!-- Identity / Role Switcher -->
-        <div class="flex items-center gap-2 bg-slate-900/80 p-1.5 rounded-full border border-rose-500/30">
-          <span class="text-[11px] text-slate-400 px-2 font-semibold">I am:</span>
-          <button id="role-vanshika-btn" onclick="setChatRole('Vanshika ❤️')" class="px-3 py-1.5 rounded-full text-xs font-bold transition-all bg-rose-500 text-white shadow-md">
-            👸 Vanshika
-          </button>
-          <button id="role-humsafar-btn" onclick="setChatRole('Humsafar 🤵')" class="px-3 py-1.5 rounded-full text-xs font-bold transition-all text-slate-300 hover:text-white">
-            🤵 Humsafar
+        <!-- Identity / User Badge -->
+        <div class="flex items-center gap-2 bg-slate-900/80 px-4 py-2 rounded-full border border-rose-500/30">
+          <span class="text-xs text-slate-400 font-semibold">Logged in as:</span>
+          <span id="current-user-badge" class="text-xs font-bold text-amber-300">Not Set</span>
+          <button onclick="openNameLoginModal()" class="text-[11px] text-rose-400 hover:text-rose-300 underline font-semibold ml-1">
+            (Change)
           </button>
         </div>
       </div>
@@ -482,7 +516,7 @@
 
       <!-- Chat Input Area -->
       <div class="mt-4 flex gap-2">
-        <input type="text" id="live-chat-input" onkeydown="if(event.key==='Enter') sendLiveChatMessage()" placeholder="Type your message here..." class="flex-1 px-5 py-3.5 rounded-full bg-slate-900/90 border border-rose-500/40 text-xs md:text-sm text-white focus:outline-none focus:border-rose-400 shadow-inner">
+        <input type="text" id="live-chat-input" onfocus="checkUserLoginBeforeChat()" onkeydown="if(event.key==='Enter') sendLiveChatMessage()" placeholder="Type your message here..." class="flex-1 px-5 py-3.5 rounded-full bg-slate-900/90 border border-rose-500/40 text-xs md:text-sm text-white focus:outline-none focus:border-rose-400 shadow-inner">
         <button onclick="sendLiveChatMessage()" class="btn-rose px-6 py-3.5 rounded-full text-xs font-bold uppercase tracking-wider shadow-lg shadow-rose-500/40 flex items-center gap-1">
           <span>Send 🚀</span>
         </button>
@@ -569,7 +603,7 @@
         <div class="mt-8 pt-6 border-t border-rose-500/20 flex justify-between items-center">
           <div>
             <p class="text-xs text-slate-400">Forever Yours,</p>
-            <p class="font-handwriting text-2xl text-rose-300">Your Humsafar ❤️</p>
+            <p class="font-handwriting text-2xl text-rose-300">Your Soulmate ❤️</p>
           </div>
           <button onclick="closeLetterModal()" class="btn-rose px-6 py-2 rounded-full text-xs font-bold">
             Close Letter
@@ -653,13 +687,13 @@
       </div>
     </section>
 
-    <!-- PHOTO MEMORY GALLERY WITH DIRECT PER-CARD UPLOADER & EDITABLE CAPTIONS -->
+    <!-- PHOTO MEMORY GALLERY WITH DIRECT PER-CARD UPLOADER & DEFAULT DUMMY IMAGES -->
     <section id="gallery-section" class="py-12 my-10">
       <div class="text-center mb-10">
         <span class="text-xs text-amber-400 font-bold uppercase tracking-widest">Our Visual Memories</span>
         <h2 class="font-cinzel text-3xl md:text-5xl text-gradient-rose font-bold mt-1 mb-2">Vanshika's Photo Gallery</h2>
         <p class="text-slate-300 text-xs md:text-sm max-w-xl mx-auto">
-          👇 <strong class="text-amber-300">Click on ANY card below to select & upload a photo specifically for that card!</strong>
+          👇 <strong class="text-amber-300">Click on ANY photo card below to replace it with her real photo!</strong>
         </p>
       </div>
 
@@ -671,19 +705,13 @@
             ✨ Special Eyes Frame
           </div>
 
-          <div class="h-64 rounded bg-gradient-to-tr from-rose-950 via-purple-950 to-slate-900 relative overflow-hidden flex flex-col items-center justify-center text-white">
-            <img id="img-card-eyes" src="" alt="Vanshika's Enchanting Eyes" class="w-full h-full object-cover hidden">
+          <div class="h-64 rounded bg-slate-900 relative overflow-hidden flex flex-col items-center justify-center text-white">
+            <img id="img-card-eyes" src="assests/WhatsApp Image 2026-09-19 at 1.31.59 PM.jpeg" onerror="this.src='https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=600&q=80'" alt="Vanshika's Enchanting Eyes" class="w-full h-full object-cover">
             
-            <div id="placeholder-card-eyes" class="flex flex-col items-center justify-center p-4">
-              <span class="text-6xl mb-2 animate-bounce">👁️</span>
-              <p class="font-bold text-sm text-amber-300">Her Enchanting Eyes</p>
-              <p class="text-[11px] text-pink-200 mt-1">Click to add her eyes photo here!</p>
-            </div>
-
             <div class="photo-overlay-btn" onclick="triggerCardFilePicker('card-eyes')">
               <span class="text-3xl mb-1">👁️</span>
-              <span class="text-xs font-bold text-amber-300">Upload Eyes Photo</span>
-              <span class="text-[10px] text-slate-300 mt-1">Click to select photo</span>
+              <span class="text-xs font-bold text-amber-300">Change Eyes Photo</span>
+              <span class="text-[10px] text-slate-300 mt-1">Select photo from device</span>
             </div>
           </div>
           
@@ -696,18 +724,12 @@
 
         <!-- Card 1 -->
         <div class="polaroid-frame w-64 text-center" data-card-id="card-1">
-          <div class="h-64 rounded bg-gradient-to-tr from-pink-300 to-rose-400 relative overflow-hidden flex flex-col items-center justify-center text-white">
-            <img id="img-card-1" src="" alt="Vanshika Photo" class="w-full h-full object-cover hidden">
+          <div class="h-64 rounded bg-slate-900 relative overflow-hidden flex flex-col items-center justify-center text-white">
+            <img id="img-card-1" src="assests/WhatsApp Image 2026-10-09 at 12.33.37 PM.jpeg" onerror="this.src='https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80'" alt="Vanshika Photo" class="w-full h-full object-cover">
             
-            <div id="placeholder-card-1" class="flex flex-col items-center justify-center p-4">
-              <span class="text-5xl mb-2 animate-pulse">👸</span>
-              <p class="font-bold text-sm text-white">My Queen Vanshika</p>
-              <p class="text-[11px] text-pink-100 mt-1">Click to add photo here</p>
-            </div>
-
             <div class="photo-overlay-btn" onclick="triggerCardFilePicker('card-1')">
               <span class="text-3xl mb-1">📷</span>
-              <span class="text-xs font-bold text-amber-300">Change This Photo</span>
+              <span class="text-xs font-bold text-amber-300">Change Photo</span>
               <span class="text-[10px] text-slate-300 mt-1">Select from computer</span>
             </div>
           </div>
@@ -721,18 +743,12 @@
 
         <!-- Card 2 -->
         <div class="polaroid-frame w-64 text-center" data-card-id="card-2">
-          <div class="h-64 rounded bg-gradient-to-tr from-rose-400 to-pink-500 relative overflow-hidden flex flex-col items-center justify-center text-white">
-            <img id="img-card-2" src="" alt="Vanshika Photo" class="w-full h-full object-cover hidden">
+          <div class="h-64 rounded bg-slate-900 relative overflow-hidden flex flex-col items-center justify-center text-white">
+            <img id="img-card-2" src="assests/WhatsApp Image 2026-10-09 at 12.33.37 PM (1).jpeg" onerror="this.src='https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=600&q=80'" alt="Vanshika Photo" class="w-full h-full object-cover">
             
-            <div id="placeholder-card-2" class="flex flex-col items-center justify-center p-4">
-              <span class="text-5xl mb-2 animate-pulse">✨</span>
-              <p class="font-bold text-sm text-white">Her Magical Smile</p>
-              <p class="text-[11px] text-pink-100 mt-1">Click to add photo here</p>
-            </div>
-
             <div class="photo-overlay-btn" onclick="triggerCardFilePicker('card-2')">
               <span class="text-3xl mb-1">📷</span>
-              <span class="text-xs font-bold text-amber-300">Change This Photo</span>
+              <span class="text-xs font-bold text-amber-300">Change Photo</span>
               <span class="text-[10px] text-slate-300 mt-1">Select from computer</span>
             </div>
           </div>
@@ -746,18 +762,12 @@
 
         <!-- Card 3 -->
         <div class="polaroid-frame w-64 text-center" data-card-id="card-3">
-          <div class="h-64 rounded bg-gradient-to-tr from-purple-300 to-pink-400 relative overflow-hidden flex flex-col items-center justify-center text-white">
-            <img id="img-card-3" src="" alt="Vanshika Photo" class="w-full h-full object-cover hidden">
+          <div class="h-64 rounded bg-slate-900 relative overflow-hidden flex flex-col items-center justify-center text-white">
+            <img id="img-card-3" src="assests/WhatsApp Image 2026-10-09 at 12.33.37 PM (2).jpeg" onerror="this.src='https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=600&q=80'" alt="Vanshika Photo" class="w-full h-full object-cover">
             
-            <div id="placeholder-card-3" class="flex flex-col items-center justify-center p-4">
-              <span class="text-5xl mb-2 animate-pulse">👩‍❤️‍👨</span>
-              <p class="font-bold text-sm text-white">Naa Bangaram</p>
-              <p class="text-[11px] text-purple-100 mt-1">Click to add photo here</p>
-            </div>
-
             <div class="photo-overlay-btn" onclick="triggerCardFilePicker('card-3')">
               <span class="text-3xl mb-1">📷</span>
-              <span class="text-xs font-bold text-amber-300">Change This Photo</span>
+              <span class="text-xs font-bold text-amber-300">Change Photo</span>
               <span class="text-[10px] text-slate-300 mt-1">Select from computer</span>
             </div>
           </div>
@@ -771,18 +781,12 @@
 
         <!-- Card 4 -->
         <div class="polaroid-frame w-64 text-center" data-card-id="card-4">
-          <div class="h-64 rounded bg-gradient-to-tr from-amber-200 to-rose-300 relative overflow-hidden flex flex-col items-center justify-center text-slate-900">
-            <img id="img-card-4" src="" alt="Vanshika Photo" class="w-full h-full object-cover hidden">
+          <div class="h-64 rounded bg-slate-900 relative overflow-hidden flex flex-col items-center justify-center text-slate-900">
+            <img id="img-card-4" src="assests/WhatsApp Image 2026-10-09 at 12.41.22 PM.jpeg" onerror="this.src='https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=600&q=80'" alt="Vanshika Photo" class="w-full h-full object-cover">
             
-            <div id="placeholder-card-4" class="flex flex-col items-center justify-center p-4">
-              <span class="text-5xl mb-2 animate-pulse">👰</span>
-              <p class="font-bold text-sm text-amber-950">Future Wifey</p>
-              <p class="text-[11px] text-amber-900 mt-1">Click to add photo here</p>
-            </div>
-
             <div class="photo-overlay-btn" onclick="triggerCardFilePicker('card-4')">
               <span class="text-3xl mb-1">📷</span>
-              <span class="text-xs font-bold text-amber-300">Change This Photo</span>
+              <span class="text-xs font-bold text-amber-300">Change Photo</span>
               <span class="text-[10px] text-slate-300 mt-1">Select from computer</span>
             </div>
           </div>
@@ -796,18 +800,12 @@
 
         <!-- Card 5 -->
         <div class="polaroid-frame w-64 text-center" data-card-id="card-5">
-          <div class="h-64 rounded bg-gradient-to-tr from-pink-400 to-purple-500 relative overflow-hidden flex flex-col items-center justify-center text-white">
-            <img id="img-card-5" src="" alt="Vanshika Photo" class="w-full h-full object-cover hidden">
+          <div class="h-64 rounded bg-slate-900 relative overflow-hidden flex flex-col items-center justify-center text-white">
+            <img id="img-card-5" src="assests/WhatsApp Image 2026-10-09 at 12.41.22 PM (1).jpeg" onerror="this.src='https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=600&q=80'" alt="Vanshika Photo" class="w-full h-full object-cover">
             
-            <div id="placeholder-card-5" class="flex flex-col items-center justify-center p-4">
-              <span class="text-5xl mb-2 animate-pulse">💖</span>
-              <p class="font-bold text-sm text-white">My Sweetheart</p>
-              <p class="text-[11px] text-pink-100 mt-1">Click to add photo here</p>
-            </div>
-
             <div class="photo-overlay-btn" onclick="triggerCardFilePicker('card-5')">
               <span class="text-3xl mb-1">📷</span>
-              <span class="text-xs font-bold text-amber-300">Change This Photo</span>
+              <span class="text-xs font-bold text-amber-300">Change Photo</span>
               <span class="text-[10px] text-slate-300 mt-1">Select from computer</span>
             </div>
           </div>
@@ -821,18 +819,12 @@
 
         <!-- Card 6 -->
         <div class="polaroid-frame w-64 text-center" data-card-id="card-6">
-          <div class="h-64 rounded bg-gradient-to-tr from-rose-500 to-amber-400 relative overflow-hidden flex flex-col items-center justify-center text-white">
-            <img id="img-card-6" src="" alt="Vanshika Photo" class="w-full h-full object-cover hidden">
+          <div class="h-64 rounded bg-slate-900 relative overflow-hidden flex flex-col items-center justify-center text-white">
+            <img id="img-card-6" src="assests/WhatsApp Image 2026-10-09 at 12.41.23 PM.jpeg" onerror="this.src='https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?auto=format&fit=crop&w=600&q=80'" alt="Vanshika Photo" class="w-full h-full object-cover">
             
-            <div id="placeholder-card-6" class="flex flex-col items-center justify-center p-4">
-              <span class="text-5xl mb-2 animate-pulse">🌸</span>
-              <p class="font-bold text-sm text-white">Forever & Always</p>
-              <p class="text-[11px] text-rose-100 mt-1">Click to add photo here</p>
-            </div>
-
             <div class="photo-overlay-btn" onclick="triggerCardFilePicker('card-6')">
               <span class="text-3xl mb-1">📷</span>
-              <span class="text-xs font-bold text-amber-300">Change This Photo</span>
+              <span class="text-xs font-bold text-amber-300">Change Photo</span>
               <span class="text-[10px] text-slate-300 mt-1">Select from computer</span>
             </div>
           </div>
@@ -842,6 +834,25 @@
           </div>
 
           <input type="file" id="input-card-6" accept="image/*" class="hidden" onchange="handleSingleCardPhotoUpload(event, 'card-6')">
+        </div>
+
+        <!-- Card 7 -->
+        <div class="polaroid-frame w-64 text-center" data-card-id="card-7">
+          <div class="h-64 rounded bg-slate-900 relative overflow-hidden flex flex-col items-center justify-center text-white">
+            <img id="img-card-7" src="assests/WhatsApp Image 2026-10-09 at 12.41.23 PM (1).jpeg" onerror="this.src='https://images.unsplash.com/photo-1518199266791-5375a83190b7?auto=format&fit=crop&w=600&q=80'" alt="Vanshika Photo" class="w-full h-full object-cover">
+            
+            <div class="photo-overlay-btn" onclick="triggerCardFilePicker('card-7')">
+              <span class="text-3xl mb-1">📷</span>
+              <span class="text-xs font-bold text-amber-300">Change Photo</span>
+              <span class="text-[10px] text-slate-300 mt-1">Select from computer</span>
+            </div>
+          </div>
+          
+          <div id="caption-card-7" contenteditable="true" onblur="saveCardData('card-7')" class="mt-3 font-handwriting text-2xl text-slate-800 font-bold focus:outline-none focus:ring-2 focus:ring-rose-400 rounded px-2" title="Click to edit caption">
+            My Precious Love ✨
+          </div>
+
+          <input type="file" id="input-card-7" accept="image/*" class="hidden" onchange="handleSingleCardPhotoUpload(event, 'card-7')">
         </div>
       </div>
     </section>
@@ -888,7 +899,7 @@
 
     <!-- FOOTER -->
     <footer class="text-center py-10 text-slate-500 text-xs border-t border-slate-800/80 mt-16">
-      <p class="font-sacramento text-3xl text-rose-400 mb-2 glow-rose">Made With Infinite Love For Vanshika</p>
+      <p class="font-sacramento text-3xl text-rose-400 mb-2 glow-rose">Made With Infinite Love For You My Lady Princess Vanshika (Pandu) 💖</p>
       <p class="font-cinzel tracking-wider text-[11px] text-slate-400">Everlasting Promise • Forever & Always</p>
     </footer>
 
@@ -897,20 +908,66 @@
   <!-- JAVASCRIPT LOGIC & LIVE 2-WAY CHAT BACKEND INTEGRATION -->
   <script>
     // Current Chat Role State
-    let currentChatSender = 'Vanshika ❤️';
+    let currentChatSender = localStorage.getItem('chat_user_name') || '';
     let previousMsgCount = 0;
+    let isPlayingMusic = false;
 
-    function setChatRole(role) {
-      currentChatSender = role;
-      const vBtn = document.getElementById('role-vanshika-btn');
-      const hBtn = document.getElementById('role-humsafar-btn');
+    function toggleRomanticMusic() {
+      const audio = document.getElementById('bg-music-player');
+      const btn = document.getElementById('music-toggle-btn');
+      const status = document.getElementById('music-status');
 
-      if (role === 'Vanshika ❤️') {
-        vBtn.className = "px-3 py-1.5 rounded-full text-xs font-bold transition-all bg-rose-500 text-white shadow-md";
-        hBtn.className = "px-3 py-1.5 rounded-full text-xs font-bold transition-all text-slate-300 hover:text-white";
+      if (!audio) return;
+
+      if (!isPlayingMusic) {
+        audio.play().then(() => {
+          isPlayingMusic = true;
+          if (btn) btn.innerText = '⏸️';
+          if (status) status.innerText = 'Playing Romantic Melody...';
+        }).catch(err => {
+          console.log('Audio autoplay prevented');
+        });
       } else {
-        hBtn.className = "px-3 py-1.5 rounded-full text-xs font-bold transition-all bg-amber-400 text-slate-950 shadow-md";
-        vBtn.className = "px-3 py-1.5 rounded-full text-xs font-bold transition-all text-slate-300 hover:text-white";
+        audio.pause();
+        isPlayingMusic = false;
+        if (btn) btn.innerText = '▶️';
+        if (status) status.innerText = 'Music Paused';
+      }
+    }
+
+    function openNameLoginModal() {
+      document.getElementById('name-login-modal').classList.remove('hidden');
+      const input = document.getElementById('login-name-input');
+      if (input) {
+        input.value = currentChatSender;
+        input.focus();
+      }
+    }
+
+    function quickSetLoginName(name) {
+      document.getElementById('login-name-input').value = name;
+      confirmNameLogin();
+    }
+
+    function confirmNameLogin() {
+      const input = document.getElementById('login-name-input');
+      let val = input.value.trim();
+      if (!val) val = 'Guest 💕';
+      currentChatSender = val;
+      localStorage.setItem('chat_user_name', val);
+      document.getElementById('name-login-modal').classList.add('hidden');
+      updateUserBadge();
+      fetchLiveChatMessages();
+    }
+
+    function updateUserBadge() {
+      const badge = document.getElementById('current-user-badge');
+      if (badge) badge.innerText = currentChatSender || 'Not Set';
+    }
+
+    function checkUserLoginBeforeChat() {
+      if (!currentChatSender) {
+        openNameLoginModal();
       }
     }
 
@@ -972,51 +1029,6 @@
     }
     animateParticles();
 
-    // 2. AUDIO SYNTHESIZER ENGINE
-    let audioCtx = null;
-    let isPlayingAudio = false;
-    let synthInterval = null;
-
-    function toggleAudioEngine() {
-      const musicBtnText = document.getElementById('music-text');
-      const musicIcon = document.getElementById('music-icon');
-
-      if (!isPlayingAudio) {
-        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        audioCtx.resume();
-        isPlayingAudio = true;
-        musicBtnText.textContent = 'Pause Music';
-        musicIcon.textContent = '🎶';
-        startRomanticMelody();
-      } else {
-        isPlayingAudio = false;
-        musicBtnText.textContent = 'Play Romantic Music';
-        musicIcon.textContent = '🎵';
-        if (synthInterval) clearInterval(synthInterval);
-      }
-    }
-
-    function startRomanticMelody() {
-      const scale = [261.63, 329.63, 392.00, 523.25, 587.33, 659.25];
-      synthInterval = setInterval(() => {
-        if (!isPlayingAudio || !audioCtx) return;
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        const freq = scale[Math.floor(Math.random() * scale.length)];
-
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-        gain.gain.setValueAtTime(0.001, audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.08, audioCtx.currentTime + 0.8);
-        gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 3.8);
-
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        osc.start();
-        osc.stop(audioCtx.currentTime + 3.9);
-      }, 1300);
-    }
-
     function openLetterModal() {
       const modal = document.getElementById('letter-modal');
       modal.classList.remove('hidden');
@@ -1063,14 +1075,9 @@
       reader.onload = function(e) {
         const dataUrl = e.target.result;
         const img = document.getElementById('img-' + cardId);
-        const placeholder = document.getElementById('placeholder-' + cardId);
 
         if (img) {
           img.src = dataUrl;
-          img.classList.remove('hidden');
-        }
-        if (placeholder) {
-          placeholder.classList.add('hidden');
         }
 
         saveCardData(cardId, dataUrl);
@@ -1098,13 +1105,10 @@
       Object.keys(store).forEach(cardId => {
         const item = store[cardId];
         const img = document.getElementById('img-' + cardId);
-        const placeholder = document.getElementById('placeholder-' + cardId);
         const caption = document.getElementById('caption-' + cardId);
 
         if (item.photo && img) {
           img.src = item.photo;
-          img.classList.remove('hidden');
-          if (placeholder) placeholder.classList.add('hidden');
         }
         if (item.caption && caption) {
           caption.innerText = item.caption;
@@ -1115,16 +1119,13 @@
       fetchWishesFromBackend();
     }
 
-    function resetGalleryPhotos() {
-      if (confirm("Reset all uploaded photos and restore default placeholders?")) {
-        localStorage.removeItem('vanshika_gallery_data');
-        localStorage.removeItem('vanshika_sky_wishes');
-        location.reload();
-      }
-    }
-
     // 3. FULLSTACK 2-WAY LIVE CHAT SYSTEM (REST API + REALTIME POLLING)
     async function sendLiveChatMessage() {
+      if (!currentChatSender) {
+        openNameLoginModal();
+        return;
+      }
+
       const input = document.getElementById('live-chat-input');
       const text = input.value.trim();
       if (!text) return;
@@ -1155,6 +1156,17 @@
       } catch (err) {}
     }
 
+    function formatMessageTime(timestampStr, fallbackTime) {
+      if (!timestampStr) return fallbackTime || '';
+      try {
+        const d = new Date(timestampStr);
+        if (isNaN(d.getTime())) return fallbackTime || '';
+        return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
+      } catch (e) {
+        return fallbackTime || '';
+      }
+    }
+
     function renderChatFeed(messages) {
       const feed = document.getElementById('chat-feed-box');
       if (!feed) return;
@@ -1168,28 +1180,31 @@
         return;
       }
 
-      // Check if new message arrived
       if (messages.length > previousMsgCount && previousMsgCount > 0) {
         playChatPingSound();
       }
       previousMsgCount = messages.length;
 
+      const myCleanName = (currentChatSender || '').toLowerCase().trim();
+
       feed.innerHTML = messages.map(m => {
-        const isHumsafar = m.sender && m.sender.includes('Humsafar');
+        const msgSenderClean = (m.sender || '').toLowerCase().trim();
+        const isMyMessage = myCleanName && (msgSenderClean.includes(myCleanName) || myCleanName.includes(msgSenderClean));
+        const timeFormatted = formatMessageTime(m.timestamp, m.formattedTime);
+
         return `
-          <div class="flex flex-col ${isHumsafar ? 'items-end' : 'items-start'} my-2">
+          <div class="flex flex-col ${isMyMessage ? 'items-end' : 'items-start'} my-2">
             <div class="flex items-center gap-2 mb-1 px-1">
-              <span class="text-xs font-bold ${isHumsafar ? 'text-amber-300' : 'text-rose-400'}">${m.sender}</span>
-              <span class="text-[10px] text-slate-500 font-mono">${m.formattedTime || ''}</span>
+              <span class="text-xs font-bold ${isMyMessage ? 'text-amber-300' : 'text-rose-400'}">${m.sender}</span>
+              <span class="text-[10px] text-slate-500 font-mono">${timeFormatted}</span>
             </div>
-            <div class="max-w-[80%] p-3.5 text-xs md:text-sm font-medium leading-relaxed ${isHumsafar ? 'chat-bubble-humsafar text-amber-100' : 'chat-bubble-vanshika text-rose-100'} shadow-md">
+            <div class="max-w-[80%] p-3.5 text-xs md:text-sm font-medium leading-relaxed ${isMyMessage ? 'chat-bubble-mine text-amber-100' : 'chat-bubble-partner text-rose-100'} shadow-md">
               ${m.message}
             </div>
           </div>
         `;
       }).join('');
 
-      // Auto scroll to bottom
       feed.scrollTop = feed.scrollHeight;
     }
 
@@ -1208,8 +1223,7 @@
       } catch (e) {}
     }
 
-    // Polling chat every 1.5s for real-time responsiveness
-    setInterval(fetchLiveChatMessages, 1500);
+    setInterval(fetchLiveChatMessages, 1000);
 
     // 4. SKY LANTERN WISH API
     async function launchSkyLantern() {
@@ -1238,7 +1252,7 @@
         await fetch('/api/wishes', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ sender: currentChatSender, wishText: wishText })
+          body: JSON.stringify({ sender: currentChatSender || 'Anonymous', wishText: wishText })
         });
       } catch (e) {}
 
@@ -1251,7 +1265,7 @@
         const res = await fetch('/api/wishes');
         const data = await res.json();
         if (data.success && data.data.length > 0) {
-          renderSavedWishes(data.data.map(w => ({ text: w.text, date: w.formattedTime })));
+          renderSavedWishes(data.data.map(w => ({ text: w.text, date: formatMessageTime(w.timestamp, w.formattedTime) })));
           return;
         }
       } catch (e) {}
@@ -1280,7 +1294,14 @@
       `).join('');
     }
 
-    window.addEventListener('DOMContentLoaded', loadSavedGalleryData);
+    window.addEventListener('DOMContentLoaded', () => {
+      loadSavedGalleryData();
+      if (!localStorage.getItem('chat_user_name')) {
+        setTimeout(openNameLoginModal, 800);
+      } else {
+        updateUserBadge();
+      }
+    });
 
     function scrollToElement(id) {
       document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
