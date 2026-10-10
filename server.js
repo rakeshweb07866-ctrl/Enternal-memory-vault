@@ -125,6 +125,9 @@ function getMessages() {
 function saveMessage(msgObj) {
   let list = getMessages();
   list.push(msgObj);
+  if (list.length > 30) {
+    list = list.slice(list.length - 30);
+  }
   inMemoryMessages = list;
   try {
     fs.writeFileSync(MESSAGES_FILE, JSON.stringify(list, null, 2));
@@ -284,6 +287,32 @@ app.get('/api/messages', (req, res) => {
     cleanExpiredPresence();
 
     return res.json({ success: true, count: getMessages().length, data: getMessages(), presence: onlineUsers });
+  } catch (err) {
+    return res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+app.post('/api/messages/clear', (req, res) => {
+  try {
+    const { sender, pin } = req.body;
+    if (!isValidPin(sender, pin)) {
+      return res.status(401).json({ success: false, error: 'Access Denied: Invalid Passcode!' });
+    }
+    const welcomeMsg = {
+      id: 'msg_welcome_' + Date.now(),
+      sender: 'Soulmate 🤵',
+      message: 'Chat cleared! Start a fresh conversation ❤️✨',
+      timestamp: new Date().toISOString(),
+      formattedTime: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true }),
+      formattedDate: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+    };
+    inMemoryMessages = [welcomeMsg];
+    try {
+      fs.writeFileSync(MESSAGES_FILE, JSON.stringify(inMemoryMessages, null, 2));
+    } catch (err) {}
+
+    if (io) io.to('love_chat_room').emit('chat_cleared', { messages: inMemoryMessages });
+    return res.json({ success: true, message: 'Chat room cleared successfully!', data: inMemoryMessages });
   } catch (err) {
     return res.status(500).json({ success: false, error: err.message });
   }
