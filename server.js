@@ -65,6 +65,15 @@ function isValidPin(sender, pin) {
   return false;
 }
 
+// Helper: Format time strictly in Indian Standard Time (IST)
+function getISTTimeString() {
+  return new Date().toLocaleTimeString('en-US', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit', hour12: true });
+}
+
+function getISTDateString() {
+  return new Date().toLocaleDateString('en-US', { timeZone: 'Asia/Kolkata', month: 'short', day: 'numeric' });
+}
+
 // Presence State Tracker
 let onlineUsers = {
   vanshika: { isOnline: false, lastSeen: null, lastPing: 0 },
@@ -75,7 +84,7 @@ function updateHttpPresence(sender) {
   if (!sender) return;
   const s = sender.toLowerCase();
   const now = Date.now();
-  const nowStr = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+  const nowStr = getISTTimeString();
 
   if (s.includes('vanshika')) {
     onlineUsers.vanshika.isOnline = true;
@@ -179,8 +188,8 @@ if (io) {
         sender: sender,
         message: message.trim(),
         timestamp: now.toISOString(),
-        formattedTime: now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true }),
-        formattedDate: now.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+        formattedTime: getISTTimeString(),
+        formattedDate: getISTDateString()
       };
 
       saveMessage(newMsg);
@@ -198,7 +207,7 @@ if (io) {
         sender: sender || 'Vanshika 👸',
         text: wishText.trim(),
         timestamp: new Date().toISOString(),
-        formattedTime: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })
+        formattedTime: getISTTimeString()
       };
 
       saveWish(newWish);
@@ -215,7 +224,7 @@ if (io) {
 
     socket.on('disconnect', () => {
       if (socketUserRole) {
-        const nowStr = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+        const nowStr = getISTTimeString();
         if (socketUserRole === 'vanshika') {
           onlineUsers.vanshika.isOnline = false;
           onlineUsers.vanshika.lastSeen = nowStr;
@@ -258,8 +267,8 @@ app.post('/api/messages', (req, res) => {
       sender: sender,
       message: message.trim(),
       timestamp: now.toISOString(),
-      formattedTime: now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true }),
-      formattedDate: now.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+      formattedTime: getISTTimeString(),
+      formattedDate: getISTDateString()
     };
 
     saveMessage(newMsg);
@@ -314,7 +323,7 @@ app.post('/api/wishes', (req, res) => {
       sender: sender || 'Vanshika 👸',
       text: wishText.trim(),
       timestamp: new Date().toISOString(),
-      formattedTime: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })
+      formattedTime: getISTTimeString()
     };
 
     saveWish(newWish);
