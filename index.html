@@ -529,8 +529,8 @@
               <span class="text-[11px] font-bold text-amber-300 uppercase tracking-widest">Tap To Open</span>
             </div>
           </div>
-          <div class="absolute -bottom-3 left-1/2 -translate-x-1/2 bg-amber-400 text-slate-950 text-[10px] font-extrabold uppercase px-3 py-1 rounded-full shadow-lg whitespace-nowrap">
-            ✨ 1st Month Anniversary Surprise
+          <div id="gift-lock-tag" class="absolute -bottom-3 left-1/2 -translate-x-1/2 bg-amber-500 text-slate-950 text-[10px] font-extrabold uppercase px-3 py-1 rounded-full shadow-lg whitespace-nowrap">
+            🔒 LOCKED UNTIL 17TH OCTOBER
           </div>
         </div>
         <p class="text-xs text-rose-300 mt-6 italic">Click the Gift Box above to unlock Vanshika's 1st Month Anniversary Gift! ❤️</p>
@@ -1408,7 +1408,7 @@
           const badge = document.querySelector('#anniversary-section .inline-flex span');
           if (badge) badge.innerHTML = '🎉 HAPPY 1ST MONTH ANNIVERSARY VANSHIKA! 🎉';
           
-          const giftTag = document.querySelector('#anniversary-section .absolute.-bottom-3');
+          const giftTag = document.getElementById('gift-lock-tag');
           if (giftTag) giftTag.innerHTML = '🎁 UNLOCKED TODAY: YOUR 1-MONTH SURPRISE GIFT!';
 
           if (!annivAutoTriggered) {
@@ -1422,11 +1422,39 @@
     updateAnniversaryTimer();
 
     function openAnniversarySurpriseModal() {
+      const anniversaryDate = new Date('2026-10-17T00:00:00');
+      const now = new Date();
+
+      if (now < anniversaryDate) {
+        const diffMs = anniversaryDate - now;
+        const remainingDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+        
+        const msgEl = document.getElementById('locked-toast-message');
+        if (msgEl) {
+          msgEl.innerHTML = 'Shh! Dearest Vanshika, this 1st Month Anniversary surprise is <strong class="text-rose-400">LOCKED 🔒</strong> until <strong class="text-amber-300">17th October 2026</strong>!<br/><br/><span class="text-amber-300 font-bold">' + remainingDays + ' Days remaining</span> until your special gift unlocks! ❤️✨';
+        }
+        
+        const lockedModal = document.getElementById('locked-toast-modal');
+        if (lockedModal) {
+          lockedModal.classList.remove('hidden');
+          lockedModal.classList.add('flex');
+        }
+        return;
+      }
+
       const modal = document.getElementById('anniv-modal');
       if (modal) {
         modal.classList.remove('hidden');
         modal.classList.add('flex');
         triggerAnniversaryConfetti();
+      }
+    }
+
+    function closeLockedToast() {
+      const lockedModal = document.getElementById('locked-toast-modal');
+      if (lockedModal) {
+        lockedModal.classList.add('hidden');
+        lockedModal.classList.remove('flex');
       }
     }
 
@@ -1507,6 +1535,24 @@
           Close & Celebrate 🥂
         </button>
       </div>
+    </div>
+  </div>
+
+
+  <!-- LOCKED SURPRISE TOAST MODAL -->
+  <div id="locked-toast-modal" class="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md hidden items-center justify-center p-4">
+    <div class="glass-box p-6 md:p-8 max-w-md w-full text-center border-amber-400/50 shadow-2xl relative animate-scale-up">
+      <button onclick="closeLockedToast()" class="absolute top-3 right-3 text-slate-400 hover:text-white text-xl font-bold">&times;</button>
+      
+      <div class="text-5xl mb-3 animate-bounce">🔒 🎁 ✨</div>
+      <h3 class="font-cinzel text-xl md:text-2xl text-gradient-rose font-bold mb-2">Secret Gift Locked!</h3>
+      <div id="locked-toast-message" class="text-xs md:text-sm text-slate-200 leading-relaxed my-4 bg-rose-950/40 p-4 rounded-xl border border-rose-500/30">
+        "Shh! Dearest Vanshika, this 1st Month Anniversary surprise is locked until <strong class="text-amber-300">17th October 2026</strong>! Please wait for our special day ❤️"
+      </div>
+      
+      <button onclick="closeLockedToast()" class="btn-rose px-6 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider">
+        I Will Wait ❤️
+      </button>
     </div>
   </div>
 
