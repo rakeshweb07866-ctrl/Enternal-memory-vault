@@ -1321,8 +1321,36 @@
     }
 
     // Smart HTTP Real-Time Polling (Works on Vercel Production & Localhost)
-    setInterval(fetchLiveChatMessages, 1200);
-    setInterval(fetchWishesFromBackend, 2000);
+    let chatPollInterval = null;
+    let wishPollInterval = null;
+
+    function startSmartPolling() {
+      if (chatPollInterval) clearInterval(chatPollInterval);
+      if (wishPollInterval) clearInterval(wishPollInterval);
+
+      // Poll chat messages every 2.5s (only if tab active and socket not connected)
+      chatPollInterval = setInterval(() => {
+        if (!document.hidden && (!socket || !socket.connected)) {
+          fetchLiveChatMessages();
+        }
+      }, 2500);
+
+      // Poll wishes every 5.0s
+      wishPollInterval = setInterval(() => {
+        if (!document.hidden && (!socket || !socket.connected)) {
+          fetchWishesFromBackend();
+        }
+      }, 5000);
+    }
+
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) {
+        fetchLiveChatMessages();
+        fetchWishesFromBackend();
+      }
+    });
+
+    startSmartPolling();
 
     function formatMessageTime(timestampStr, fallbackTime) {
       if (!timestampStr) return fallbackTime || '';
@@ -1382,7 +1410,7 @@
       }
 
       if (!messages || messages.length === 0) {
-        if (renderedMsgIds.size === 0) {
+        if (feed.children.length === 0 || feed.querySelector('.italic')) {
           feed.innerHTML = `
             <div class="text-center py-16 text-slate-500 text-xs italic">
               Chat room empty. Type a message below to start chatting!
@@ -1392,28 +1420,32 @@
         return;
       }
 
-      // Filter messages that have NOT been rendered yet
-      const newMessages = messages.filter(m => m.id && !renderedMsgIds.has(m.id));
-
-      // IF NO NEW MESSAGES: Return immediately without touching the DOM! (Zero flickering!)
-      if (newMessages.length === 0) {
-        return;
-      }
-
-      // Remove placeholder text if present
-      const placeholder = feed.querySelector('.italic');
-      if (placeholder) placeholder.remove();
-
       const myCleanName = (currentChatSender || '').toLowerCase().trim();
+      let hasAppendedAnyNew = false;
 
-      newMessages.forEach(m => {
+      messages.forEach(m => {
+        if (!m || !m.id) return;
+        
+        // Exact DOM Node Check: If message element is ALREADY rendered on screen, do not duplicate!
+        const existingNode = document.getElementById('msg-elem-' + m.id);
+        if (existingNode) {
+          renderedMsgIds.add(m.id);
+          return;
+        }
+
+        // Remove placeholder text if present
+        const placeholder = feed.querySelector('.italic');
+        if (placeholder) placeholder.remove();
+
         renderedMsgIds.add(m.id);
+        hasAppendedAnyNew = true;
+
         const msgSenderClean = (m.sender || '').toLowerCase().trim();
         const isMyMessage = myCleanName && (msgSenderClean.includes(myCleanName) || myCleanName.includes(msgSenderClean));
         const timeFormatted = formatMessageTime(m.timestamp, m.formattedTime);
 
         const msgHTML = `
-          <div class="flex flex-col ${isMyMessage ? 'items-end' : 'items-start'} my-2 animate-scale-up">
+          <div id="msg-elem-${m.id}" class="flex flex-col ${isMyMessage ? 'items-end' : 'items-start'} my-2 animate-scale-up">
             <div class="flex items-center gap-2 mb-1 px-1">
               <span class="text-xs font-bold ${isMyMessage ? 'text-amber-300' : 'text-rose-400'}">${m.sender}</span>
               <span class="text-[10px] text-slate-500 font-mono">${timeFormatted}</span>
@@ -1426,17 +1458,19 @@
         feed.insertAdjacentHTML('beforeend', msgHTML);
       });
 
-      if (previousMsgCount > 0 && newMessages.length > 0) {
+      if (hasAppendedAnyNew && previousMsgCount > 0) {
         playChatPingSound();
       }
       previousMsgCount = renderedMsgIds.size;
 
-      feed.scrollTop = feed.scrollHeight;
+      if (hasAppendedAnyNew) {
+        feed.scrollTop = feed.scrollHeight;
+      }
     }
 
     function appendSingleMessageToFeed(m) {
       if (!m || !m.id) return;
-      if (renderedMsgIds.has(m.id)) return;
+      if (document.getElementById('msg-elem-' + m.id)) return;
       renderChatFeed([m]);
     }
 

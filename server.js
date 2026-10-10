@@ -90,10 +90,10 @@ function updateHttpPresence(sender) {
 
 function cleanExpiredPresence() {
   const now = Date.now();
-  if (onlineUsers.vanshika.isOnline && now - onlineUsers.vanshika.lastPing > 6000) {
+  if (onlineUsers.vanshika.isOnline && now - onlineUsers.vanshika.lastPing > 12000) {
     onlineUsers.vanshika.isOnline = false;
   }
-  if (onlineUsers.rakesh.isOnline && now - onlineUsers.rakesh.lastPing > 6000) {
+  if (onlineUsers.rakesh.isOnline && now - onlineUsers.rakesh.lastPing > 12000) {
     onlineUsers.rakesh.isOnline = false;
   }
 }
@@ -125,8 +125,8 @@ function getMessages() {
 function saveMessage(msgObj) {
   let list = getMessages();
   list.push(msgObj);
-  if (list.length > 30) {
-    list = list.slice(list.length - 30);
+  if (list.length > 100) {
+    list = list.slice(list.length - 100);
   }
   inMemoryMessages = list;
   try {
