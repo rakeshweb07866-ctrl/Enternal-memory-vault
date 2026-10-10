@@ -1410,13 +1410,7 @@
       }
 
       if (!messages || messages.length === 0) {
-        if (feed.children.length === 0 || feed.querySelector('.italic')) {
-          feed.innerHTML = `
-            <div class="text-center py-16 text-slate-500 text-xs italic">
-              Chat room empty. Type a message below to start chatting!
-            </div>
-          `;
-        }
+        clearChatUI();
         return;
       }
 

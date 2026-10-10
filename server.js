@@ -99,24 +99,14 @@ function cleanExpiredPresence() {
 }
 
 // Default Memory Fallbacks
-let inMemoryMessages = [
-  {
-    id: 'msg_welcome_1',
-    sender: 'Soulmate 🤵',
-    message: 'Dearest Vanshika, welcome to our private secure chat room! ❤️✨',
-    timestamp: new Date().toISOString(),
-    formattedTime: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true }),
-    formattedDate: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
-  }
-];
-
+let inMemoryMessages = [];
 let inMemoryWishes = [];
 
 function getMessages() {
   try {
     if (fs.existsSync(MESSAGES_FILE)) {
       const data = JSON.parse(fs.readFileSync(MESSAGES_FILE, 'utf8'));
-      if (Array.isArray(data) && data.length > 0) return data;
+      if (Array.isArray(data)) return data;
     }
   } catch (err) {}
   return inMemoryMessages;
@@ -298,21 +288,13 @@ app.post('/api/messages/clear', (req, res) => {
     if (!isValidPin(sender, pin)) {
       return res.status(401).json({ success: false, error: 'Access Denied: Invalid Passcode!' });
     }
-    const welcomeMsg = {
-      id: 'msg_welcome_' + Date.now(),
-      sender: 'Soulmate 🤵',
-      message: 'Chat cleared! Start a fresh conversation ❤️✨',
-      timestamp: new Date().toISOString(),
-      formattedTime: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true }),
-      formattedDate: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
-    };
-    inMemoryMessages = [welcomeMsg];
+    inMemoryMessages = [];
     try {
-      fs.writeFileSync(MESSAGES_FILE, JSON.stringify(inMemoryMessages, null, 2));
+      fs.writeFileSync(MESSAGES_FILE, JSON.stringify([], null, 2));
     } catch (err) {}
 
-    if (io) io.to('love_chat_room').emit('chat_cleared', { messages: inMemoryMessages });
-    return res.json({ success: true, message: 'Chat room cleared successfully!', data: inMemoryMessages });
+    if (io) io.to('love_chat_room').emit('chat_cleared', { messages: [] });
+    return res.json({ success: true, message: 'Chat room cleared successfully!', data: [] });
   } catch (err) {
     return res.status(500).json({ success: false, error: err.message });
   }
