@@ -374,7 +374,7 @@
       transition: width 1.5s ease-in-out;
     }
   </style>
-  <script src="/socket.io/socket.io.js"></script>
+  <script src="/socket.io/socket.io.js" onerror="window.socketIoFailed=true"></script>
 </head>
 <body class="selection:bg-rose-500 selection:text-white">
 
@@ -1191,7 +1191,10 @@
         });
 
         socket.on('new_sky_lantern', (wish) => {
-          animateSkyLanternFloat(wish.text, wish.sender);
+          if (wish && wish.id && !animatedWishSet.has(wish.id)) {
+            animatedWishSet.add(wish.id);
+            animateSkyLanternFloat(wish.text, wish.sender, wish.id);
+          }
           fetchWishesFromBackend();
         });
       } else {
@@ -1298,7 +1301,8 @@
 
     async function fetchLiveChatMessages() {
       try {
-        const res = await fetch('/api/messages');
+        const url = currentChatSender ? '/api/messages?sender=' + encodeURIComponent(currentChatSender) : '/api/messages';
+        const res = await fetch(url);
         const data = await res.json();
         if (data.success) {
           renderChatFeed(data.data);
@@ -1306,6 +1310,10 @@
         }
       } catch (err) {}
     }
+
+    // Smart HTTP Real-Time Polling (Works on Vercel Production & Localhost)
+    setInterval(fetchLiveChatMessages, 1200);
+    setInterval(fetchWishesFromBackend, 2000);
 
     function formatMessageTime(timestampStr, fallbackTime) {
       if (!timestampStr) return fallbackTime || '';
@@ -1694,17 +1702,26 @@
         if (input) input.value = '';
       } else {
         try {
-          await fetch('/api/wishes', {
+          const res = await fetch('/api/wishes', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ sender: currentChatSender || 'Vanshika 👸', wishText: wishText })
           });
+          const data = await res.json();
+          if (data.success && data.data) {
+            if (data.data.id && !animatedWishSet.has(data.data.id)) {
+              animatedWishSet.add(data.data.id);
+              animateSkyLanternFloat(data.data.text, data.data.sender, data.data.id);
+            }
+          }
           if (input) input.value = '';
         } catch (e) {}
       }
     }
 
-    function animateSkyLanternFloat(wishText, senderName) {
+    function animateSkyLanternFloat(wishText, senderName, wishId) {
+      if (wishId) animatedWishSet.add(wishId);
+
       const lantern = document.createElement('div');
       lantern.className = 'sky-lantern-float';
       const randomLeft = Math.floor(Math.random() * 70) + 15;
@@ -1725,11 +1742,26 @@
       setTimeout(() => { lantern.remove(); }, 12000);
     }
 
+    let animatedWishSet = new Set();
+    let isInitialWishLoad = true;
+
     async function fetchWishesFromBackend() {
       try {
         const res = await fetch('/api/wishes');
         const data = await res.json();
-        if (data.success && data.data.length > 0) {
+        if (data.success && Array.isArray(data.data)) {
+          if (isInitialWishLoad) {
+            data.data.forEach(w => { if (w.id) animatedWishSet.add(w.id); });
+            isInitialWishLoad = false;
+          } else {
+            data.data.forEach(w => {
+              if (w.id && !animatedWishSet.has(w.id)) {
+                animatedWishSet.add(w.id);
+                animateSkyLanternFloat(w.text, w.sender, w.id);
+              }
+            });
+          }
+
           renderSavedWishes(data.data.map(w => ({ text: w.text, date: formatMessageTime(w.timestamp, w.formattedTime) })));
           return;
         }
