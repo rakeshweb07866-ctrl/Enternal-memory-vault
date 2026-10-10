@@ -1379,8 +1379,10 @@
 
     
     // 1-MONTH ANNIVERSARY LIVE MILESTONE TIMER (SEPT 17 to OCT 17)
+    let annivAutoTriggered = false;
     function updateAnniversaryTimer() {
       const proposalDate = new Date('2026-09-17T00:00:00');
+      const anniversaryDate = new Date('2026-10-17T00:00:00');
       const now = new Date();
       const diffMs = now - proposalDate;
 
@@ -1400,6 +1402,20 @@
         if (hoursEl) hoursEl.innerText = String(hours).padStart(2, '0');
         if (minsEl) minsEl.innerText = String(mins).padStart(2, '0');
         if (secsEl) secsEl.innerText = String(secs).padStart(2, '0');
+
+        // Automatic 17th October Anniversary Unlocking
+        if (now >= anniversaryDate) {
+          const badge = document.querySelector('#anniversary-section .inline-flex span');
+          if (badge) badge.innerHTML = '🎉 HAPPY 1ST MONTH ANNIVERSARY VANSHIKA! 🎉';
+          
+          const giftTag = document.querySelector('#anniversary-section .absolute.-bottom-3');
+          if (giftTag) giftTag.innerHTML = '🎁 UNLOCKED TODAY: YOUR 1-MONTH SURPRISE GIFT!';
+
+          if (!annivAutoTriggered) {
+            annivAutoTriggered = true;
+            setTimeout(openAnniversarySurpriseModal, 1500);
+          }
+        }
       }
     }
     setInterval(updateAnniversaryTimer, 1000);
