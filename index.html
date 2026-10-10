@@ -281,6 +281,8 @@
     .sky-lantern-float {
       position: fixed;
       bottom: -160px;
+      left: 50%;
+      transform: translateX(-50%);
       z-index: 9999;
       pointer-events: none;
       display: flex;
@@ -292,18 +294,18 @@
 
     @keyframes floatUpSky {
       0% {
-        transform: translateY(0) scale(0.7) rotate(-3deg);
+        transform: translateY(0) translateX(-50%) scale(0.7) rotate(-2deg);
         opacity: 0;
       }
       12% {
         opacity: 1;
-        transform: translateY(-25vh) scale(1.15) rotate(3deg);
+        transform: translateY(-25vh) translateX(-50%) scale(1.1) rotate(2deg);
       }
       85% {
         opacity: 0.95;
       }
       100% {
-        transform: translateY(-125vh) scale(0.6) rotate(-5deg);
+        transform: translateY(-125vh) translateX(-50%) scale(0.6) rotate(-3deg);
         opacity: 0;
       }
     }
@@ -347,12 +349,19 @@
       border-radius: 20px;
       box-shadow: 0 15px 35px rgba(0,0,0,0.8), 0 0 25px rgba(255, 215, 0, 0.5), 0 0 15px rgba(255, 59, 119, 0.6);
       margin-top: 10px;
-      white-space: nowrap;
-      max-width: 420px;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      white-space: normal;
+      text-align: center;
+      max-width: 88vw;
+      word-break: break-word;
       backdrop-filter: blur(8px);
       letter-spacing: 0.3px;
+    }
+
+    @media (min-width: 640px) {
+      .lantern-tag {
+        max-width: 450px;
+        white-space: nowrap;
+      }
     }
 
     /* Custom Animations */
@@ -1801,8 +1810,6 @@
 
       const lantern = document.createElement('div');
       lantern.className = 'sky-lantern-float';
-      const randomLeft = Math.floor(Math.random() * 65) + 18;
-      lantern.style.left = randomLeft + 'vw';
 
       const cleanSender = senderName || 'Vanshika 👸';
 
@@ -1810,7 +1817,7 @@
         <div class="lantern-glow-body">
           <div class="lantern-flame"></div>
         </div>
-        <div class="lantern-tag flex items-center gap-2">
+        <div class="lantern-tag flex flex-wrap items-center justify-center gap-1.5">
           <span class="text-amber-300 font-black text-xs md:text-sm">🏮 ${cleanSender}:</span>
           <span class="text-white font-bold text-xs md:text-sm">"${wishText}"</span>
           <span class="text-amber-400">✨</span>
