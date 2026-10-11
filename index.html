@@ -474,6 +474,32 @@
       </div>
     </nav>
 
+    <!-- ROYAL PRINCESS 1ST MONTH ANNIVERSARY FLOATING BANNER -->
+    <div id="princess-royal-banner" class="mb-8 p-3.5 rounded-2xl bg-gradient-to-r from-rose-950/85 via-purple-950/90 to-amber-950/85 border border-amber-400/50 shadow-xl hidden flex-wrap items-center justify-between gap-3 px-5 text-center sm:text-left">
+      <div class="flex items-center gap-3">
+        <span class="text-3xl animate-bounce">👑</span>
+        <div>
+          <h3 class="font-cinzel text-sm md:text-base font-bold text-amber-200">
+            Welcome My LADY PRINCESS Vanshika ❤️
+          </h3>
+          <p class="text-xs text-rose-300">
+            Thank you so much for accepting me on 17th September! Celebrating 1 Month of Pure Magic ✨ (17 Sept - 17 Oct)
+          </p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2 mx-auto sm:mx-0 flex-wrap justify-center">
+        <button onclick="playGrandCinematicAnniversaryAnimation()" class="px-4 py-2 rounded-full bg-gradient-to-r from-purple-600 via-rose-500 to-amber-500 text-white text-xs font-black uppercase tracking-wider shadow-lg shadow-purple-500/40 hover:scale-105 transition-all flex items-center gap-1.5 animate-pulse">
+          <span>🎆</span> Grand Animation
+        </button>
+        <button onclick="openPrincessWelcomeModal()" class="px-4 py-2 rounded-full bg-rose-600/70 border border-rose-400/60 text-xs font-bold text-white hover:bg-rose-500 shadow-md transition-all">
+          👑 Princess Secret
+        </button>
+        <button onclick="openAnniversarySurpriseModal()" class="px-4 py-2 rounded-full bg-gradient-to-r from-amber-400 via-amber-500 to-rose-500 text-slate-950 text-xs font-black uppercase tracking-wider shadow-lg shadow-amber-500/40 hover:scale-105 transition-all">
+          🎁 Anniversary Gifts
+        </button>
+      </div>
+    </div>
+
     <!-- HERO SECTION -->
     <section class="text-center py-10 md:py-16 relative">
       <div class="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-rose-500/15 border border-rose-500/40 text-rose-300 text-xs md:text-sm font-semibold mb-6 animate-float">
@@ -1143,6 +1169,11 @@
           } else {
             initSocketConnection();
           }
+
+          // Trigger Grand Cinematic Anniversary Animation upon Login
+          if (isAnniversaryActive()) {
+            setTimeout(playGrandCinematicAnniversaryAnimation, 400);
+          }
         } else {
           if (errEl) {
             errEl.innerText = '❌ Incorrect Security Passcode! Please try again.';
@@ -1157,6 +1188,9 @@
         document.getElementById('name-login-modal').classList.add('hidden');
         updateUserBadge();
         initSocketConnection();
+        if (isAnniversaryActive()) {
+          setTimeout(playGrandCinematicAnniversaryAnimation, 400);
+        }
       }
     }
 
@@ -1673,6 +1707,17 @@
       fetchWishesFromBackend();
     }
 
+    // 1-MONTH ANNIVERSARY CELEBRATION CONFIG
+    // Locked for production: Automatically unlocks on 17th October 2026!
+    const IS_ANNIVERSARY_PREVIEW_TEST = false;
+
+    function isAnniversaryActive() {
+      if (IS_ANNIVERSARY_PREVIEW_TEST) return true;
+      const now = new Date();
+      const annivDate = new Date('2026-10-17T00:00:00');
+      return now >= annivDate;
+    }
+
     // 1-MONTH ANNIVERSARY LIVE MILESTONE TIMER (SEPT 17 to OCT 17)
     function updateAnniversaryTimer() {
       const proposalDate = new Date('2026-09-17T00:00:00');
@@ -1692,21 +1737,34 @@
         const minsEl = document.getElementById('anniv-mins');
         const secsEl = document.getElementById('anniv-secs');
 
-        if (daysEl) daysEl.innerText = days;
+        if (daysEl) daysEl.innerText = isAnniversaryActive() ? Math.max(days, 30) : days;
         if (hoursEl) hoursEl.innerText = String(hours).padStart(2, '0');
         if (minsEl) minsEl.innerText = String(mins).padStart(2, '0');
         if (secsEl) secsEl.innerText = String(secs).padStart(2, '0');
 
-        if (now >= anniversaryDate) {
+        if (isAnniversaryActive()) {
           const badge = document.querySelector('#anniversary-section .inline-flex span');
           if (badge) badge.innerHTML = '🎉 HAPPY 1ST MONTH ANNIVERSARY VANSHIKA! 🎉';
           
           const giftTag = document.getElementById('gift-lock-tag');
           if (giftTag) giftTag.innerHTML = '🎁 UNLOCKED TODAY: YOUR 1-MONTH SURPRISE GIFT!';
 
-          if (!annivAutoTriggered) {
-            annivAutoTriggered = true;
-            setTimeout(openAnniversarySurpriseModal, 1500);
+          const banner = document.getElementById('princess-royal-banner');
+          if (banner) {
+            banner.classList.remove('hidden');
+            banner.classList.add('flex');
+          }
+        } else {
+          const badge = document.querySelector('#anniversary-section .inline-flex span');
+          if (badge) badge.innerHTML = '✨ 1st Month Anniversary Special ✨';
+          
+          const giftTag = document.getElementById('gift-lock-tag');
+          if (giftTag) giftTag.innerHTML = '🔒 LOCKED UNTIL 17TH OCTOBER';
+
+          const banner = document.getElementById('princess-royal-banner');
+          if (banner) {
+            banner.classList.add('hidden');
+            banner.classList.remove('flex');
           }
         }
       }
@@ -1714,10 +1772,9 @@
     setInterval(updateAnniversaryTimer, 1000);
 
     function openAnniversarySurpriseModal() {
-      const anniversaryDate = new Date('2026-10-17T00:00:00');
-      const now = new Date();
-
-      if (now < anniversaryDate) {
+      if (!isAnniversaryActive()) {
+        const anniversaryDate = new Date('2026-10-17T00:00:00');
+        const now = new Date();
         const diffMs = anniversaryDate - now;
         const remainingDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
         
@@ -1739,6 +1796,19 @@
         modal.classList.remove('hidden');
         modal.classList.add('flex');
         triggerAnniversaryConfetti();
+        try {
+          const audio = document.getElementById('bg-music-player');
+          if (audio && audio.paused) {
+            audio.play().then(() => {
+              isPlayingMusic = true;
+              const btn = document.getElementById('music-toggle-btn');
+              const status = document.getElementById('music-status');
+              if (btn) btn.innerText = '⏸️';
+              if (status) status.innerText = 'Playing Romantic Melody...';
+            }).catch(() => {});
+          }
+        } catch (e) {}
+        renderCouponsState();
       }
     }
 
@@ -1756,6 +1826,410 @@
         lockedModal.classList.add('hidden');
         lockedModal.classList.remove('flex');
       }
+    }
+
+    // ROYAL PRINCESS LOGIN WELCOME & REVELATION SYSTEM
+    function openPrincessWelcomeModal(resetToQuestion = true) {
+      if (!isAnniversaryActive()) {
+        openAnniversarySurpriseModal();
+        return;
+      }
+      const modal = document.getElementById('princess-welcome-modal');
+      const stageQ = document.getElementById('princess-stage-question');
+      const stageR = document.getElementById('princess-stage-reveal');
+
+      if (resetToQuestion) {
+        if (stageQ) stageQ.classList.remove('hidden');
+        if (stageR) stageR.classList.add('hidden');
+      }
+
+      if (modal) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        triggerAnniversaryConfetti();
+      }
+    }
+
+    function revealMostBeautifulGirl() {
+      const stageQ = document.getElementById('princess-stage-question');
+      const stageR = document.getElementById('princess-stage-reveal');
+      const imgEl = document.getElementById('princess-reveal-img');
+
+      if (imgEl) {
+        try {
+          const savedData = JSON.parse(localStorage.getItem('vanshika_gallery_data') || '{}');
+          if (savedData['card-queen'] && savedData['card-queen'].photo) {
+            imgEl.src = savedData['card-queen'].photo;
+          } else if (savedData['card-eyes'] && savedData['card-eyes'].photo) {
+            imgEl.src = savedData['card-eyes'].photo;
+          } else {
+            imgEl.src = 'assests/queen.jpeg';
+          }
+        } catch (e) {
+          imgEl.src = 'assests/queen.jpeg';
+        }
+      }
+
+      if (stageQ) stageQ.classList.add('hidden');
+      if (stageR) {
+        stageR.classList.remove('hidden');
+        stageR.classList.add('animate-scale-up');
+      }
+
+      triggerAnniversaryConfetti();
+
+      try {
+        const audio = document.getElementById('bg-music-player');
+        if (audio && audio.paused) {
+          audio.play().then(() => {
+            isPlayingMusic = true;
+            const btn = document.getElementById('music-toggle-btn');
+            const status = document.getElementById('music-status');
+            if (btn) btn.innerText = '⏸️';
+            if (status) status.innerText = 'Playing Romantic Melody...';
+          }).catch(() => {});
+        }
+      } catch (e) {}
+    }
+
+    function resetPrincessQuestion() {
+      const stageQ = document.getElementById('princess-stage-question');
+      const stageR = document.getElementById('princess-stage-reveal');
+      if (stageQ) stageQ.classList.remove('hidden');
+      if (stageR) stageR.classList.add('hidden');
+    }
+
+    function closePrincessWelcomeModal() {
+      const modal = document.getElementById('princess-welcome-modal');
+      if (modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      }
+    }
+
+    function openAnnivFromPrincessModal() {
+      closePrincessWelcomeModal();
+      setTimeout(openAnniversarySurpriseModal, 250);
+    }
+
+    // GRAND FULLSCREEN CINEMATIC FIREWORKS & CELEBRATION ENGINE
+    let fireworksAnimFrame = null;
+    let fireworksCanvas = null;
+    let fireworksCtx = null;
+    let fireworksParticles = [];
+    let fireworksRockets = [];
+    let floatingHearts = [];
+    let fireworksActive = false;
+
+    class CinematicRocket {
+      constructor(w, h) {
+        this.x = Math.random() * (w * 0.8) + (w * 0.1);
+        this.y = h;
+        this.targetY = Math.random() * (h * 0.45) + (h * 0.08);
+        this.speed = Math.random() * 4 + 7;
+        this.angle = -Math.PI / 2 + (Math.random() - 0.5) * 0.2;
+        this.color = ['#ffd700', '#ff3b77', '#f43f5e', '#a855f7', '#38bdf8', '#fbbf24', '#34d399'][Math.floor(Math.random() * 7)];
+        this.trail = [];
+      }
+      update() {
+        this.trail.push({ x: this.x, y: this.y, alpha: 1 });
+        if (this.trail.length > 8) this.trail.shift();
+        this.trail.forEach(t => t.alpha *= 0.85);
+
+        this.x += Math.cos(this.angle) * this.speed;
+        this.y += Math.sin(this.angle) * this.speed;
+        return this.y <= this.targetY;
+      }
+      draw(ctx) {
+        this.trail.forEach(t => {
+          ctx.save();
+          ctx.globalAlpha = t.alpha;
+          ctx.fillStyle = this.color;
+          ctx.beginPath();
+          ctx.arc(t.x, t.y, 2, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        });
+        ctx.save();
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, 3, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+    }
+
+    class FireworkSpark {
+      constructor(x, y, color) {
+        this.x = x;
+        this.y = y;
+        const angle = Math.random() * Math.PI * 2;
+        const speed = Math.random() * 6 + 1.5;
+        this.vx = Math.cos(angle) * speed;
+        this.vy = Math.sin(angle) * speed;
+        this.color = color;
+        this.alpha = 1;
+        this.decay = Math.random() * 0.02 + 0.012;
+        this.gravity = 0.08;
+        this.friction = 0.96;
+        this.size = Math.random() * 2.5 + 1.5;
+      }
+      update() {
+        this.vx *= this.friction;
+        this.vy *= this.friction;
+        this.vy += this.gravity;
+        this.x += this.vx;
+        this.y += this.vy;
+        this.alpha -= this.decay;
+        return this.alpha <= 0;
+      }
+      draw(ctx) {
+        ctx.save();
+        ctx.globalAlpha = Math.max(0, this.alpha);
+        ctx.fillStyle = this.color;
+        ctx.shadowBlur = 8;
+        ctx.shadowColor = this.color;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+    }
+
+    class CinematicHeart {
+      constructor(w, h) {
+        this.w = w;
+        this.h = h;
+        this.reset();
+        this.y = Math.random() * h;
+      }
+      reset() {
+        this.x = Math.random() * this.w;
+        this.y = this.h + 20;
+        this.speedY = Math.random() * 1.5 + 0.8;
+        this.amplitude = Math.random() * 30 + 10;
+        this.frequency = Math.random() * 0.02 + 0.01;
+        this.phase = Math.random() * Math.PI * 2;
+        this.size = Math.random() * 18 + 12;
+        this.alpha = Math.random() * 0.6 + 0.3;
+        this.char = Math.random() > 0.4 ? '💖' : (Math.random() > 0.5 ? '🌹' : '✨');
+      }
+      update() {
+        this.y -= this.speedY;
+        this.phase += this.frequency;
+        this.currX = this.x + Math.sin(this.phase) * this.amplitude;
+        if (this.y < -30) this.reset();
+      }
+      draw(ctx) {
+        ctx.save();
+        ctx.globalAlpha = this.alpha;
+        ctx.font = `${this.size}px serif`;
+        ctx.fillText(this.char, this.currX || this.x, this.y);
+        ctx.restore();
+      }
+    }
+
+    function initFireworksEngine() {
+      fireworksCanvas = document.getElementById('anniv-fireworks-canvas');
+      if (!fireworksCanvas) return;
+      fireworksCtx = fireworksCanvas.getContext('2d');
+      fireworksCanvas.width = window.innerWidth;
+      fireworksCanvas.height = window.innerHeight;
+
+      floatingHearts = [];
+      for (let i = 0; i < 25; i++) {
+        floatingHearts.push(new CinematicHeart(fireworksCanvas.width, fireworksCanvas.height));
+      }
+    }
+
+    function launchRocketBurst(w, h) {
+      if (fireworksRockets.length < 5) {
+        fireworksRockets.push(new CinematicRocket(w, h));
+      }
+    }
+
+    function explodeRocket(x, y, color) {
+      const colors = [color, '#ffd700', '#ffffff', '#ff3b77', '#f43f5e', '#a855f7'];
+      const count = 55;
+      for (let i = 0; i < count; i++) {
+        const c = colors[Math.floor(Math.random() * colors.length)];
+        fireworksParticles.push(new FireworkSpark(x, y, c));
+      }
+    }
+
+    function loopFireworks() {
+      if (!fireworksActive || !fireworksCtx) return;
+      const w = fireworksCanvas.width;
+      const h = fireworksCanvas.height;
+
+      fireworksCtx.clearRect(0, 0, w, h);
+
+      // Random rocket launch
+      if (Math.random() < 0.08) launchRocketBurst(w, h);
+
+      // Update & Draw Rockets
+      for (let i = fireworksRockets.length - 1; i >= 0; i--) {
+        const r = fireworksRockets[i];
+        const exploded = r.update();
+        r.draw(fireworksCtx);
+        if (exploded) {
+          explodeRocket(r.x, r.y, r.color);
+          fireworksRockets.splice(i, 1);
+        }
+      }
+
+      // Update & Draw Particles
+      for (let i = fireworksParticles.length - 1; i >= 0; i--) {
+        const p = fireworksParticles[i];
+        const dead = p.update();
+        p.draw(fireworksCtx);
+        if (dead) fireworksParticles.splice(i, 1);
+      }
+
+      // Update & Draw Floating Hearts
+      floatingHearts.forEach(heart => {
+        heart.update();
+        heart.draw(fireworksCtx);
+      });
+
+      fireworksAnimFrame = requestAnimationFrame(loopFireworks);
+    }
+
+    function playGrandCinematicAnniversaryAnimation() {
+      if (!isAnniversaryActive()) {
+        openAnniversarySurpriseModal();
+        return;
+      }
+      const screen = document.getElementById('anniv-grand-cinematic-screen');
+      if (!screen) return;
+
+      screen.classList.remove('hidden');
+      screen.classList.add('flex');
+      fireworksActive = true;
+
+      initFireworksEngine();
+      if (fireworksAnimFrame) cancelAnimationFrame(fireworksAnimFrame);
+      loopFireworks();
+
+      triggerAnniversaryConfetti();
+
+      // Trigger Romantic Music
+      try {
+        const audio = document.getElementById('bg-music-player');
+        if (audio && audio.paused) {
+          audio.play().then(() => {
+            isPlayingMusic = true;
+            const btn = document.getElementById('music-toggle-btn');
+            const status = document.getElementById('music-status');
+            if (btn) btn.innerText = '⏸️';
+            if (status) status.innerText = 'Playing Romantic Melody...';
+          }).catch(() => {});
+        }
+      } catch (e) {}
+    }
+
+    function dismissGrandCinematicScreen() {
+      const screen = document.getElementById('anniv-grand-cinematic-screen');
+      if (screen) {
+        screen.classList.add('hidden');
+        screen.classList.remove('flex');
+      }
+      fireworksActive = false;
+      if (fireworksAnimFrame) cancelAnimationFrame(fireworksAnimFrame);
+      if (fireworksCtx && fireworksCanvas) fireworksCtx.clearRect(0, 0, fireworksCanvas.width, fireworksCanvas.height);
+    }
+
+    function enterCelebrationFromCinematic() {
+      dismissGrandCinematicScreen();
+      sessionStorage.setItem('anniv_cinematic_played', 'true');
+      setTimeout(() => {
+        openPrincessWelcomeModal(true);
+      }, 300);
+    }
+
+    // MULTI-TAB SWITCHER FOR ANNIVERSARY MODAL
+    function switchAnnivTab(tabName) {
+      const tabs = ['letter', 'promises', 'coupons', 'stats'];
+      tabs.forEach(t => {
+        const pane = document.getElementById('anniv-pane-' + t);
+        const btn = document.getElementById('anniv-tab-btn-' + t);
+        if (pane) {
+          if (t === tabName) {
+            pane.classList.remove('hidden');
+          } else {
+            pane.classList.add('hidden');
+          }
+        }
+        if (btn) {
+          if (t === tabName) {
+            btn.className = 'flex-1 py-2.5 px-3 rounded-xl bg-gradient-to-r from-amber-400 to-rose-500 text-slate-950 font-black text-xs shadow-lg shadow-rose-500/30 transition-all flex items-center justify-center gap-1.5 whitespace-nowrap';
+          } else {
+            btn.className = 'flex-1 py-2.5 px-3 rounded-xl bg-slate-900/80 border border-slate-700/60 text-slate-300 hover:text-amber-300 font-bold text-xs transition-all flex items-center justify-center gap-1.5 whitespace-nowrap';
+          }
+        }
+      });
+      if (tabName === 'coupons') renderCouponsState();
+    }
+
+    // 5 INTERACTIVE REDEEMABLE LOVE COUPONS
+    const LOVE_COUPONS = [
+      { id: 'coupon-hugs', title: 'Lifetime Warm Hugs & Comfort Pass' },
+      { id: 'coupon-midnight', title: 'Midnight Long Call & Sweet Talk Pass' },
+      { id: 'coupon-forgive', title: 'Forgive Any Mistake Card' },
+      { id: 'coupon-princess', title: 'Princess Treatment For 24 Hours' },
+      { id: 'coupon-masterwish', title: '1 Master Wish Card' }
+    ];
+
+    function getRedeemedCoupons() {
+      try {
+        return JSON.parse(localStorage.getItem('vanshika_redeemed_coupons') || '{}');
+      } catch (e) {
+        return {};
+      }
+    }
+
+    function redeemCoupon(couponId) {
+      const store = getRedeemedCoupons();
+      const now = new Date();
+      const timeStr = now.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) + ' at ' + now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+
+      store[couponId] = {
+        redeemed: true,
+        time: timeStr
+      };
+      localStorage.setItem('vanshika_redeemed_coupons', JSON.stringify(store));
+
+      triggerAnniversaryConfetti();
+
+      const coupon = LOVE_COUPONS.find(c => c.id === couponId);
+      const title = coupon ? coupon.title : 'Coupon';
+
+      alert('🎉💖 COUPON REDEEMED SUCCESSFULLY!\n\n"' + title + '" has been claimed!\nRakesh has been notified of your royal request, My Lady Princess Vanshika! ❤️');
+
+      renderCouponsState();
+    }
+
+    function renderCouponsState() {
+      const store = getRedeemedCoupons();
+      LOVE_COUPONS.forEach(c => {
+        const btn = document.getElementById('btn-redeem-' + c.id);
+        const status = document.getElementById('status-redeem-' + c.id);
+        if (!btn || !status) return;
+
+        if (store[c.id]) {
+          btn.classList.add('hidden');
+          status.classList.remove('hidden');
+          status.innerHTML = `
+            <div class="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-emerald-500/20 border border-emerald-400 text-emerald-300 text-xs font-bold shadow">
+              <span>✅ REDEEMED</span>
+              <span class="text-[10px] text-slate-300">(${store[c.id].time})</span>
+            </div>
+          `;
+        } else {
+          btn.classList.remove('hidden');
+          status.classList.add('hidden');
+        }
+      });
     }
 
     function triggerAnniversaryConfetti() {
@@ -1887,46 +2361,516 @@
       } else {
         updateUserBadge();
         initSocketConnection();
+        // If already logged in, play grand cinematic celebration animation if not seen yet
+        if (isAnniversaryActive()) {
+          if (!sessionStorage.getItem('anniv_cinematic_played')) {
+            sessionStorage.setItem('anniv_cinematic_played', 'true');
+            setTimeout(playGrandCinematicAnniversaryAnimation, 800);
+          }
+        }
       }
     });
   </script>
 
-  <!-- 1ST MONTH ANNIVERSARY SURPRISE MODAL -->
-  <div id="anniv-modal" class="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-md hidden items-center justify-center p-4">
-    <div class="glass-box p-6 md:p-10 max-w-2xl w-full text-center border-amber-400/50 shadow-2xl relative animate-scale-up max-h-[90vh] overflow-y-auto">
-      <button onclick="closeAnniversaryModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-2xl font-bold">
+  <!-- FULLSCREEN GRAND CINEMATIC ANNIVERSARY ANIMATION OVERLAY -->
+  <div id="anniv-grand-cinematic-screen" class="fixed inset-0 z-[100] bg-slate-950/95 backdrop-blur-xl hidden flex-col items-center justify-center p-4 overflow-hidden select-none">
+    
+    <!-- Celebration Canvas for Fireworks, Shooting Rockets & Floating Hearts -->
+    <canvas id="anniv-fireworks-canvas" class="absolute inset-0 pointer-events-none z-0"></canvas>
+
+    <!-- Close / Skip Button at Top Right -->
+    <button onclick="dismissGrandCinematicScreen()" class="absolute top-5 right-5 z-20 px-4 py-2 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-xs font-bold text-slate-300 hover:text-white transition-all flex items-center gap-1.5 backdrop-blur-md">
+      <span>✕</span> <span>Skip</span>
+    </button>
+
+    <!-- Center Cinematic Container -->
+    <div class="relative z-10 text-center max-w-2xl w-full px-6 py-8 flex flex-col items-center animate-scale-up">
+      
+      <!-- Pulsing Crown with Glowing Halo -->
+      <div class="relative mb-6">
+        <div class="w-28 h-28 sm:w-36 sm:h-36 rounded-full bg-gradient-to-tr from-amber-400 via-rose-500 to-purple-600 flex items-center justify-center text-6xl sm:text-7xl shadow-[0_0_80px_rgba(255,59,119,0.8)] mx-auto animate-bounce">
+          👑
+        </div>
+        <span class="absolute -top-3 -right-3 text-4xl animate-spin" style="animation-duration: 4s;">✨</span>
+        <span class="absolute -bottom-2 -left-3 text-3xl animate-ping" style="animation-duration: 2s;">💖</span>
+      </div>
+
+      <!-- Golden Eyebrow Badge -->
+      <div class="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-gradient-to-r from-amber-500/25 via-rose-500/25 to-purple-500/25 border border-amber-400/60 text-amber-300 text-xs sm:text-sm font-black uppercase tracking-[0.25em] mb-4 shadow-lg backdrop-blur-md animate-pulse">
+        <span>✨ 1ST MONTH ANNIVERSARY CELEBRATION ✨</span>
+      </div>
+
+      <!-- Main Glowing Title -->
+      <h1 class="font-cinzel text-3xl sm:text-5xl md:text-6xl text-gradient-rose font-black mb-3 tracking-tight leading-tight glow-rose">
+        HAPPY ANNIVERSARY,<br/>
+        <span class="text-gradient-gold glow-gold">MY LADY PRINCESS!</span> ❤️
+      </h1>
+
+      <!-- Date Milestone Banner -->
+      <div class="flex items-center justify-center gap-3 text-xs sm:text-sm font-cinzel font-bold text-amber-200/90 my-3 bg-slate-900/80 px-6 py-2.5 rounded-full border border-amber-400/40 shadow-inner">
+        <span>💍 Sept 17, 2026</span>
+        <span class="text-rose-400">➔</span>
+        <span class="text-amber-300">🥂 Oct 17, 2026</span>
+        <span class="text-rose-400">➔</span>
+        <span>♾️ Forever</span>
+      </div>
+
+      <!-- Romantic Poetic Subtitle -->
+      <p class="font-sacramento text-2xl sm:text-4xl text-rose-300 text-center my-4 glow-rose max-w-lg leading-relaxed">
+        "30 Days of Holding Your Heart... And A Lifetime of Love To Go."
+      </p>
+
+      <p class="text-slate-300 text-xs sm:text-sm max-w-md mx-auto mb-8 leading-relaxed font-light">
+        Every heartbeat since the moment you accepted my love has been pure magic. Welcome to your special celebration, Vanshika!
+      </p>
+
+      <!-- Grand CTA Button -->
+      <div class="flex flex-col sm:flex-row items-center gap-4">
+        <button onclick="enterCelebrationFromCinematic()" class="btn-rose px-8 py-4 rounded-full text-xs sm:text-sm font-black uppercase tracking-widest shadow-[0_0_40px_rgba(255,59,119,0.7)] hover:scale-105 transition-all flex items-center justify-center gap-2.5">
+          <span>✨ Enter Our Royal Celebration 💖</span>
+        </button>
+      </div>
+
+      <!-- Telugu cultural whisper -->
+      <p class="text-[11px] sm:text-xs text-amber-300/80 mt-5 font-mono italic">
+        "నువ్వు నా ప్రాణం • You Are My Soul, Life & Universe"
+      </p>
+
+    </div>
+  </div>
+
+  <!-- ROYAL PRINCESS REVELATION MODAL (INTERACTIVE ANIMATION & PHOTO REVEAL) -->
+  <div id="princess-welcome-modal" class="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-md hidden items-center justify-center p-3 md:p-6">
+    <div class="glass-box p-6 md:p-10 max-w-xl w-full text-center border-amber-400/60 shadow-2xl relative animate-scale-up max-h-[92vh] overflow-y-auto">
+      <button onclick="closePrincessWelcomeModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-2xl font-bold z-20">
         &times;
       </button>
 
-      <div class="text-5xl mb-3">🎉 🥂 💖</div>
-      <span class="text-xs font-bold text-amber-300 uppercase tracking-widest">Special Anniversary Reveal</span>
-      <h3 class="font-cinzel text-2xl md:text-4xl text-gradient-rose font-black mt-2 mb-4">
-        Happy 1st Month Anniversary, Vanshika! ❤️
-      </h3>
+      <!-- STAGE 1: THE INTRIGUING QUESTION ANIMATION -->
+      <div id="princess-stage-question" class="space-y-6">
+        <div class="relative inline-block my-2">
+          <div class="w-24 h-24 rounded-full bg-gradient-to-tr from-amber-400 via-rose-500 to-purple-600 flex items-center justify-center text-5xl shadow-2xl shadow-rose-500/50 mx-auto animate-bounce">
+            👑
+          </div>
+          <span class="absolute -top-2 -right-2 text-3xl animate-spin" style="animation-duration: 5s;">✨</span>
+        </div>
 
-      <div class="p-6 rounded-2xl bg-rose-950/40 border border-rose-500/30 text-slate-200 text-sm md:text-base leading-relaxed text-left space-y-4 my-6 shadow-inner">
-        <p class="font-sacramento text-3xl text-amber-300 text-center glow-gold">
-          "From September 17 to October 17... and Forever Beyond."
-        </p>
-        <p>
-          My Dearest Vanshika ❤️,
-        </p>
-        <p>
-          Exactly one month ago, on <strong class="text-amber-300">September 17th</strong>, I opened my heart to you. You gave me your trust, your love, and your beautiful smile. 
-        </p>
-        <p>
-          Now, on <strong class="text-rose-400">October 17th</strong>, as we complete our very first month together, I want you to know that my love for you has grown deeper with every single heartbeat.
-        </p>
-        <p>
-          Thank you for bringing so much light into my life, for being my bangaram, my comfort, and my future wife. This 1st month is just the beginning of our lifelong fairy tale.
-        </p>
-        <p class="text-right font-handwriting text-2xl text-amber-300 pt-2">
-          Forever Yours, Rakesh (Your Soulmate) 🤵❤️
+        <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-gradient-to-r from-amber-500/20 to-rose-500/20 border border-amber-400/50 text-amber-300 text-xs font-bold uppercase tracking-widest">
+          <span>✨ A Sacred Secret From Rakesh ✨</span>
+        </div>
+
+        <h2 class="font-cinzel text-2xl md:text-3xl text-gradient-rose font-black leading-snug">
+          A Special Question For My Princess... ❤️
+        </h2>
+
+        <div class="p-6 md:p-8 rounded-2xl bg-gradient-to-b from-rose-950/60 via-slate-950/80 to-purple-950/50 border border-amber-400/40 text-slate-200 text-center space-y-4 shadow-inner relative overflow-hidden">
+          <div class="text-3xl animate-pulse">🌹 💫 💖</div>
+          <p class="font-cinzel text-lg md:text-xl text-white font-bold leading-relaxed">
+            Do you know who the most beautiful, pure-hearted, and enchanting girl in the entire world is — by heart, soul, smile, and everything?
+          </p>
+          <p class="text-xs md:text-sm text-rose-300 italic">
+            Curious to see who holds the entire universe in her smile?
+          </p>
+        </div>
+
+        <div class="pt-2">
+          <button onclick="revealMostBeautifulGirl()" class="btn-rose px-8 py-4 rounded-full text-xs md:text-sm font-black uppercase tracking-widest shadow-2xl shadow-rose-500/60 hover:scale-105 transition-all flex items-center justify-center gap-2 mx-auto">
+            <span>✨ Reveal Her To Me 💖</span>
+          </button>
+          <p class="text-[11px] text-slate-400 mt-3 font-mono">Tap the button above to discover the secret</p>
+        </div>
+      </div>
+
+      <!-- STAGE 2: THE GLORIOUS REVELATION (VANSHIKA'S PHOTO & ROYAL ENGLISH LETTER) -->
+      <div id="princess-stage-reveal" class="hidden space-y-4">
+        
+        <!-- Royal Crown & Sparkles -->
+        <div class="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-amber-500/20 border border-amber-400/50 text-amber-300 text-[11px] font-bold uppercase tracking-widest mb-1">
+          <span>👑 The Eternal Queen of My Heart 👑</span>
+        </div>
+
+        <!-- Glowing Photo Frame of Vanshika -->
+        <div class="relative w-44 h-44 sm:w-48 sm:h-48 mx-auto my-3 group">
+          <div class="absolute -inset-1.5 bg-gradient-to-r from-amber-400 via-rose-500 to-purple-600 rounded-full blur-md animate-pulse"></div>
+          <div class="relative w-full h-full rounded-full overflow-hidden border-4 border-amber-300 shadow-2xl bg-slate-900">
+            <img id="princess-reveal-img" src="assests/queen.jpeg" onerror="this.src='assests/naa-bangaram.jpeg'" alt="My Lady Princess Vanshika" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+          </div>
+          <div class="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-gradient-to-r from-amber-400 to-rose-500 text-slate-950 font-black text-[10px] sm:text-[11px] uppercase tracking-wider px-3 py-1 rounded-full shadow-lg whitespace-nowrap">
+            👑 My Lady Princess
+          </div>
+        </div>
+
+        <!-- Headline -->
+        <h2 class="font-cinzel text-2xl md:text-3xl text-gradient-rose font-black mt-2 mb-1">
+          Of Course, It's YOU! ❤️
+        </h2>
+        <span class="text-xs font-bold text-amber-300 uppercase tracking-widest block mb-3">
+          My Dearest Vanshika (Pandu) 👸
+        </span>
+
+        <!-- Romantic English Letter -->
+        <div class="p-6 rounded-2xl bg-gradient-to-b from-rose-950/50 to-slate-950/70 border border-amber-400/40 text-slate-200 text-sm md:text-base leading-relaxed text-left space-y-4 my-3 shadow-inner">
+          <p class="font-sacramento text-3xl md:text-4xl text-amber-300 text-center glow-gold">
+            "You are unique, irreplaceable, and truly one of a kind."
+          </p>
+          <p>
+            Out of <strong class="text-amber-300">8 billion people</strong> in this world, there is not a single soul who compares to you. You are effortlessly gorgeous, pure-hearted, and breathtakingly beautiful in every single way — both inside and out.
+          </p>
+          <p>
+            Your sweet voice calms down all my worries, and your innocence is the most precious treasure I have ever seen. Thank you so much, my dearest love, for accepting me and saying YES on <strong class="text-rose-400 font-semibold">17th September 2026</strong>!
+          </p>
+          <p>
+            Accepting my love was the greatest gift of my life. Today, as we celebrate our <strong class="text-amber-300 font-bold">1st Month Anniversary</strong>, I want you to know that you will always receive princess treatment from me, today and for all eternity.
+          </p>
+          <p class="italic text-amber-200/90 text-sm bg-slate-950/60 p-3.5 rounded-xl border border-amber-400/30 text-center">
+            "నువ్వు నా ప్రాణం (Nuvvu Naa Pranam — You are my life)... Nuvvu Naa Lokam (You are my entire world) ❤️"
+          </p>
+          <p class="text-right font-handwriting text-2xl text-amber-300 pt-1">
+            Forever & Always In Love With You,<br/>
+            <span class="font-cinzel text-sm font-bold text-rose-300">Rakesh (Your Soulmate) 🤵❤️</span>
+          </p>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex flex-col sm:flex-row justify-center gap-3 pt-2">
+          <button onclick="openAnnivFromPrincessModal()" class="btn-rose px-6 py-3.5 rounded-full text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg shadow-rose-500/50 hover:scale-105 transition-all">
+            🎁 Open 1st Month Anniversary Surprise!
+          </button>
+          <button onclick="closePrincessWelcomeModal()" class="px-6 py-3.5 rounded-full bg-slate-900 border border-slate-700 text-slate-300 hover:text-white text-xs font-bold uppercase tracking-wider">
+            Enter Memory Vault 💖
+          </button>
+        </div>
+
+        <div class="pt-2">
+          <button onclick="resetPrincessQuestion()" class="text-[11px] text-amber-300/70 hover:text-amber-200 underline">
+            ↺ Replay Secret Question
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 1ST MONTH ANNIVERSARY SURPRISE MODAL (4 DELUXE INTERACTIVE TABS) -->
+  <div id="anniv-modal" class="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-md hidden items-center justify-center p-3 md:p-6">
+    <div class="glass-box p-5 md:p-8 max-w-3xl w-full text-center border-amber-400/50 shadow-2xl relative animate-scale-up max-h-[92vh] flex flex-col">
+      <button onclick="closeAnniversaryModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-2xl font-bold z-10">
+        &times;
+      </button>
+
+      <!-- Modal Header -->
+      <div class="mb-4">
+        <div class="flex items-center justify-center gap-2 text-2xl md:text-3xl mb-1">
+          <span>👑</span> <span>🥂</span> <span>💖</span> <span>✨</span>
+        </div>
+        <span class="text-[11px] font-bold text-amber-300 uppercase tracking-widest">
+          Grand 1st Month Anniversary Celebration
+        </span>
+        <h3 class="font-cinzel text-xl md:text-3xl text-gradient-rose font-black mt-1">
+          Happy 1st Month Anniversary, Vanshika! ❤️
+        </h3>
+        <p class="text-xs text-slate-300">
+          From 17th September 2026 to Forever & Always • Built for My Lady Princess
         </p>
       </div>
 
-      <div class="flex justify-center gap-4">
-        <button onclick="closeAnniversaryModal()" class="btn-rose px-8 py-3.5 rounded-full text-xs font-bold uppercase tracking-wider">
+      <!-- Navigation Tabs -->
+      <div class="flex gap-2 p-1.5 bg-slate-950/80 rounded-2xl border border-amber-400/30 mb-5 overflow-x-auto">
+        <button id="anniv-tab-btn-letter" onclick="switchAnnivTab('letter')" class="flex-1 py-2.5 px-3 rounded-xl bg-gradient-to-r from-amber-400 to-rose-500 text-slate-950 font-black text-xs shadow-lg shadow-rose-500/30 transition-all flex items-center justify-center gap-1.5 whitespace-nowrap">
+          <span>💌</span> Love Letter
+        </button>
+        <button id="anniv-tab-btn-promises" onclick="switchAnnivTab('promises')" class="flex-1 py-2.5 px-3 rounded-xl bg-slate-900/80 border border-slate-700/60 text-slate-300 hover:text-amber-300 font-bold text-xs transition-all flex items-center justify-center gap-1.5 whitespace-nowrap">
+          <span>💍</span> 7 Sacred Promises
+        </button>
+        <button id="anniv-tab-btn-coupons" onclick="switchAnnivTab('coupons')" class="flex-1 py-2.5 px-3 rounded-xl bg-slate-900/80 border border-slate-700/60 text-slate-300 hover:text-amber-300 font-bold text-xs transition-all flex items-center justify-center gap-1.5 whitespace-nowrap">
+          <span>🎟️</span> 5 Love Coupons
+        </button>
+        <button id="anniv-tab-btn-stats" onclick="switchAnnivTab('stats')" class="flex-1 py-2.5 px-3 rounded-xl bg-slate-900/80 border border-slate-700/60 text-slate-300 hover:text-amber-300 font-bold text-xs transition-all flex items-center justify-center gap-1.5 whitespace-nowrap">
+          <span>⏳</span> 30-Day Stats
+        </button>
+      </div>
+
+      <!-- Scrollable Tab Content Container -->
+      <div class="flex-1 overflow-y-auto pr-1 text-left space-y-4">
+        
+        <!-- PANE 1: LOVE LETTER -->
+        <div id="anniv-pane-letter" class="space-y-4">
+          <div class="p-6 rounded-2xl bg-rose-950/40 border border-rose-500/30 text-slate-200 text-sm md:text-base leading-relaxed space-y-4 shadow-inner">
+            <p class="font-sacramento text-3xl md:text-4xl text-amber-300 text-center glow-gold">
+              "From September 17 to October 17... And Forever Beyond."
+            </p>
+            <p class="font-bold text-rose-300">
+              My Dearest Vanshika (Naa Bangaram ❤️),
+            </p>
+            <p>
+              Exactly one month ago, on <strong class="text-amber-300 font-semibold">September 17th</strong>, I gathered all the courage in my heart to confess how much you mean to me. And when you accepted my love, you gave me the single greatest blessing of my entire life.
+            </p>
+            <p>
+              Today, on <strong class="text-rose-400 font-semibold">October 17th</strong>, as we mark our first official month together, my heart overflows with gratitude. In these 30 days, every conversation with you, every smile, every cute anger, and every sweet Telugu word has deepened my love for you beyond what words can ever explain.
+            </p>
+            <p>
+              Thank you for trusting me with your gentle heart. Thank you for being my peace after a long day, my biggest happiness, and the girl I want to spend every single sunrise of my future with.
+            </p>
+            <p class="italic text-amber-200/90 bg-slate-950/60 p-4 rounded-xl border border-amber-400/30 text-center">
+              "నువ్వు నా ప్రాణం (Naa Pranam)... మనసులో నువ్వే (Manasulo Nuvve)... ఎల్లప్పుడూ నీతోనే (Ellappudu Neethone)."
+            </p>
+            <p>
+              This first month is only Chapter 1 of a lifelong book of our love. I will protect you, cherish you, respect you, and hold you close forever.
+            </p>
+            <div class="pt-4 border-t border-rose-500/20 text-right">
+              <p class="font-handwriting text-2xl md:text-3xl text-amber-300">
+                Forever & Unconditionally Yours,
+              </p>
+              <p class="font-cinzel text-sm font-bold text-rose-300">
+                Rakesh (Your Soulmate & Future Husband) 🤵💍❤️
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- PANE 2: 7 SACRED PROMISES -->
+        <div id="anniv-pane-promises" class="hidden space-y-3">
+          <div class="text-center mb-2">
+            <span class="text-xs font-bold text-amber-300 uppercase tracking-wider">Rakesh's Vows to My Princess</span>
+            <p class="text-xs text-slate-300">7 Sacred Promises etched into my soul for you, Vanshika</p>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            
+            <!-- Promise 1 -->
+            <div class="p-4 rounded-xl bg-slate-950/70 border border-amber-400/40 shadow-md flex items-start gap-3">
+              <span class="text-2xl">👑</span>
+              <div>
+                <h4 class="font-cinzel text-xs font-bold text-amber-300 uppercase">1. Princess Treatment For Life</h4>
+                <p class="text-xs text-slate-300 mt-1 leading-snug">
+                  I promise to always treat you like royalty — with deep respect, gentle care, and putting your feelings first, always.
+                </p>
+              </div>
+            </div>
+
+            <!-- Promise 2 -->
+            <div class="p-4 rounded-xl bg-slate-950/70 border border-rose-500/40 shadow-md flex items-start gap-3">
+              <span class="text-2xl">🛡️</span>
+              <div>
+                <h4 class="font-cinzel text-xs font-bold text-rose-300 uppercase">2. Your Safe Haven & Protector</h4>
+                <p class="text-xs text-slate-300 mt-1 leading-snug">
+                  I promise to protect your fragile and pure heart. Whatever tears or pain the past brought, I will replace with unconditional security.
+                </p>
+              </div>
+            </div>
+
+            <!-- Promise 3 -->
+            <div class="p-4 rounded-xl bg-slate-950/70 border border-amber-400/40 shadow-md flex items-start gap-3">
+              <span class="text-2xl">☀️</span>
+              <div>
+                <h4 class="font-cinzel text-xs font-bold text-amber-300 uppercase">3. Never Sleep Sad or Upset</h4>
+                <p class="text-xs text-slate-300 mt-1 leading-snug">
+                  I promise never to let you go to sleep crying or hurt. Even if we ever disagree, I will hug you, apologize, and make you smile before bed.
+                </p>
+              </div>
+            </div>
+
+            <!-- Promise 4 -->
+            <div class="p-4 rounded-xl bg-slate-950/70 border border-rose-500/40 shadow-md flex items-start gap-3">
+              <span class="text-2xl">🎧</span>
+              <div>
+                <h4 class="font-cinzel text-xs font-bold text-rose-300 uppercase">4. Always Listen to Your Heart</h4>
+                <p class="text-xs text-slate-300 mt-1 leading-snug">
+                  I promise to listen to everything you say — your rambles, your quiet worries, your excitement — with full patience and zero judgment.
+                </p>
+              </div>
+            </div>
+
+            <!-- Promise 5 -->
+            <div class="p-4 rounded-xl bg-slate-950/70 border border-amber-400/40 shadow-md flex items-start gap-3">
+              <span class="text-2xl">🚀</span>
+              <div>
+                <h4 class="font-cinzel text-xs font-bold text-amber-300 uppercase">5. Champion of Your Dreams</h4>
+                <p class="text-xs text-slate-300 mt-1 leading-snug">
+                  I promise to be your biggest cheerleader in life. Whatever goals and aspirations you have, I will stand right behind you cheering you on.
+                </p>
+              </div>
+            </div>
+
+            <!-- Promise 6 -->
+            <div class="p-4 rounded-xl bg-slate-950/70 border border-rose-500/40 shadow-md flex items-start gap-3">
+              <span class="text-2xl">🤝</span>
+              <div>
+                <h4 class="font-cinzel text-xs font-bold text-rose-300 uppercase">6. Stand by You in Every Storm</h4>
+                <p class="text-xs text-slate-300 mt-1 leading-snug">
+                  In health, in tough days, in joy and sorrow, my hand will never let go of yours. Ellappudu Neethone — forever by your side.
+                </p>
+              </div>
+            </div>
+
+            <!-- Promise 7 (Full width) -->
+            <div class="p-4 rounded-xl bg-gradient-to-r from-rose-950/50 via-slate-950/80 to-amber-950/50 border border-amber-300/50 shadow-md flex items-start gap-3 md:col-span-2">
+              <span class="text-2xl">♾️</span>
+              <div>
+                <h4 class="font-cinzel text-xs font-bold text-amber-200 uppercase">7. Loving You More With Every Single Breath</h4>
+                <p class="text-xs text-slate-200 mt-1 leading-snug">
+                  I promise to choose you every single day, to fall in love with you over and over again, and to love you until the end of time itself.
+                </p>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- PANE 3: 5 LOVE COUPONS -->
+        <div id="anniv-pane-coupons" class="hidden space-y-4">
+          <div class="text-center mb-2">
+            <span class="text-xs font-bold text-amber-300 uppercase tracking-wider">Vanshika's Special Privileges</span>
+            <p class="text-xs text-slate-300">Tap "Redeem 🎟️" whenever you want Rakesh to fulfill a perk!</p>
+          </div>
+
+          <div class="space-y-3">
+            
+            <!-- Coupon 1 -->
+            <div class="p-4 rounded-2xl bg-gradient-to-r from-rose-950/40 to-slate-950/80 border-2 border-dashed border-rose-500/50 relative overflow-hidden flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-md">
+              <div class="flex items-start gap-3">
+                <span class="text-3xl">🫂</span>
+                <div>
+                  <div class="inline-block px-2 py-0.5 rounded bg-rose-500/20 text-rose-300 text-[10px] font-bold uppercase mb-1">UNLIMITED USE</div>
+                  <h4 class="font-cinzel text-xs md:text-sm font-bold text-amber-300">Lifetime Warm Hugs & Comfort Pass</h4>
+                  <p class="text-xs text-slate-300 mt-1 max-w-md">Valid anytime you feel low or tired. Entitles you to unlimited warm cuddles and forehead kisses until you smile.</p>
+                </div>
+              </div>
+              <div class="self-end sm:self-center shrink-0">
+                <button id="btn-redeem-coupon-hugs" onclick="redeemCoupon('coupon-hugs')" class="px-4 py-2 rounded-full bg-gradient-to-r from-rose-500 to-amber-400 text-slate-950 font-black text-xs uppercase tracking-wider shadow hover:scale-105 transition-all">
+                  Redeem 🎟️
+                </button>
+                <div id="status-redeem-coupon-hugs" class="hidden"></div>
+              </div>
+            </div>
+
+            <!-- Coupon 2 -->
+            <div class="p-4 rounded-2xl bg-gradient-to-r from-purple-950/40 to-slate-950/80 border-2 border-dashed border-amber-400/50 relative overflow-hidden flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-md">
+              <div class="flex items-start gap-3">
+                <span class="text-3xl">🌙</span>
+                <div>
+                  <div class="inline-block px-2 py-0.5 rounded bg-purple-500/20 text-purple-300 text-[10px] font-bold uppercase mb-1">NIGHT OWL PASS</div>
+                  <h4 class="font-cinzel text-xs md:text-sm font-bold text-amber-300">Midnight Long Call & Sweet Talk Pass</h4>
+                  <p class="text-xs text-slate-300 mt-1 max-w-md">Valid for an endless late-night phone call. Rakesh will stay awake, talk sweet nothings, and listen to you with zero complaints.</p>
+                </div>
+              </div>
+              <div class="self-end sm:self-center shrink-0">
+                <button id="btn-redeem-coupon-midnight" onclick="redeemCoupon('coupon-midnight')" class="px-4 py-2 rounded-full bg-gradient-to-r from-purple-500 to-amber-400 text-slate-950 font-black text-xs uppercase tracking-wider shadow hover:scale-105 transition-all">
+                  Redeem 🎟️
+                </button>
+                <div id="status-redeem-coupon-midnight" class="hidden"></div>
+              </div>
+            </div>
+
+            <!-- Coupon 3 -->
+            <div class="p-4 rounded-2xl bg-gradient-to-r from-emerald-950/40 to-slate-950/80 border-2 border-dashed border-emerald-400/50 relative overflow-hidden flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-md">
+              <div class="flex items-start gap-3">
+                <span class="text-3xl">🤍</span>
+                <div>
+                  <div class="inline-block px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 text-[10px] font-bold uppercase mb-1">FREE PEACE PASS</div>
+                  <h4 class="font-cinzel text-xs md:text-sm font-bold text-amber-300">Forgive Any Mistake Card</h4>
+                  <p class="text-xs text-slate-300 mt-1 max-w-md">Play this card in any disagreement! Rakesh will instantly drop arguments, smile, and say: "Vanshika is 100% right, I apologize My Princess!"</p>
+                </div>
+              </div>
+              <div class="self-end sm:self-center shrink-0">
+                <button id="btn-redeem-coupon-forgive" onclick="redeemCoupon('coupon-forgive')" class="px-4 py-2 rounded-full bg-gradient-to-r from-emerald-500 to-amber-400 text-slate-950 font-black text-xs uppercase tracking-wider shadow hover:scale-105 transition-all">
+                  Redeem 🎟️
+                </button>
+                <div id="status-redeem-coupon-forgive" class="hidden"></div>
+              </div>
+            </div>
+
+            <!-- Coupon 4 -->
+            <div class="p-4 rounded-2xl bg-gradient-to-r from-amber-950/40 to-slate-950/80 border-2 border-dashed border-amber-400/50 relative overflow-hidden flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-md">
+              <div class="flex items-start gap-3">
+                <span class="text-3xl">👑</span>
+                <div>
+                  <div class="inline-block px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 text-[10px] font-bold uppercase mb-1">ROYAL DECREE</div>
+                  <h4 class="font-cinzel text-xs md:text-sm font-bold text-amber-300">Princess Treatment For 24 Hours</h4>
+                  <p class="text-xs text-slate-300 mt-1 max-w-md">24 hours where Vanshika is treated like Queen! Every wish, snack craving, and order is executed with absolute love and priority.</p>
+                </div>
+              </div>
+              <div class="self-end sm:self-center shrink-0">
+                <button id="btn-redeem-coupon-princess" onclick="redeemCoupon('coupon-princess')" class="px-4 py-2 rounded-full bg-gradient-to-r from-amber-400 to-rose-500 text-slate-950 font-black text-xs uppercase tracking-wider shadow hover:scale-105 transition-all">
+                  Redeem 🎟️
+                </button>
+                <div id="status-redeem-coupon-princess" class="hidden"></div>
+              </div>
+            </div>
+
+            <!-- Coupon 5 -->
+            <div class="p-4 rounded-2xl bg-gradient-to-r from-rose-950/40 via-amber-950/30 to-slate-950/80 border-2 border-dashed border-amber-300 relative overflow-hidden flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-md">
+              <div class="flex items-start gap-3">
+                <span class="text-3xl">🌟</span>
+                <div>
+                  <div class="inline-block px-2 py-0.5 rounded bg-amber-500/30 text-amber-300 text-[10px] font-black uppercase mb-1">MASTER PASS</div>
+                  <h4 class="font-cinzel text-xs md:text-sm font-bold text-amber-300">1 Master Wish Card</h4>
+                  <p class="text-xs text-slate-300 mt-1 max-w-md">Valid for 1 special wish of Vanshika's choosing. Anything you wish for in our relationship, Rakesh is pledged to make happen!</p>
+                </div>
+              </div>
+              <div class="self-end sm:self-center shrink-0">
+                <button id="btn-redeem-coupon-masterwish" onclick="redeemCoupon('coupon-masterwish')" class="px-4 py-2 rounded-full bg-gradient-to-r from-amber-300 to-rose-500 text-slate-950 font-black text-xs uppercase tracking-wider shadow hover:scale-105 transition-all">
+                  Redeem 🎟️
+                </button>
+                <div id="status-redeem-coupon-masterwish" class="hidden"></div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- PANE 4: 30-DAY LOVE STATS -->
+        <div id="anniv-pane-stats" class="hidden space-y-4">
+          <div class="text-center mb-2">
+            <span class="text-xs font-bold text-amber-300 uppercase tracking-wider">Milestone Breakdown (17 Sept - 17 Oct)</span>
+            <p class="text-xs text-slate-300">Our numbers of devotion over the first 30 days together</p>
+          </div>
+
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div class="bg-slate-950/70 p-4 rounded-xl border border-amber-400/30 text-center shadow-inner">
+              <div class="font-cinzel text-2xl md:text-3xl font-bold text-amber-300 glow-gold">30</div>
+              <div class="text-[10px] text-slate-400 font-bold uppercase mt-1">Days Together</div>
+            </div>
+            <div class="bg-slate-950/70 p-4 rounded-xl border border-rose-500/30 text-center shadow-inner">
+              <div class="font-cinzel text-2xl md:text-3xl font-bold text-rose-400">720</div>
+              <div class="text-[10px] text-slate-400 font-bold uppercase mt-1">Hours Of Love</div>
+            </div>
+            <div class="bg-slate-950/70 p-4 rounded-xl border border-amber-400/30 text-center shadow-inner">
+              <div class="font-cinzel text-2xl md:text-3xl font-bold text-amber-300 glow-gold">43,200</div>
+              <div class="text-[10px] text-slate-400 font-bold uppercase mt-1">Minutes Cherished</div>
+            </div>
+            <div class="bg-slate-950/70 p-4 rounded-xl border border-rose-500/30 text-center shadow-inner">
+              <div class="font-cinzel text-2xl md:text-3xl font-bold text-rose-400">2.59M+</div>
+              <div class="text-[10px] text-slate-400 font-bold uppercase mt-1">Heartbeat Seconds</div>
+            </div>
+          </div>
+
+          <!-- Relationship Progress Meter -->
+          <div class="p-4 rounded-2xl bg-slate-950/60 border border-amber-400/30 space-y-3">
+            <div class="flex justify-between text-xs font-bold">
+              <span class="text-amber-300">Month 1 Milestone Status</span>
+              <span class="text-emerald-400">100% Completed ✅</span>
+            </div>
+            <div class="w-full h-3 rounded-full bg-slate-800 overflow-hidden p-0.5">
+              <div class="h-full rounded-full bg-gradient-to-r from-amber-400 via-rose-500 to-purple-500 w-full animate-pulse"></div>
+            </div>
+            <div class="flex justify-between text-[10px] text-slate-400 font-medium">
+              <span>Sept 17: Proposal Accepted 💍</span>
+              <span>Oct 17: 1st Month Milestone 🥂</span>
+              <span>Eternity: To Go ♾️</span>
+            </div>
+          </div>
+
+          <div class="p-4 rounded-xl bg-rose-950/30 border border-rose-500/30 text-center text-xs text-rose-200">
+            💖 "Distance or time doesn't matter — having you in my life is the greatest win of my existence."
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="pt-4 mt-3 border-t border-slate-800 flex justify-center gap-3">
+        <button onclick="closeAnniversaryModal()" class="btn-rose px-8 py-3 rounded-full text-xs font-bold uppercase tracking-wider shadow-lg shadow-rose-500/40">
           Close & Celebrate 🥂
         </button>
       </div>
