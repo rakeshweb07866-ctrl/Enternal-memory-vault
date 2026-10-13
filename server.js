@@ -127,7 +127,17 @@ function saveMessage(msgObj) {
   if (existingIdx !== -1) {
     list[existingIdx] = { ...list[existingIdx], ...msgObj };
   } else {
-    list.push(msgObj);
+    // Check for twin duplicate by sender, message, and time within 4s
+    const msgTime = new Date(msgObj.timestamp || 0).getTime();
+    const dupeIdx = list.findIndex(m => {
+      const prevTime = new Date(m.timestamp || 0).getTime();
+      return m.sender === msgObj.sender && m.message === msgObj.message && Math.abs(prevTime - msgTime) < 4000;
+    });
+    if (dupeIdx !== -1) {
+      list[dupeIdx] = { ...list[dupeIdx], ...msgObj };
+    } else {
+      list.push(msgObj);
+    }
   }
   if (list.length > 500) {
     list = list.slice(list.length - 500);
@@ -189,12 +199,14 @@ if (io) {
 
       const now = new Date();
       const newMsg = {
-        id: 'msg_' + Date.now(),
+        id: data.id || ('msg_' + Date.now()),
         sender: sender,
         message: message.trim(),
-        timestamp: now.toISOString(),
-        formattedTime: getISTTimeString(),
-        formattedDate: getISTDateString()
+        timestamp: data.timestamp || now.toISOString(),
+        formattedTime: data.formattedTime || getISTTimeString(),
+        formattedDate: data.formattedDate || getISTDateString(),
+        status: data.status || 'sent',
+        replyTo: data.replyTo || null
       };
 
       saveMessage(newMsg);
@@ -274,7 +286,8 @@ app.post('/api/messages', (req, res) => {
       timestamp: req.body.timestamp || now.toISOString(),
       formattedTime: req.body.formattedTime || getISTTimeString(),
       formattedDate: req.body.formattedDate || getISTDateString(),
-      status: req.body.status || 'sent'
+      status: req.body.status || 'sent',
+      replyTo: req.body.replyTo || null
     };
 
     saveMessage(newMsg);
