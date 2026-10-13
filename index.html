@@ -387,22 +387,55 @@
       transition: width 1.5s ease-in-out;
     }
 
-    /* Animated Road & Car Track */
-    @keyframes driveRoad {
-      0% {
-        left: 10%;
-        transform: translateY(0) scale(0.95);
+    /* 3D Realistic Heartbeat Glow & Ripple Animations */
+    @keyframes heartbeatPulse {
+      0%, 100% {
+        transform: scale(1);
+        filter: drop-shadow(0 0 15px rgba(255, 59, 119, 0.6)) drop-shadow(0 0 35px rgba(255, 59, 119, 0.3));
       }
-      50% {
-        transform: translateY(-3px) scale(1.08);
+      14% {
+        transform: scale(1.15);
+        filter: drop-shadow(0 0 30px rgba(255, 59, 119, 0.9)) drop-shadow(0 0 50px rgba(255, 215, 0, 0.6));
       }
-      100% {
-        left: 80%;
-        transform: translateY(0) scale(0.95);
+      28% {
+        transform: scale(1.02);
+      }
+      42% {
+        transform: scale(1.22);
+        filter: drop-shadow(0 0 45px rgba(255, 59, 119, 1)) drop-shadow(0 0 65px rgba(255, 215, 0, 0.8));
+      }
+      70% {
+        transform: scale(1);
       }
     }
-    .animate-drive-road {
-      animation: driveRoad 6s infinite ease-in-out alternate;
+
+    .animate-heartbeat-glow {
+      animation: heartbeatPulse 1.6s ease-in-out infinite;
+    }
+
+    @keyframes auraRingRipple {
+      0% {
+        transform: scale(0.85);
+        opacity: 0.9;
+      }
+      100% {
+        transform: scale(2.4);
+        opacity: 0;
+      }
+    }
+
+    .aura-ring {
+      position: absolute;
+      inset: -15px;
+      border-radius: 50%;
+      border: 2px solid rgba(255, 59, 119, 0.7);
+      animation: auraRingRipple 2.2s cubic-bezier(0.1, 0.8, 0.3, 1) infinite;
+      pointer-events: none;
+    }
+
+    .aura-ring-delayed {
+      animation-delay: 1.1s;
+      border-color: rgba(255, 215, 0, 0.6);
     }
   </style>
   <script src="/socket.io/socket.io.js" onerror="window.socketIoFailed=true"></script>
@@ -492,40 +525,6 @@
       </div>
     </nav>
 
-    <!-- SAFE JOURNEY TO ANANTAPUR FLOATING BANNER (OCT 12 SPECIAL) -->
-    <div id="anantapur-journey-banner" class="mb-8 p-3.5 sm:p-4 rounded-2xl bg-gradient-to-r from-rose-950/90 via-purple-950/90 to-amber-950/90 border border-rose-400/50 shadow-2xl flex flex-wrap items-center justify-between gap-3 px-4 sm:px-5 text-center sm:text-left">
-      <div class="flex items-center gap-3.5 mx-auto sm:mx-0">
-        <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-rose-500/20 border border-rose-400/40 flex items-center justify-center text-2xl shadow-inner shrink-0 animate-bounce">
-          🚗
-        </div>
-        <div>
-          <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-rose-500/25 border border-rose-400/50 text-[10px] uppercase font-bold tracking-widest text-rose-300 mb-0.5">
-            🛣️ Special Blessing • Oct 12 Journey
-          </div>
-          <h3 class="font-cinzel text-sm sm:text-base font-bold text-amber-200">
-            Safe Journey to Anantapur, Naa Bangaram! ❤️
-          </h3>
-          <p class="text-xs text-rose-200/90 max-w-xl">
-            We can't meet today, but my whole heart is traveling right by your side. Jagratha ga vellu pandu! ✨
-          </p>
-        </div>
-      </div>
-      <div class="flex items-center gap-2 mx-auto sm:mx-0 flex-wrap justify-center">
-        <button onclick="playAnantapurCinematicAnimation()" class="px-4 py-2 rounded-full bg-gradient-to-r from-purple-600 via-rose-500 to-amber-500 text-white text-xs font-black uppercase tracking-wider shadow-lg shadow-purple-500/40 hover:scale-105 transition-all flex items-center gap-1.5 animate-pulse">
-          <span>🎬</span> Journey Animation
-        </button>
-        <button onclick="openAnantapurLetterModal()" class="px-4 py-2 rounded-full bg-gradient-to-r from-rose-600 via-pink-600 to-amber-500 text-white text-xs font-bold tracking-wide shadow-lg shadow-rose-600/40 hover:scale-105 transition-all flex items-center gap-1.5">
-          <span>💌</span> Read Travel Letter
-        </button>
-        <button onclick="triggerQuickVirtualCare('hug')" class="px-3.5 py-2 rounded-full bg-slate-900/90 border border-rose-400/50 text-xs font-bold text-rose-300 hover:text-white hover:bg-rose-500/30 transition-all flex items-center gap-1 shadow-md">
-          <span>🤗</span> Send Hug
-        </button>
-        <button onclick="triggerQuickVirtualCare('kiss')" class="px-3.5 py-2 rounded-full bg-slate-900/90 border border-amber-400/50 text-xs font-bold text-amber-300 hover:text-white hover:bg-amber-500/30 transition-all flex items-center gap-1 shadow-md">
-          <span>💋</span> Forehead Kiss
-        </button>
-      </div>
-    </div>
-
     <!-- ROYAL PRINCESS 1ST MONTH ANNIVERSARY FLOATING BANNER -->
     <div id="princess-royal-banner" class="mb-8 p-3.5 rounded-2xl bg-gradient-to-r from-rose-950/85 via-purple-950/90 to-amber-950/85 border border-amber-400/50 shadow-xl hidden flex-wrap items-center justify-between gap-3 px-5 text-center sm:text-left">
       <div class="flex items-center gap-3">
@@ -586,104 +585,52 @@
       </div>
     </section>
 
-    <!-- SPECIAL ANANTAPUR JOURNEY & MISSING YOU TODAY SECTION (OCT 12) -->
-    <section id="anantapur-journey-section" class="my-10 glass-box p-6 sm:p-10 text-center max-w-4xl mx-auto border-rose-500/40 relative overflow-hidden shadow-2xl">
+    <!-- SACRED HEARTBEAT & WHO IS IN MY HEART SPECIAL SECTION (OCT 13) -->
+    <section id="soul-heartbeat-section" class="my-10 glass-box p-6 sm:p-10 text-center max-w-3xl mx-auto border-rose-500/40 relative overflow-hidden shadow-2xl">
       <div class="absolute -top-12 -left-12 w-48 h-48 bg-rose-600/15 rounded-full blur-3xl pointer-events-none"></div>
       <div class="absolute -bottom-12 -right-12 w-48 h-48 bg-amber-500/15 rounded-full blur-3xl pointer-events-none"></div>
 
-      <!-- Badge -->
+      <!-- Golden Badge -->
       <div class="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-gradient-to-r from-rose-500/20 via-purple-500/20 to-amber-500/20 border border-rose-400/50 text-rose-300 text-xs sm:text-sm font-bold uppercase tracking-wider mb-4 shadow-md">
-        <span>🚗 Safe Travel Blessing • Anantapur Trip • Oct 12 ❤️</span>
+        <span>✨ A Sacred Secret From Rakesh's Soul ✨</span>
       </div>
 
-      <h2 class="font-cinzel text-2xl sm:text-4xl md:text-5xl text-gradient-rose font-black mt-1 mb-2">
-        Missing You Every Second Today, My Queen ❤️
+      <h2 class="font-cinzel text-2xl sm:text-4xl text-gradient-rose font-black mt-1 mb-2">
+        Do You Want To See Who Lives Inside My Heart? ❤️
       </h2>
-      <p class="font-sacramento text-2xl sm:text-4xl text-amber-300 mb-4 glow-gold">
-        "Distance Means Nothing When Someone Means Everything"
+      <p class="font-sacramento text-2xl sm:text-4xl text-amber-300 mb-6 glow-gold">
+        "One Heart. One Soul. One Princess Forever."
       </p>
 
-      <p class="text-slate-300 text-xs sm:text-sm max-w-2xl mx-auto mb-6 font-light leading-relaxed">
-        Today you are traveling to Anantapur, and we won't get to meet face-to-face until you return tonight. While my eyes miss your sweet smile, my soul is holding your hand every meter of the road. <span class="text-amber-300 font-medium">Jagratha ga velli ra, Naa Bangaram!</span>
-      </p>
-
-      <!-- ANIMATED HIGHWAY & GPS HEART TRACK -->
-      <div class="relative w-full h-16 sm:h-20 bg-slate-950/80 rounded-2xl border border-rose-500/30 overflow-hidden mb-8 flex items-center shadow-inner">
-        <!-- Glowing Road Line -->
-        <div class="absolute inset-x-0 h-1 bg-gradient-to-r from-rose-500 via-amber-400 to-purple-500 opacity-80"></div>
-        <!-- Dashed Lane Striping -->
-        <div class="absolute inset-x-0 h-0.5 border-t border-dashed border-amber-300/40"></div>
+      <!-- Interactive Pulsing 3D Heart Visual -->
+      <div class="my-6 relative inline-block cursor-pointer group" onclick="openSoulHeartbeatModal()">
+        <div class="aura-ring"></div>
+        <div class="aura-ring aura-ring-delayed"></div>
         
-        <!-- From Point -->
-        <div class="absolute left-2 sm:left-5 flex items-center gap-1.5 z-10 bg-slate-900/95 px-3 py-1.5 rounded-full border border-rose-500/40 text-[10px] sm:text-xs font-bold text-rose-300 shadow">
-          <span>❤️</span> <span>Rakesh (Waiting Tonight)</span>
+        <div class="w-32 h-32 sm:w-40 sm:h-40 rounded-full bg-gradient-to-tr from-rose-700 via-rose-500 to-amber-400 flex items-center justify-center text-6xl sm:text-7xl shadow-[0_0_50px_rgba(255,59,119,0.7)] mx-auto animate-heartbeat-glow group-hover:scale-110 transition-transform duration-300">
+          💖
         </div>
-
-        <!-- Animated Moving Car with Hearts -->
-        <div class="absolute z-20 flex items-center animate-drive-road">
-          <span class="text-2xl sm:text-3xl animate-bounce">🚗</span>
-          <span class="text-sm -ml-1 animate-ping text-rose-400">💖</span>
-          <span class="text-xs -ml-0.5 text-amber-300">✨</span>
-        </div>
-
-        <!-- Destination Point -->
-        <div class="absolute right-2 sm:right-5 flex items-center gap-1.5 z-10 bg-slate-900/95 px-3 py-1.5 rounded-full border border-amber-400/40 text-[10px] sm:text-xs font-bold text-amber-300 shadow">
-          <span>👸</span> <span>Anantapur (Princess Vanshika)</span>
-        </div>
+        <span class="absolute -top-2 -right-2 text-3xl animate-ping" style="animation-duration: 2.5s;">✨</span>
+        <span class="absolute -bottom-2 -left-2 text-2xl animate-spin" style="animation-duration: 4s;">💫</span>
       </div>
 
-      <!-- 4 TRAVEL CARE REMINDER TILES -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 mb-8 text-left">
-        <div class="p-4 rounded-2xl bg-slate-950/80 border border-rose-500/30 hover:border-rose-400/60 transition-all shadow-md">
-          <div class="text-2xl mb-2">💧</div>
-          <h4 class="font-cinzel text-xs font-bold text-rose-300 uppercase">1. Stay Hydrated</h4>
-          <p class="text-[11px] text-slate-300 mt-1 leading-snug">Drink water regularly throughout your trip. Please take good care of your health today!</p>
-        </div>
+      <p class="text-slate-300 text-xs sm:text-sm max-w-md mx-auto mb-6 font-light leading-relaxed">
+        Ever wondered who makes my heart beat faster, who brings peace to my soul, and who owns every breath I take?
+      </p>
 
-        <div class="p-4 rounded-2xl bg-slate-950/80 border border-amber-400/30 hover:border-amber-400/60 transition-all shadow-md">
-          <div class="text-2xl mb-2">🍱</div>
-          <h4 class="font-cinzel text-xs font-bold text-amber-300 uppercase">2. Don't Skip Food</h4>
-          <p class="text-[11px] text-slate-300 mt-1 leading-snug">Have your lunch on time. My princess must never stay hungry or tired.</p>
-        </div>
-
-        <div class="p-4 rounded-2xl bg-slate-950/80 border border-purple-400/30 hover:border-purple-400/60 transition-all shadow-md">
-          <div class="text-2xl mb-2">😴</div>
-          <h4 class="font-cinzel text-xs font-bold text-purple-300 uppercase">3. Rest When Tired</h4>
-          <p class="text-[11px] text-slate-300 mt-1 leading-snug">If the road gets exhausting, lean back, play our song, and remember I am loving you.</p>
-        </div>
-
-        <div class="p-4 rounded-2xl bg-slate-950/80 border border-pink-400/30 hover:border-pink-400/60 transition-all shadow-md">
-          <div class="text-2xl mb-2">🌙</div>
-          <h4 class="font-cinzel text-xs font-bold text-pink-300 uppercase">4. Waiting For Tonight</h4>
-          <p class="text-[11px] text-slate-300 mt-1 leading-snug">Counting every minute till tonight when you reach safely and message me.</p>
-        </div>
-      </div>
-
-      <!-- Quick Action Buttons -->
+      <!-- Action Button -->
       <div class="flex flex-wrap justify-center items-center gap-3">
-        <button onclick="playAnantapurCinematicAnimation()" class="px-6 py-3.5 rounded-full bg-gradient-to-r from-purple-600 via-rose-500 to-amber-500 text-white text-xs sm:text-sm font-black uppercase tracking-wider shadow-lg shadow-purple-500/40 hover:scale-105 transition-all flex items-center gap-2 animate-pulse">
-          <span>🎬</span> Watch Journey Animation
-        </button>
-        <button onclick="openAnantapurLetterModal()" class="btn-rose px-6 py-3.5 rounded-full text-xs sm:text-sm font-bold uppercase tracking-wider shadow-lg shadow-rose-600/40 hover:scale-105 transition-all flex items-center gap-2">
-          <span>💌</span> Read Full Travel Letter For You
-        </button>
-        <button onclick="triggerQuickVirtualCare('hug')" class="px-5 py-3.5 rounded-full bg-slate-900 border border-rose-400/50 text-xs sm:text-sm font-bold text-rose-300 hover:text-white hover:bg-rose-500/30 transition-all flex items-center gap-2 shadow-md">
-          <span>🤗</span> Send Virtual Hug
-        </button>
-        <button onclick="triggerQuickVirtualCare('kiss')" class="px-5 py-3.5 rounded-full bg-slate-900 border border-amber-400/50 text-xs sm:text-sm font-bold text-amber-300 hover:text-white hover:bg-amber-500/30 transition-all flex items-center gap-2 shadow-md">
-          <span>💋</span> Safe Journey Kiss
-        </button>
-        <button onclick="toggleRomanticMusic()" class="px-5 py-3.5 rounded-full bg-slate-900 border border-purple-400/50 text-xs sm:text-sm font-bold text-purple-300 hover:text-white hover:bg-purple-500/30 transition-all flex items-center gap-2 shadow-md">
-          <span>🎵</span> Calming Travel Music
+        <button onclick="openSoulHeartbeatModal()" class="btn-rose px-8 py-4 rounded-full text-xs sm:text-sm font-black uppercase tracking-widest shadow-[0_0_35px_rgba(255,59,119,0.7)] hover:scale-105 transition-all flex items-center gap-2">
+          <span>💖 Touch My Heart To Reveal 👑</span>
         </button>
       </div>
 
       <!-- Telugu cultural quote -->
-      <p class="text-[11px] sm:text-xs text-amber-300/80 mt-6 font-mono italic">
-        "జాగ్రత్తగా వెళ్ళు నా బంగారం... నేను ఎప్పుడూ నీతోనే ఉన్నాను (Jagratha ga vellu Naa Bangaram... Nenu eppudu neethone unnanu)"
+      <p class="text-[11px] sm:text-xs text-amber-300/80 mt-5 font-mono italic">
+        "నా గుండె చప్పుడు నువ్వే... నువ్వు నా ప్రాణం (Naa gunde chappudu nuvve... Nuvvu Naa Pranam)"
       </p>
     </section>
-    
+
     <!-- 1ST MONTH ANNIVERSARY MILESTONE & SURPRISE SECTION -->
     <section id="anniversary-section" class="my-12 glass-box p-8 md:p-12 text-center max-w-4xl mx-auto border-amber-400/40 relative overflow-hidden shadow-2xl">
       <div class="absolute -top-10 -left-10 w-40 h-40 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
@@ -1322,9 +1269,6 @@
           // Trigger Grand Cinematic Anniversary Animation upon Login
           if (isAnniversaryActive()) {
             setTimeout(playGrandCinematicAnniversaryAnimation, 400);
-          } else if (name.toLowerCase().includes('vanshika')) {
-            // Special Anantapur Journey Cinematic Animation for Vanshika (Oct 12)
-            setTimeout(playAnantapurCinematicAnimation, 500);
           }
         } else {
           if (errEl) {
@@ -1342,8 +1286,6 @@
         initSocketConnection();
         if (isAnniversaryActive()) {
           setTimeout(playGrandCinematicAnniversaryAnimation, 400);
-        } else if (name.toLowerCase().includes('vanshika')) {
-          setTimeout(playAnantapurCinematicAnimation, 500);
         }
       }
     }
@@ -1982,9 +1924,22 @@
       }
     }
 
-    // SPECIAL ANANTAPUR JOURNEY SYSTEM (OCT 12)
-    function openAnantapurLetterModal() {
-      const modal = document.getElementById('anantapur-travel-modal');
+    // SACRED HEARTBEAT REVELATION SYSTEM (OCT 13)
+    function openSoulHeartbeatModal() {
+      const modal = document.getElementById('soul-heartbeat-modal');
+      const imgEl = document.getElementById('soul-heartbeat-img');
+
+      if (imgEl) {
+        try {
+          const savedData = JSON.parse(localStorage.getItem('vanshika_gallery_data') || '{}');
+          if (savedData['card-queen'] && savedData['card-queen'].photo) {
+            imgEl.src = savedData['card-queen'].photo;
+          } else if (savedData['card-eyes'] && savedData['card-eyes'].photo) {
+            imgEl.src = savedData['card-eyes'].photo;
+          }
+        } catch (e) {}
+      }
+
       if (modal) {
         modal.classList.remove('hidden');
         modal.classList.add('flex');
@@ -2004,223 +1959,54 @@
       }
     }
 
-    function closeAnantapurLetterModal() {
-      const modal = document.getElementById('anantapur-travel-modal');
+    function closeSoulHeartbeatModal() {
+      const modal = document.getElementById('soul-heartbeat-modal');
       if (modal) {
         modal.classList.add('hidden');
         modal.classList.remove('flex');
       }
     }
 
-    let virtualCareToastTimeout = null;
-    function triggerQuickVirtualCare(type) {
-      const toast = document.getElementById('virtual-care-toast');
-      const textEl = document.getElementById('virtual-care-toast-text');
-      const iconEl = document.getElementById('virtual-care-toast-icon');
-
-      if (!toast || !textEl || !iconEl) return;
-
-      if (type === 'hug') {
-        iconEl.innerText = '🤗';
-        textEl.innerHTML = '<strong class="text-rose-400 font-cinzel text-xs sm:text-sm">Warm Tight Hug Delivered!</strong><br/><span class="text-slate-200">ME wrapping my arms around you right now. Feel relaxed, comfortable and safe on your way to Anantapur Naa Bangaram I LOVE YOU ALWAYS MY LADY PRINCESS 💕</span>';
-      } else if (type === 'kiss') {
-        iconEl.innerText = '💋';
-        textEl.innerHTML = '<strong class="text-amber-300 font-cinzel text-xs sm:text-sm">Forehead Safe Journey Kiss!</strong><br/><span class="text-slate-200">A gentle, protective kiss from ME YOUR KUCHUPUCHUU to protect my princess throughout her travel today. Jagratha ga vellu pandu! 🌸✨</span>';
-      }
-
-      toast.classList.remove('hidden');
-      toast.classList.add('flex');
+    let pulseToastTimeout = null;
+    async function sendHeartbeatPulseToRakesh() {
       triggerAnniversaryConfetti();
 
-      if (virtualCareToastTimeout) clearTimeout(virtualCareToastTimeout);
-      virtualCareToastTimeout = setTimeout(() => {
-        closeVirtualCareToast();
-      }, 5500);
-    }
-
-    function closeVirtualCareToast() {
-      const toast = document.getElementById('virtual-care-toast');
+      // Show toast notification
+      const toast = document.getElementById('heartbeat-pulse-toast');
       if (toast) {
-        toast.classList.add('hidden');
-        toast.classList.remove('flex');
-      }
-    }
-
-    // ANANTAPUR FULLSCREEN CINEMATIC ANIMATION ENGINE
-    let anantapurCanvas = null;
-    let anantapurCtx = null;
-    let anantapurAnimFrame = null;
-    let anantapurActive = false;
-    let journeyStars = [];
-    let journeyHearts = [];
-    let journeyShootingStars = [];
-
-    class JourneyStar {
-      constructor(w, h) {
-        this.x = Math.random() * w;
-        this.y = Math.random() * h;
-        this.size = Math.random() * 2 + 0.8;
-        this.alpha = Math.random() * 0.7 + 0.3;
-        this.pulseSpeed = Math.random() * 0.03 + 0.01;
-      }
-      update() {
-        this.alpha += Math.sin(Date.now() * this.pulseSpeed * 0.05) * 0.01;
-        this.alpha = Math.max(0.2, Math.min(1, this.alpha));
-      }
-      draw(ctx) {
-        ctx.save();
-        ctx.globalAlpha = this.alpha;
-        ctx.fillStyle = '#ffd700';
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.restore();
-      }
-    }
-
-    class JourneyFloatingHeart {
-      constructor(w, h) {
-        this.x = Math.random() * w;
-        this.y = h + Math.random() * 50;
-        this.size = Math.random() * 16 + 14;
-        this.vy = Math.random() * 1.5 + 1;
-        this.vx = (Math.random() - 0.5) * 1.2;
-        this.alpha = Math.random() * 0.6 + 0.4;
-        this.symbol = ['💖', '🚗', '✨', '🌸', '💕'][Math.floor(Math.random() * 5)];
-      }
-      update() {
-        this.y -= this.vy;
-        this.x += this.vx;
-        this.alpha -= 0.003;
-        return this.y <= -30 || this.alpha <= 0;
-      }
-      draw(ctx) {
-        ctx.save();
-        ctx.globalAlpha = Math.max(0, this.alpha);
-        ctx.font = `${this.size}px serif`;
-        ctx.fillText(this.symbol, this.x, this.y);
-        ctx.restore();
-      }
-    }
-
-    class JourneyShootingStar {
-      constructor(w, h) {
-        this.x = Math.random() * w * 0.8;
-        this.y = Math.random() * (h * 0.4);
-        this.len = Math.random() * 80 + 40;
-        this.speed = Math.random() * 8 + 8;
-        this.alpha = 1;
-      }
-      update() {
-        this.x += this.speed;
-        this.y += this.speed * 0.5;
-        this.alpha -= 0.025;
-        return this.alpha <= 0;
-      }
-      draw(ctx) {
-        ctx.save();
-        ctx.globalAlpha = Math.max(0, this.alpha);
-        ctx.strokeStyle = '#ffd700';
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.moveTo(this.x, this.y);
-        ctx.lineTo(this.x - this.len, this.y - this.len * 0.5);
-        ctx.stroke();
-        ctx.restore();
-      }
-    }
-
-    function initAnantapurCanvas() {
-      anantapurCanvas = document.getElementById('anantapur-journey-canvas');
-      if (!anantapurCanvas) return;
-      anantapurCtx = anantapurCanvas.getContext('2d');
-      const w = anantapurCanvas.width = window.innerWidth;
-      const h = anantapurCanvas.height = window.innerHeight;
-
-      journeyStars = [];
-      journeyHearts = [];
-      journeyShootingStars = [];
-
-      for (let i = 0; i < 70; i++) {
-        journeyStars.push(new JourneyStar(w, h));
-      }
-    }
-
-    function loopAnantapurAnimation() {
-      if (!anantapurActive || !anantapurCtx) return;
-      const w = anantapurCanvas.width;
-      const h = anantapurCanvas.height;
-
-      anantapurCtx.clearRect(0, 0, w, h);
-
-      journeyStars.forEach(s => { s.update(); s.draw(anantapurCtx); });
-
-      if (Math.random() < 0.12) {
-        journeyHearts.push(new JourneyFloatingHeart(w, h));
-      }
-      for (let i = journeyHearts.length - 1; i >= 0; i--) {
-        if (journeyHearts[i].update()) {
-          journeyHearts.splice(i, 1);
-        } else {
-          journeyHearts[i].draw(anantapurCtx);
-        }
+        toast.classList.remove('hidden');
+        toast.classList.add('flex');
+        if (pulseToastTimeout) clearTimeout(pulseToastTimeout);
+        pulseToastTimeout = setTimeout(closeHeartbeatPulseToast, 5000);
       }
 
-      if (Math.random() < 0.025) {
-        journeyShootingStars.push(new JourneyShootingStar(w, h));
-      }
-      for (let i = journeyShootingStars.length - 1; i >= 0; i--) {
-        if (journeyShootingStars[i].update()) {
-          journeyShootingStars.splice(i, 1);
-        } else {
-          journeyShootingStars[i].draw(anantapurCtx);
-        }
-      }
-
-      anantapurAnimFrame = requestAnimationFrame(loopAnantapurAnimation);
-    }
-
-    function playAnantapurCinematicAnimation() {
-      const screen = document.getElementById('anantapur-cinematic-screen');
-      if (!screen) return;
-
-      screen.classList.remove('hidden');
-      screen.classList.add('flex');
-      anantapurActive = true;
-
-      initAnantapurCanvas();
-      if (anantapurAnimFrame) cancelAnimationFrame(anantapurAnimFrame);
-      loopAnantapurAnimation();
-
-      triggerAnniversaryConfetti();
-
+      // Send live message to chat
+      const sender = currentChatSender || 'Vanshika 👸';
+      const text = '💓 Vanshika just connected with Rakesh\'s heartbeat! "My heart beats only for you, Rakesh ❤️"';
+      
       try {
-        const audio = document.getElementById('bg-music-player');
-        if (audio && audio.paused) {
-          audio.play().then(() => {
-            isPlayingMusic = true;
-            const btn = document.getElementById('music-toggle-btn');
-            const status = document.getElementById('music-status');
-            if (btn) btn.innerText = '⏸️';
-            if (status) status.innerText = 'Playing Romantic Melody...';
-          }).catch(() => {});
+        if (socket && socket.connected) {
+          socket.emit('chat_message', {
+            sender: sender,
+            pin: currentChatPin || '1709',
+            text: text
+          });
+        } else {
+          await fetch('/api/messages', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ sender: sender, pin: currentChatPin || '1709', text: text })
+          });
         }
       } catch (e) {}
     }
 
-    function dismissAnantapurCinematicScreen() {
-      const screen = document.getElementById('anantapur-cinematic-screen');
-      if (screen) {
-        screen.classList.add('hidden');
-        screen.classList.remove('flex');
+    function closeHeartbeatPulseToast() {
+      const toast = document.getElementById('heartbeat-pulse-toast');
+      if (toast) {
+        toast.classList.add('hidden');
+        toast.classList.remove('flex');
       }
-      anantapurActive = false;
-      if (anantapurAnimFrame) cancelAnimationFrame(anantapurAnimFrame);
-    }
-
-    function enterLetterFromCinematic() {
-      dismissAnantapurCinematicScreen();
-      setTimeout(openAnantapurLetterModal, 300);
     }
 
     // ROYAL PRINCESS LOGIN WELCOME & REVELATION SYSTEM
@@ -2767,77 +2553,6 @@
     });
   </script>
 
-  <!-- FULLSCREEN GRAND CINEMATIC ANANTAPUR JOURNEY ANIMATION OVERLAY -->
-  <div id="anantapur-cinematic-screen" class="fixed inset-0 z-[100] bg-slate-950/95 backdrop-blur-xl hidden flex-col items-center justify-center p-4 overflow-hidden select-none">
-    
-    <!-- Canvas for Stars, Highway GPS Route, and Floating Hearts -->
-    <canvas id="anantapur-journey-canvas" class="absolute inset-0 pointer-events-none z-0"></canvas>
-
-    <!-- Close / Skip Button at Top Right -->
-    <button onclick="dismissAnantapurCinematicScreen()" class="absolute top-5 right-5 z-20 px-4 py-2 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-xs font-bold text-slate-300 hover:text-white transition-all flex items-center gap-1.5 backdrop-blur-md">
-      <span>✕</span> <span>Close</span>
-    </button>
-
-    <!-- Center Cinematic Container -->
-    <div class="relative z-10 text-center max-w-2xl w-full px-6 py-6 flex flex-col items-center animate-scale-up">
-      
-      <!-- Animated Car with Pulsing Heart Halo -->
-      <div class="relative mb-5">
-        <div class="w-24 h-24 sm:w-32 sm:h-32 rounded-3xl bg-gradient-to-tr from-rose-600 via-purple-600 to-amber-500 flex items-center justify-center text-5xl sm:text-6xl shadow-[0_0_80px_rgba(255,59,119,0.8)] mx-auto animate-bounce">
-          🚗
-        </div>
-        <span class="absolute -top-3 -right-3 text-3xl animate-ping" style="animation-duration: 2s;">💖</span>
-        <span class="absolute -bottom-2 -left-2 text-2xl animate-spin" style="animation-duration: 4s;">✨</span>
-      </div>
-
-      <!-- Route Indicator Badge -->
-      <div class="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-gradient-to-r from-rose-500/25 via-purple-500/25 to-amber-500/25 border border-rose-400/60 text-amber-300 text-xs sm:text-sm font-black uppercase tracking-[0.2em] mb-3 shadow-lg backdrop-blur-md animate-pulse">
-        <span>📍 MY Heart ❤️ ➔ ➔ Anantapur (MY LADY PRINCESS Vanshika 👸)</span>
-      </div>
-
-      <!-- Main Glowing Title -->
-      <h1 class="font-cinzel text-2xl sm:text-4xl md:text-5xl text-gradient-rose font-black mb-2 tracking-tight leading-tight glow-rose">
-        SAFE JOURNEY TO ANANTAPUR,<br/>
-        <span class="text-gradient-gold glow-gold">NAA BANGARAM!</span> ❤️
-      </h1>
-
-      <!-- Date Milestone Banner -->
-      <div class="flex items-center justify-center gap-3 text-xs sm:text-sm font-cinzel font-bold text-rose-200/90 my-2 bg-slate-900/80 px-6 py-2 rounded-full border border-rose-400/40 shadow-inner">
-        <span>🚗 Journey Date: October 12, 2026</span>
-        <span class="text-amber-400">•</span>
-        <span class="text-amber-300">Until Tonight When You're Safe Home 🌙</span>
-      </div>
-
-      <!-- Romantic Poetic Subtitle -->
-      <p class="font-sacramento text-2xl sm:text-4xl text-rose-300 text-center my-3 glow-rose max-w-lg leading-relaxed">
-        "My eyes will miss you today... but my entire heart is traveling right by your side."
-      </p>
-
-      <p class="text-slate-300 text-xs sm:text-sm max-w-md mx-auto mb-6 leading-relaxed font-light">
-        No matter how many kilometers lie on this road today, remember that you are never alone. Eat well, stay hydrated, and know that Rakesh is counting every single minute until you return.
-      </p>
-
-      <!-- Action Buttons -->
-      <div class="flex flex-wrap justify-center items-center gap-3">
-        <button onclick="enterLetterFromCinematic()" class="btn-rose px-6 py-3.5 rounded-full text-xs sm:text-sm font-black uppercase tracking-wider shadow-[0_0_35px_rgba(255,59,119,0.7)] hover:scale-105 transition-all flex items-center gap-2">
-          <span>💌</span> Read Travel Letter & Care Pack
-        </button>
-        <button onclick="triggerQuickVirtualCare('hug')" class="px-5 py-3.5 rounded-full bg-slate-900/90 border border-rose-400/60 text-xs sm:text-sm font-bold text-rose-300 hover:text-white hover:bg-rose-500/30 transition-all flex items-center gap-1.5 shadow-md">
-          <span>🤗</span> Send Hug
-        </button>
-        <button onclick="triggerQuickVirtualCare('kiss')" class="px-5 py-3.5 rounded-full bg-slate-900/90 border border-amber-400/60 text-xs sm:text-sm font-bold text-amber-300 hover:text-white hover:bg-amber-500/30 transition-all flex items-center gap-1.5 shadow-md">
-          <span>💋</span> Forehead Kiss
-        </button>
-      </div>
-
-      <!-- Telugu cultural whisper -->
-      <p class="text-[11px] sm:text-xs text-amber-300/90 mt-5 font-mono italic">
-        "జాగ్రత్తగా వెళ్ళు నా బంగారం... నేను ఎప్పుడూ నీతోనే ఉన్నాను (Jagratha ga vellu Naa Bangaram...)"
-      </p>
-
-    </div>
-  </div>
-
   <!-- FULLSCREEN GRAND CINEMATIC ANNIVERSARY ANIMATION OVERLAY -->
   <div id="anniv-grand-cinematic-screen" class="fixed inset-0 z-[100] bg-slate-950/95 backdrop-blur-xl hidden flex-col items-center justify-center p-4 overflow-hidden select-none">
     
@@ -3361,121 +3076,89 @@
     </div>
   </div>
 
-  <!-- SPECIAL ANANTAPUR JOURNEY LOVE LETTER MODAL (OCT 12) -->
-  <div id="anantapur-travel-modal" class="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-md hidden items-center justify-center p-3 md:p-6">
-    <div class="glass-box p-6 md:p-10 max-w-2xl w-full text-center border-rose-400/60 shadow-2xl relative animate-scale-up max-h-[92vh] overflow-y-auto">
-      <button onclick="closeAnantapurLetterModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-2xl font-bold z-20">
+  <!-- SACRED HEARTBEAT REVELATION MODAL (OCT 13 SPECIAL) -->
+  <div id="soul-heartbeat-modal" class="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-md hidden items-center justify-center p-3 md:p-6">
+    <div class="glass-box p-6 md:p-10 max-w-xl w-full text-center border-rose-400/60 shadow-2xl relative animate-scale-up max-h-[92vh] overflow-y-auto">
+      <button onclick="closeSoulHeartbeatModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-2xl font-bold z-20">
         &times;
       </button>
 
-      <!-- Header -->
-      <div class="text-center mb-5">
-        <div class="w-20 h-20 rounded-full bg-gradient-to-tr from-rose-500 via-purple-600 to-amber-400 flex items-center justify-center text-4xl shadow-xl shadow-rose-500/40 mx-auto mb-3 animate-bounce">
-          🚗
+      <!-- Glowing Crown & Royal Photo Frame of Vanshika -->
+      <div class="relative w-44 h-44 sm:w-52 sm:h-52 mx-auto my-3 group">
+        <div class="absolute -inset-2 bg-gradient-to-r from-amber-400 via-rose-500 to-purple-600 rounded-full blur-lg animate-pulse"></div>
+        <div class="relative w-full h-full rounded-full overflow-hidden border-4 border-amber-300 shadow-2xl bg-slate-900">
+          <img id="soul-heartbeat-img" src="assests/queen.jpeg" onerror="this.src='assests/naa-bangaram.jpeg'" alt="My Lady Princess Vanshika" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
         </div>
-        <div class="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-rose-500/20 border border-rose-400/50 text-rose-300 text-[11px] font-bold uppercase tracking-widest mb-1.5">
-          <span>🛣️ Safe Journey Blessing • October 12, 2026</span>
-        </div>
-        <h2 class="font-cinzel text-xl sm:text-3xl text-gradient-rose font-black leading-snug">
-          To My Lady Princess Vanshika ❤️
-        </h2>
-        <p class="text-xs text-amber-300 font-medium">
-          On Your Way to Anantapur Today — With All My Prayers & Love
-        </p>
-      </div>
-
-      <!-- ANIMATED HIGHWAY & GPS HEART TRACK IN MODAL -->
-      <div class="relative w-full h-14 sm:h-16 bg-slate-950/80 rounded-2xl border border-rose-500/30 overflow-hidden mb-5 flex items-center shadow-inner">
-        <!-- Glowing Road Line -->
-        <div class="absolute inset-x-0 h-1 bg-gradient-to-r from-rose-500 via-amber-400 to-purple-500 opacity-80"></div>
-        <!-- Dashed Lane Striping -->
-        <div class="absolute inset-x-0 h-0.5 border-t border-dashed border-amber-300/40"></div>
-        
-        <!-- From Point -->
-        <div class="absolute left-2 sm:left-4 flex items-center gap-1 z-10 bg-slate-900/95 px-2.5 py-1 rounded-full border border-rose-500/40 text-[9px] sm:text-[10px] font-bold text-rose-300 shadow">
-          <span>❤️</span> <span>Rakesh</span>
-        </div>
-
-        <!-- Animated Moving Car with Hearts -->
-        <div class="absolute z-20 flex items-center animate-drive-road">
-          <span class="text-xl sm:text-2xl animate-bounce">🚗</span>
-          <span class="text-xs -ml-1 animate-ping text-rose-400">💖</span>
-        </div>
-
-        <!-- Destination Point -->
-        <div class="absolute right-2 sm:right-4 flex items-center gap-1 z-10 bg-slate-900/95 px-2.5 py-1 rounded-full border border-amber-400/40 text-[9px] sm:text-[10px] font-bold text-amber-300 shadow">
-          <span>👸</span> <span>Anantapur (Vanshika)</span>
+        <div class="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-gradient-to-r from-amber-400 to-rose-500 text-slate-950 font-black text-[10px] sm:text-[11px] uppercase tracking-wider px-3.5 py-1 rounded-full shadow-lg whitespace-nowrap">
+          👑 The Only Queen Of My Heart
         </div>
       </div>
 
-      <!-- The Letter Body -->
-      <div class="p-5 sm:p-7 rounded-2xl bg-gradient-to-b from-rose-950/50 to-slate-950/80 border border-rose-400/40 text-slate-200 text-sm sm:text-base leading-relaxed text-left space-y-4 shadow-inner">
+      <!-- Subtitle & Headline -->
+      <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-500/20 text-rose-300 text-[11px] font-bold uppercase tracking-widest mt-2 mb-1">
+        <span>💖 Sacred Truth Revealed 💖</span>
+      </div>
+      <h2 class="font-cinzel text-2xl sm:text-3xl text-gradient-rose font-black mb-1">
+        Of Course, It Has Always Been YOU! ❤️
+      </h2>
+      <p class="text-xs text-amber-300 font-bold uppercase tracking-wider mb-3">
+        My Dearest Lady Princess Vanshika (Pandu) 👸
+      </p>
+
+      <!-- Romantic Letter & Confession -->
+      <div class="p-5 sm:p-7 rounded-2xl bg-gradient-to-b from-rose-950/50 to-slate-950/80 border border-rose-400/40 text-slate-200 text-sm sm:text-base leading-relaxed text-left space-y-4 my-2 shadow-inner">
         <p class="font-sacramento text-3xl sm:text-4xl text-amber-300 text-center glow-gold">
-          "My Eyes Will Miss You Today, But My Heart Travels With You."
-        </p>
-        <p class="font-bold text-rose-300">
-          Dearest Vanshika (Naa Pranam, Naa Pandu ❤️),
+          "Before you came, my heart only kept me alive... Now it beats to love you."
         </p>
         <p>
-          Today you are traveling to Anantapur, and because of this journey, we won't get to meet in person today. As you step out on the road, I want you to carry this truth in your heart: even if there are miles between us today, <strong class="text-amber-300 font-semibold">my soul has never left your side for a single heartbeat.</strong>
+          Whenever someone asks what my heart looks like, I only see your gentle face, your mesmerizing eyes, and that sweet smile that makes all my worries vanish in an instant.
         </p>
         <p>
-          Whenever I think of you traveling, my heart immediately sends a silent prayer to God to protect you, keep you comfortable, and guide every turn of the road with absolute safety. Please take great care of yourself today. Don't skip water, have your meals peacefully, and don't exert yourself.
+          You are not just a part of my life, Vanshika — <strong class="text-amber-300 font-semibold">you are the very center of my existence.</strong> Every promise I make, every future dream I imagine, has only your hand resting inside mine.
         </p>
         <p>
-          If the journey ever feels long, boring, or tiring, close your eyes for a moment, take a deep breath, and remember that there is a man here who loves you more than words can ever capture. I am eagerly counting every single hour until you return safely tonight.
+          No matter how big this world is, my heart has only one home, and that home is YOU. I promise to cherish you, love you with endless patience, and keep you smiling every single day of our lives.
         </p>
-        <p class="italic text-amber-200/95 bg-slate-950/70 p-4 rounded-xl border border-amber-400/40 text-center leading-relaxed">
-          "జాగ్రత్తగా వెళ్ళి రా నా బంగారం... నీతో నా ప్రాణం ఉంది (Jagratha ga velli ra Naa Bangaram... Neetho naa pranam undi). Can't wait to see you back safe tonight! ❤️"
+        <p class="italic text-amber-200/95 bg-slate-950/70 p-3.5 rounded-xl border border-amber-400/40 text-center leading-relaxed">
+          "నువ్వు నా ప్రాణం (Naa Pranam)... నా మనసంతా నువ్వే (Naa Manasantha Nuvve)... ఎల్లప్పుడూ నీతోనే (Ellappudu Neethone) ❤️"
         </p>
-        <div class="pt-3 border-t border-rose-500/20 text-right">
+        <div class="pt-2 border-t border-rose-500/20 text-right">
           <p class="font-handwriting text-2xl text-amber-300">
-            Holding You Close In My Thoughts,
+            Loving You More With Every Heartbeat,
           </p>
           <p class="font-cinzel text-xs sm:text-sm font-bold text-rose-300">
-            ME (Always Waiting For You) 🤵💖
+            Rakesh (Your Kuchupuchuu Forever) 🤵💖
           </p>
         </div>
       </div>
 
-      <!-- Care Action Buttons inside Modal -->
-      <div class="flex flex-wrap justify-center gap-3 pt-5">
-        <button onclick="playAnantapurCinematicAnimation()" class="px-5 py-3 rounded-full bg-gradient-to-r from-purple-600 via-rose-500 to-amber-500 text-white text-xs font-black uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-lg shadow-purple-500/40 hover:scale-105 transition-all animate-pulse">
-          <span>🎬</span> Watch Animation
+      <!-- Action Buttons -->
+      <div class="flex flex-wrap justify-center gap-3 pt-4">
+        <button onclick="sendHeartbeatPulseToRakesh()" class="btn-rose px-6 py-3.5 rounded-full text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg shadow-rose-500/40 hover:scale-105 transition-all">
+          <span>💓</span> Send Pulse To Rakesh's Heart
         </button>
-        <button onclick="triggerQuickVirtualCare('hug')" class="btn-rose px-6 py-3 rounded-full text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg shadow-rose-500/40 hover:scale-105 transition-all">
-          <span>🤗</span> Receive Virtual Hug From Rakesh
+        <button onclick="toggleRomanticMusic()" class="px-5 py-3.5 rounded-full bg-slate-900 border border-purple-400/50 text-purple-300 hover:text-white hover:bg-purple-500/30 text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-all">
+          <span>🎵</span> Romantic Music
         </button>
-        <button onclick="triggerQuickVirtualCare('kiss')" class="px-6 py-3 rounded-full bg-slate-900 border border-amber-400/50 text-amber-300 hover:text-white hover:bg-amber-500/30 text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-all">
-          <span>💋</span> Forehead Safe Journey Kiss
-        </button>
-        <button onclick="toggleRomanticMusic()" class="px-5 py-3 rounded-full bg-slate-900 border border-purple-400/50 text-purple-300 hover:text-white hover:bg-purple-500/30 text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-all">
-          <span>🎵</span> Journey Music
-        </button>
-      </div>
-
-      <div class="pt-3">
-        <button onclick="closeAnantapurLetterModal()" class="text-xs text-slate-400 hover:text-white underline">
-          Close & Return to Memory Vault ✨
+        <button onclick="closeSoulHeartbeatModal()" class="px-5 py-3.5 rounded-full bg-slate-900 border border-slate-700 text-slate-300 hover:text-white text-xs font-bold uppercase tracking-wider">
+          Close ✨
         </button>
       </div>
     </div>
   </div>
 
-  <!-- VIRTUAL CARE FLOATING TOAST NOTIFICATION -->
-  <div id="virtual-care-toast" class="fixed bottom-6 left-4 right-4 sm:left-auto sm:right-6 sm:w-96 z-50 p-4 rounded-2xl bg-slate-950/95 border border-rose-400/60 shadow-2xl backdrop-blur-xl hidden items-start gap-3.5 animate-scale-up">
-    <div id="virtual-care-toast-icon" class="text-3xl shrink-0 animate-bounce">
-      🤗
+  <!-- HEARTBEAT PULSE TOAST NOTIFICATION -->
+  <div id="heartbeat-pulse-toast" class="fixed bottom-6 left-4 right-4 sm:left-auto sm:right-6 sm:w-96 z-50 p-4 rounded-2xl bg-slate-950/95 border border-rose-400/60 shadow-2xl backdrop-blur-xl hidden items-start gap-3.5 animate-scale-up">
+    <div class="text-3xl shrink-0 animate-bounce">
+      💓
     </div>
     <div class="flex-1">
-      <div id="virtual-care-toast-text" class="text-xs text-slate-200 leading-relaxed">
-        <!-- Injected via JS -->
-      </div>
-      <p class="text-[10px] text-amber-300 font-mono mt-1.5">
-        From ME with infinite love • Oct 12 ✨
+      <h4 class="text-xs font-bold text-rose-300 font-cinzel">Heartbeat Pulse Delivered!</h4>
+      <p class="text-xs text-slate-200 mt-0.5 leading-snug">
+        Rakesh just felt your pulse in his heart! He is smiling and sending you a million hugs right now 💕
       </p>
     </div>
-    <button onclick="closeVirtualCareToast()" class="text-slate-400 hover:text-white text-lg font-bold">
+    <button onclick="closeHeartbeatPulseToast()" class="text-slate-400 hover:text-white text-lg font-bold">
       &times;
     </button>
   </div>
