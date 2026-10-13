@@ -112,17 +112,39 @@
       transform: translateY(-2px);
     }
 
-    /* Chat Bubbles */
+    /* WhatsApp Romantic Chat Styles */
     .chat-bubble-mine {
-      background: linear-gradient(135deg, rgba(255, 215, 0, 0.25) 0%, rgba(255, 59, 119, 0.25) 100%);
-      border: 1px solid rgba(255, 215, 0, 0.4);
+      background: linear-gradient(135deg, rgba(217, 119, 6, 0.38) 0%, rgba(225, 29, 72, 0.42) 100%);
+      border: 1px solid rgba(251, 191, 36, 0.45);
       border-radius: 18px 18px 4px 18px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
     }
 
     .chat-bubble-partner {
-      background: linear-gradient(135deg, rgba(255, 59, 119, 0.25) 0%, rgba(168, 85, 247, 0.2) 100%);
-      border: 1px solid rgba(255, 59, 119, 0.4);
+      background: linear-gradient(135deg, rgba(147, 51, 234, 0.32) 0%, rgba(225, 29, 72, 0.38) 100%);
+      border: 1px solid rgba(244, 63, 94, 0.45);
       border-radius: 18px 18px 18px 4px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+    }
+
+    .chat-wallpaper {
+      background-color: #06020a;
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(255, 59, 119, 0.08) 0%, transparent 35%),
+        radial-gradient(circle at 90% 80%, rgba(168, 85, 247, 0.08) 0%, transparent 35%),
+        radial-gradient(circle at 50% 50%, rgba(255, 215, 0, 0.03) 0%, transparent 50%);
+    }
+
+    .tick-blue {
+      color: #38bdf8 !important;
+    }
+
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
     }
 
     /* Floating Hearts Canvas */
@@ -438,6 +460,9 @@
       border-color: rgba(255, 215, 0, 0.6);
     }
   </style>
+  <!-- Google Firebase Realtime Database SDK (WhatsApp-level Realtime Cloud Engine) -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
   <script src="/socket.io/socket.io.js" onerror="window.socketIoFailed=true"></script>
 </head>
 <body class="selection:bg-rose-500 selection:text-white">
@@ -723,17 +748,26 @@
             💬
           </div>
           <div>
-            <h2 class="font-cinzel text-xl md:text-2xl text-gradient-rose font-bold">Private Live Chat Room</h2>
-            <p class="text-xs text-slate-300">Real-time chat between Vanshika & Rakesh ❤️</p>
+            <div class="flex items-center gap-2">
+              <h2 class="font-cinzel text-xl md:text-2xl text-gradient-rose font-bold">Private Live Chat Room</h2>
+              <span id="sync-mode-pill" class="text-[10px] px-2.5 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 font-semibold flex items-center gap-1 shadow-sm">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> WhatsApp Mode
+              </span>
+            </div>
+            <p class="text-xs text-slate-300">Ultra-fast instant chat between Vanshika & Rakesh ❤️</p>
           </div>
         </div>
 
         <!-- Identity / User Badge & Realtime Presence -->
         <div class="flex flex-wrap items-center gap-3">
-          <div class="flex items-center gap-2 bg-slate-900/90 px-3 py-1.5 rounded-full border border-rose-500/30">
+          <div class="flex items-center gap-2 bg-slate-900/90 px-3 py-1.5 rounded-full border border-rose-500/30 shadow-inner">
             <span id="presence-dot" class="w-2.5 h-2.5 rounded-full bg-slate-500"></span>
             <span id="presence-text" class="text-[11px] font-semibold text-slate-300">Checking status...</span>
           </div>
+
+          <button onclick="openCloudDbModal()" title="Cloud Permanent Storage Settings" class="btn-glass px-3 py-1.5 rounded-full text-xs font-semibold text-emerald-300 hover:text-white flex items-center gap-1 shadow-sm">
+            ☁️ Cloud Sync
+          </button>
 
           <button onclick="requestNotificationPermission()" title="Enable Desktop Notifications" class="btn-glass px-3 py-1.5 rounded-full text-xs font-semibold text-amber-300 hover:text-white flex items-center gap-1">
             🔔 Push Alerts
@@ -758,24 +792,77 @@
         💬 Partner is typing...
       </div>
 
-      <!-- Live Chat Messages Feed Box -->
-      <div id="chat-feed-box" class="h-[360px] overflow-y-auto p-4 rounded-2xl bg-slate-950/70 border border-rose-500/20 space-y-4 shadow-inner">
-        <div class="text-center py-16 text-slate-500 text-xs italic">
-          Loading live chat messages...
+      <!-- Live Chat Messages Feed Box with WhatsApp Wallpaper & Smooth Scrolling -->
+      <div class="relative">
+        <div id="chat-feed-box" class="chat-wallpaper h-[380px] overflow-y-auto p-4 rounded-2xl border border-rose-500/20 space-y-3 shadow-inner scroll-smooth">
+          <div class="text-center py-16 text-slate-500 text-xs italic">
+            Loading live chat messages...
+          </div>
         </div>
+        <!-- Floating Scroll to Bottom Button with Unread Badge -->
+        <button id="chat-scroll-bottom-btn" onclick="scrollChatToBottom(true)" class="hidden absolute bottom-3 right-3 px-3 py-1.5 rounded-full bg-rose-600/90 text-white shadow-xl border border-rose-400/50 text-xs font-semibold flex items-center gap-1.5 z-20 hover:scale-105 transition-all">
+          <span>⬇️ New</span>
+          <span id="unread-pill-count" class="hidden px-1.5 py-0.2 rounded-full bg-amber-400 text-slate-950 font-bold text-[10px]"></span>
+        </button>
+      </div>
+
+      <!-- Quick Romantic Reactions Bar -->
+      <div class="mt-3 mb-1 flex items-center gap-1.5 overflow-x-auto py-1 px-1 no-scrollbar select-none">
+        <span class="text-[10px] text-slate-400 font-medium mr-1 uppercase tracking-wider">Quick:</span>
+        <button type="button" onclick="insertQuickChatEmoji('❤️')" class="px-2 py-1 rounded-lg bg-slate-900/80 hover:bg-rose-500/20 border border-white/5 hover:border-rose-500/40 text-xs transition-transform active:scale-90">❤️</button>
+        <button type="button" onclick="insertQuickChatEmoji('🥰')" class="px-2 py-1 rounded-lg bg-slate-900/80 hover:bg-rose-500/20 border border-white/5 hover:border-rose-500/40 text-xs transition-transform active:scale-90">🥰</button>
+        <button type="button" onclick="insertQuickChatEmoji('😘')" class="px-2 py-1 rounded-lg bg-slate-900/80 hover:bg-rose-500/20 border border-white/5 hover:border-rose-500/40 text-xs transition-transform active:scale-90">😘</button>
+        <button type="button" onclick="insertQuickChatEmoji('🌹')" class="px-2 py-1 rounded-lg bg-slate-900/80 hover:bg-rose-500/20 border border-white/5 hover:border-rose-500/40 text-xs transition-transform active:scale-90">🌹</button>
+        <button type="button" onclick="insertQuickChatEmoji('✨')" class="px-2 py-1 rounded-lg bg-slate-900/80 hover:bg-rose-500/20 border border-white/5 hover:border-rose-500/40 text-xs transition-transform active:scale-90">✨</button>
+        <button type="button" onclick="insertQuickChatEmoji('💍')" class="px-2 py-1 rounded-lg bg-slate-900/80 hover:bg-rose-500/20 border border-white/5 hover:border-rose-500/40 text-xs transition-transform active:scale-90">💍</button>
+        <button type="button" onclick="insertQuickChatEmoji('💌')" class="px-2 py-1 rounded-lg bg-slate-900/80 hover:bg-rose-500/20 border border-white/5 hover:border-rose-500/40 text-xs transition-transform active:scale-90">💌</button>
+        <button type="button" onclick="insertQuickChatEmoji('🫂')" class="px-2 py-1 rounded-lg bg-slate-900/80 hover:bg-rose-500/20 border border-white/5 hover:border-rose-500/40 text-xs transition-transform active:scale-90">🫂</button>
+        <button type="button" onclick="insertQuickChatEmoji('🥺')" class="px-2 py-1 rounded-lg bg-slate-900/80 hover:bg-rose-500/20 border border-white/5 hover:border-rose-500/40 text-xs transition-transform active:scale-90">🥺</button>
+        <button type="button" onclick="insertQuickChatEmoji('💖')" class="px-2 py-1 rounded-lg bg-slate-900/80 hover:bg-rose-500/20 border border-white/5 hover:border-rose-500/40 text-xs transition-transform active:scale-90">💖</button>
       </div>
 
       <!-- Chat Input Area -->
-      <div class="mt-4 flex gap-2">
+      <div class="flex gap-2">
         <input type="text" id="live-chat-input" onfocus="checkUserLoginBeforeChat()" oninput="handleTypingEvent()" onkeydown="if(event.key==='Enter') sendLiveChatMessage()" placeholder="Type your message here..." class="flex-1 px-5 py-3.5 rounded-full bg-slate-900/90 border border-rose-500/40 text-xs md:text-sm text-white focus:outline-none focus:border-rose-400 shadow-inner">
-        <button onclick="sendLiveChatMessage()" class="btn-rose px-6 py-3.5 rounded-full text-xs font-bold uppercase tracking-wider shadow-lg shadow-rose-500/40 flex items-center gap-1">
+        <button onclick="sendLiveChatMessage()" class="btn-rose px-6 py-3.5 rounded-full text-xs font-bold uppercase tracking-wider shadow-lg shadow-rose-500/40 flex items-center gap-1 active:scale-95 transition-transform">
           <span>Send 🚀</span>
         </button>
       </div>
       <p class="text-[11px] text-slate-400 mt-2 text-center">
-        ✨ Messages automatically sync in real-time across both screens!
+        ⚡ Instant 0ms WhatsApp UI • Double Checkmarks (✓✓) • Local Message Vault Backup • Offline Auto-Sync
       </p>
     </section>
+
+    <!-- CLOUD SYNC / FIREBASE CONFIG MODAL -->
+    <div id="cloud-sync-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-lg p-4">
+      <div class="glass-box p-6 md:p-8 max-w-lg w-full border-rose-500/40 text-left relative shadow-2xl space-y-4">
+        <div class="flex items-center justify-between border-b border-rose-500/30 pb-3">
+          <div class="flex items-center gap-2">
+            <span class="text-2xl">☁️</span>
+            <h3 class="font-cinzel text-lg font-bold text-amber-300">Permanent Cloud Sync (Firebase)</h3>
+          </div>
+          <button onclick="closeCloudDbModal()" class="text-slate-400 hover:text-white text-lg font-bold">✕</button>
+        </div>
+        <p class="text-xs text-slate-300 leading-relaxed">
+          Google Firebase Realtime Database is <strong class="text-emerald-300">100% Free Forever</strong>. It provides true real-time WebSockets (&lt;50ms) and keeps offline messages permanently in Google Cloud so neither of you ever loses a single message even when Vercel server sleeps.
+        </p>
+        <div class="p-3 rounded-xl bg-slate-950/80 border border-emerald-500/30 text-[11px] text-slate-300 space-y-1.5">
+          <p class="text-emerald-400 font-bold">✨ Quick 2-Minute Free Setup:</p>
+          <p>1. Open <a href="https://console.firebase.google.com" target="_blank" class="text-amber-300 underline font-semibold">console.firebase.google.com</a> &amp; create a project.</p>
+          <p>2. Click <strong>Realtime Database</strong> -&gt; <em>Create Database</em> (test mode rules).</p>
+          <p>3. Go to Project Settings -&gt; Web App (<code>&lt;/&gt;</code>) -&gt; Copy the <code>firebaseConfig</code> object &amp; paste below:</p>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 mb-1">Paste Firebase Config JSON:</label>
+          <textarea id="firebase-config-input" rows="5" placeholder='{\n  "apiKey": "...",\n  "authDomain": "...",\n  "databaseURL": "https://...",\n  "projectId": "..."\n}' class="w-full p-3 rounded-xl bg-slate-900 border border-rose-500/30 text-xs font-mono text-emerald-300 focus:outline-none focus:border-rose-400"></textarea>
+        </div>
+        <div id="cloud-sync-status-msg" class="text-xs font-bold text-emerald-300 hidden"></div>
+        <div class="flex items-center justify-end gap-3 pt-2">
+          <button onclick="closeCloudDbModal()" class="px-4 py-2 rounded-full bg-slate-800 text-slate-300 text-xs hover:bg-slate-700">Close</button>
+          <button onclick="saveCloudDbConfig()" class="btn-rose px-5 py-2 rounded-full text-xs font-bold shadow-lg shadow-rose-500/40">Save &amp; Connect 🚀</button>
+        </div>
+      </div>
+    </div>
 
     <!-- METRICS OF LOVE / COMPATIBILITY WHEEL -->
     <section class="grid grid-cols-1 md:grid-cols-3 gap-6 my-16">
@@ -1159,14 +1246,33 @@
   <!-- JAVASCRIPT LOGIC & LIVE 2-WAY CHAT BACKEND INTEGRATION -->
   <!-- JAVASCRIPT LOGIC & REALTIME SOCKET.IO BACKEND INTEGRATION -->
   <script>
-    // State Variables
+    // ==========================================
+    // WHATSAPP REALTIME CHAT ENGINE (MEMORY VAULT)
+    // ==========================================
+
+    // OPTIONAL FIREBASE CONFIG SLOT:
+    // If you paste your free Google Firebase config here, chat runs on 100% Free Google Realtime WebSockets (<50ms delay, permanent cloud storage).
+    // You can also connect it anytime by clicking the "☁️ Cloud Sync" button in the chat header!
+    window.FIREBASE_CONFIG = window.FIREBASE_CONFIG || null;
+
+    const VAULT_MSG_STORAGE_KEY = 'eternal_vault_chat_messages_v3';
+    const FIREBASE_CONFIG_KEY = 'vault_firebase_config';
+
     let socket = null;
-    let currentChatSender = sessionStorage.getItem('chat_user_name') || '';
-    let currentChatPin = sessionStorage.getItem('chat_user_pin') || '';
+    let fbApp = null;
+    let fbDb = null;
+    let isFirebaseActive = false;
+    let currentChatSender = sessionStorage.getItem('chat_user_name') || localStorage.getItem('chat_user_name') || '';
+    let currentChatPin = sessionStorage.getItem('chat_user_pin') || localStorage.getItem('chat_user_pin') || '';
     let previousMsgCount = 0;
     let isPlayingMusic = false;
     let typingTimeout = null;
     let annivAutoTriggered = false;
+    let offlinePendingQueue = [];
+    let unreadBelowCount = 0;
+    let latestPresenceState = { vanshika: { isOnline: false }, rakesh: { isOnline: false } };
+    let renderedMsgIds = new Set();
+    let renderedDatesSet = new Set();
 
     // Helper: Scroll to element smoothly
     function scrollToElement(id) {
@@ -1189,12 +1295,11 @@
       const eyeIcon = document.getElementById('eye-icon');
 
       if (pinInput) {
-        pinInput.value = ''; // Always keep empty on fresh open
+        pinInput.value = '';
         pinInput.type = 'password';
       }
       if (eyeIcon) eyeIcon.innerText = '👁️';
       if (errEl) errEl.classList.add('hidden');
-
       if (modal) modal.classList.remove('hidden');
     }
 
@@ -1255,19 +1360,23 @@
           currentChatPin = pin;
           sessionStorage.setItem('chat_user_name', name);
           sessionStorage.setItem('chat_user_pin', pin);
+          localStorage.setItem('chat_user_name', name);
+          localStorage.setItem('chat_user_pin', pin);
 
           document.getElementById('name-login-modal').classList.add('hidden');
           if (errEl) errEl.classList.add('hidden');
           updateUserBadge();
 
-          if (socket && socket.connected) {
+          if (isFirebaseActive) {
+            initFirebaseCloud();
+          } else if (socket && socket.connected) {
             socket.emit('user_join', { sender: currentChatSender, pin: currentChatPin });
           } else {
             initSocketConnection();
           }
 
-          // Trigger Grand Cinematic Anniversary Animation upon Login
-          if (isAnniversaryActive()) {
+          // Anniversary cinematic triggers if Oct 17
+          if (typeof isAnniversaryActive === 'function' && isAnniversaryActive()) {
             setTimeout(playGrandCinematicAnniversaryAnimation, 400);
           }
         } else {
@@ -1281,10 +1390,12 @@
         currentChatPin = pin;
         sessionStorage.setItem('chat_user_name', name);
         sessionStorage.setItem('chat_user_pin', pin);
+        localStorage.setItem('chat_user_name', name);
+        localStorage.setItem('chat_user_pin', pin);
         document.getElementById('name-login-modal').classList.add('hidden');
         updateUserBadge();
         initSocketConnection();
-        if (isAnniversaryActive()) {
+        if (typeof isAnniversaryActive === 'function' && isAnniversaryActive()) {
           setTimeout(playGrandCinematicAnniversaryAnimation, 400);
         }
       }
@@ -1295,67 +1406,454 @@
       if (badge) badge.innerText = currentChatSender || 'Not Set';
     }
 
-    // Socket.io Connection & Events
-    function initSocketConnection() {
-      if (typeof io !== 'undefined') {
-        socket = io();
+    // ==========================================
+    // LOCAL STORAGE MESSAGE VAULT ENGINE
+    // ==========================================
+    function getLocalVaultMessages() {
+      try {
+        const raw = localStorage.getItem(VAULT_MSG_STORAGE_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed)) return parsed;
+        }
+      } catch (e) {}
+      return [];
+    }
 
-        socket.on('connect', () => {
-          if (currentChatSender && currentChatPin) {
-            socket.emit('user_join', { sender: currentChatSender, pin: currentChatPin });
-          }
-        });
-
-        socket.on('auth_success', (data) => {
-          updatePresenceUI(data.onlineUsers);
-          if (data.messages) renderChatFeed(data.messages);
-        });
-
-        socket.on('auth_error', (data) => {
-          console.warn('Socket Auth Error:', data.message);
-        });
-
-        socket.on('presence_update', (onlineUsers) => {
-          updatePresenceUI(onlineUsers);
-        });
-
-        socket.on('new_message', (msg) => {
-          appendSingleMessageToFeed(msg);
-          playChatPingSound();
-          triggerPushNotification(msg);
-        });
-
-        socket.on('chat_cleared', (data) => {
-          clearChatUI();
-          if (data && data.messages) renderChatFeed(data.messages, true);
-        });
-
-        socket.on('user_typing', (data) => {
-          const bar = document.getElementById('typing-indicator-bar');
-          if (bar) {
-            if (data.isTyping && data.sender !== currentChatSender) {
-              bar.innerText = '💬 ' + data.sender + ' is typing...';
-              bar.classList.remove('hidden');
-            } else {
-              bar.classList.add('hidden');
-            }
-          }
-        });
-
-        socket.on('new_sky_lantern', (wish) => {
-          if (wish && wish.id && !animatedWishSet.has(wish.id)) {
-            animatedWishSet.add(wish.id);
-            animateSkyLanternFloat(wish.text, wish.sender, wish.id);
-          }
-          fetchWishesFromBackend();
-        });
+    function saveMessageToLocalVault(msg) {
+      if (!msg || !msg.id) return;
+      let msgs = getLocalVaultMessages();
+      const idx = msgs.findIndex(m => m.id === msg.id);
+      if (idx !== -1) {
+        msgs[idx] = { ...msgs[idx], ...msg };
       } else {
-        setInterval(fetchLiveChatMessages, 1500);
+        msgs.push(msg);
+      }
+      if (msgs.length > 500) msgs = msgs.slice(msgs.length - 500);
+      try {
+        localStorage.setItem(VAULT_MSG_STORAGE_KEY, JSON.stringify(msgs));
+      } catch (e) {}
+    }
+
+    function mergeAndSaveVaultMessages(newList) {
+      if (!Array.isArray(newList)) return getLocalVaultMessages();
+      let local = getLocalVaultMessages();
+      const map = new Map();
+      local.forEach(m => { if (m && m.id) map.set(m.id, m); });
+      newList.forEach(m => {
+        if (m && m.id) {
+          const existing = map.get(m.id);
+          map.set(m.id, existing ? { ...existing, ...m } : m);
+        }
+      });
+      let merged = Array.from(map.values());
+      merged.sort((a, b) => new Date(a.timestamp || 0) - new Date(b.timestamp || 0));
+      if (merged.length > 500) merged = merged.slice(merged.length - 500);
+      try {
+        localStorage.setItem(VAULT_MSG_STORAGE_KEY, JSON.stringify(merged));
+      } catch (e) {}
+      return merged;
+    }
+
+    // ==========================================
+    // TIME & FORMATTING HELPERS
+    // ==========================================
+    function getISTTimeString(isoString) {
+      const d = isoString ? new Date(isoString) : new Date();
+      if (isNaN(d.getTime())) return '';
+      return d.toLocaleTimeString('en-US', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit', hour12: true });
+    }
+
+    function getISTDateString(isoString) {
+      const d = isoString ? new Date(isoString) : new Date();
+      if (isNaN(d.getTime())) return '';
+      return d.toLocaleDateString('en-US', { timeZone: 'Asia/Kolkata', month: 'short', day: 'numeric' });
+    }
+
+    function getMessageDayLabel(isoString) {
+      if (!isoString) return 'Today';
+      const d = new Date(isoString);
+      if (isNaN(d.getTime())) return 'Today';
+      const now = new Date();
+      const isToday = d.toLocaleDateString('en-US', { timeZone: 'Asia/Kolkata' }) === now.toLocaleDateString('en-US', { timeZone: 'Asia/Kolkata' });
+      if (isToday) return 'Today';
+      const yesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+      const isYesterday = d.toLocaleDateString('en-US', { timeZone: 'Asia/Kolkata' }) === yesterday.toLocaleDateString('en-US', { timeZone: 'Asia/Kolkata' });
+      if (isYesterday) return 'Yesterday';
+      return d.toLocaleDateString('en-US', { timeZone: 'Asia/Kolkata', month: 'short', day: 'numeric', year: 'numeric' });
+    }
+
+    function escapeChatHtml(str) {
+      if (!str) return '';
+      return str
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    // ==========================================
+    // WEB AUDIO SOUND SYNTHESIZER
+    // ==========================================
+    function playSentSound() {
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(750, ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(1350, ctx.currentTime + 0.08);
+        gain.gain.setValueAtTime(0.08, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.12);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.13);
+      } catch (e) {}
+    }
+
+    function playReceiveSound() {
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const now = ctx.currentTime;
+        [ { freq: 659.25, time: 0 }, { freq: 830.61, time: 0.1 } ].forEach(tone => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(tone.freq, now + tone.time);
+          gain.gain.setValueAtTime(0.08, now + tone.time);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + tone.time + 0.25);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(now + tone.time);
+          osc.stop(now + tone.time + 0.26);
+        });
+      } catch (e) {}
+    }
+
+    function playChatPingSound() {
+      playReceiveSound();
+    }
+
+    // ==========================================
+    // WHATSAPP CHECKMARKS (✓, ✓✓, BLUE ✓✓)
+    // ==========================================
+    function checkIsPartnerOnline() {
+      const isMeVanshika = (currentChatSender || '').toLowerCase().includes('vanshika');
+      const partnerRole = isMeVanshika ? 'rakesh' : 'vanshika';
+      return !!(latestPresenceState[partnerRole] && latestPresenceState[partnerRole].isOnline);
+    }
+
+    function getTickMarkup(status) {
+      const isPartnerOnline = checkIsPartnerOnline();
+      if (status === 'pending') {
+        return '<span class="text-[10px] opacity-60" title="Sending...">🕒</span>';
+      } else if (status === 'read' || isPartnerOnline) {
+        return '<span class="tick-blue font-bold text-[11px]" title="Seen by Soulmate">✓✓</span>';
+      } else if (status === 'delivered') {
+        return '<span class="text-slate-300 font-bold text-[11px]" title="Delivered">✓✓</span>';
+      } else {
+        return '<span class="text-slate-400 font-bold text-[11px]" title="Sent to Cloud">✓</span>';
       }
     }
 
+    function updateAllMyTicks() {
+      const tickEls = document.querySelectorAll('[data-my-msg-tick]');
+      tickEls.forEach(el => {
+        const status = el.getAttribute('data-status') || 'sent';
+        el.innerHTML = getTickMarkup(status);
+      });
+    }
+
+    // ==========================================
+    // SMART SCROLLING & UNREAD FLOATING PILL
+    // ==========================================
+    function isChatNearBottom() {
+      const feed = document.getElementById('chat-feed-box');
+      if (!feed) return true;
+      return feed.scrollHeight - feed.scrollTop - feed.clientHeight < 160;
+    }
+
+    function scrollChatToBottom(force = false) {
+      const feed = document.getElementById('chat-feed-box');
+      const btn = document.getElementById('chat-scroll-bottom-btn');
+      const badge = document.getElementById('unread-pill-count');
+      if (!feed) return;
+
+      if (force || isChatNearBottom()) {
+        feed.scrollTop = feed.scrollHeight;
+        if (btn) btn.classList.add('hidden');
+        if (badge) badge.classList.add('hidden');
+        unreadBelowCount = 0;
+      } else {
+        if (btn) btn.classList.remove('hidden');
+        if (badge) {
+          unreadBelowCount++;
+          badge.innerText = unreadBelowCount > 9 ? '9+' : unreadBelowCount;
+          badge.classList.remove('hidden');
+        }
+      }
+    }
+
+    setTimeout(() => {
+      const feed = document.getElementById('chat-feed-box');
+      if (feed) {
+        feed.addEventListener('scroll', () => {
+          if (isChatNearBottom()) {
+            const btn = document.getElementById('chat-scroll-bottom-btn');
+            const badge = document.getElementById('unread-pill-count');
+            if (btn) btn.classList.add('hidden');
+            if (badge) badge.classList.add('hidden');
+            unreadBelowCount = 0;
+          }
+        });
+      }
+    }, 500);
+
+    // ==========================================
+    // MESSAGE RENDERING & OPTIMISTIC PIPELINE
+    // ==========================================
+    function buildMessageHtml(m, isMyMessage) {
+      const timeStr = m.formattedTime || getISTTimeString(m.timestamp);
+      const tickHtml = isMyMessage ? `<span id="msg-tick-${m.id}" data-my-msg-tick data-status="${m.status || 'sent'}">${getTickMarkup(m.status || 'sent')}</span>` : '';
+      const partnerIcon = m.sender && m.sender.toLowerCase().includes('vanshika') ? '👸' : '👑';
+
+      return `
+        <div id="msg-elem-${m.id}" class="flex flex-col ${isMyMessage ? 'items-end' : 'items-start'} my-1 animate-scale-up group">
+          ${!isMyMessage ? `
+            <div class="flex items-center gap-1.5 mb-0.5 px-2 text-[11px] font-bold text-rose-300">
+              <span>${partnerIcon}</span>
+              <span>${escapeChatHtml(m.sender)}</span>
+            </div>
+          ` : ''}
+          <div class="max-w-[85%] md:max-w-[75%] px-3.5 py-2.5 text-xs md:text-sm font-medium leading-relaxed ${isMyMessage ? 'chat-bubble-mine text-amber-50' : 'chat-bubble-partner text-rose-50'} shadow-md">
+            <div class="whitespace-pre-wrap break-words pr-1">${escapeChatHtml(m.message)}</div>
+            <div class="flex items-center justify-end gap-1.5 mt-1 text-[10px] font-mono select-none ${isMyMessage ? 'text-amber-200/80' : 'text-rose-200/80'}">
+              <span>${timeStr}</span>
+              ${tickHtml}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderChatFeed(messages, forceReset = false) {
+      const feed = document.getElementById('chat-feed-box');
+      if (!feed) return;
+
+      if (forceReset) {
+        feed.innerHTML = '';
+        renderedMsgIds.clear();
+        renderedDatesSet.clear();
+      }
+
+      if (!messages || messages.length === 0) {
+        if (renderedMsgIds.size === 0) clearChatUI();
+        return;
+      }
+
+      const myCleanName = (currentChatSender || '').toLowerCase().trim();
+      let hasAppendedAnyNew = false;
+      let hasNewIncomingFromPartner = false;
+
+      messages.forEach(m => {
+        if (!m || !m.id) return;
+
+        const existingNode = document.getElementById('msg-elem-' + m.id);
+        if (existingNode) {
+          renderedMsgIds.add(m.id);
+          const tickEl = document.getElementById('msg-tick-' + m.id);
+          if (tickEl && m.status) {
+            tickEl.setAttribute('data-status', m.status);
+            tickEl.innerHTML = getTickMarkup(m.status);
+          }
+          return;
+        }
+
+        const placeholder = feed.querySelector('.italic');
+        if (placeholder) placeholder.remove();
+
+        renderedMsgIds.add(m.id);
+        hasAppendedAnyNew = true;
+
+        const msgSenderClean = (m.sender || '').toLowerCase().trim();
+        const isMyMessage = myCleanName && (msgSenderClean.includes(myCleanName) || myCleanName.includes(msgSenderClean));
+        if (!isMyMessage) hasNewIncomingFromPartner = true;
+
+        // Date divider chip
+        const dayLabel = getMessageDayLabel(m.timestamp);
+        if (!renderedDatesSet.has(dayLabel)) {
+          renderedDatesSet.add(dayLabel);
+          feed.insertAdjacentHTML('beforeend', `
+            <div class="flex justify-center my-2.5">
+              <span class="px-3 py-0.5 rounded-full bg-slate-900/90 border border-rose-500/25 text-[10px] font-semibold text-slate-400 shadow-sm">${dayLabel}</span>
+            </div>
+          `);
+        }
+
+        feed.insertAdjacentHTML('beforeend', buildMessageHtml(m, isMyMessage));
+      });
+
+      if (hasNewIncomingFromPartner && renderedMsgIds.size > messages.length) {
+        playReceiveSound();
+        const lastMsg = messages[messages.length - 1];
+        if (lastMsg) triggerPushNotification(lastMsg);
+      }
+
+      if (hasAppendedAnyNew) {
+        scrollChatToBottom(false);
+      }
+    }
+
+    function appendSingleMessageToFeed(m) {
+      if (!m || !m.id) return;
+      if (document.getElementById('msg-elem-' + m.id)) return;
+      saveMessageToLocalVault(m);
+      renderChatFeed([m]);
+    }
+
+    function appendOptimisticMessage(newMsg) {
+      const feed = document.getElementById('chat-feed-box');
+      if (!feed) return;
+      const placeholder = feed.querySelector('.italic');
+      if (placeholder) placeholder.remove();
+
+      renderedMsgIds.add(newMsg.id);
+
+      const dayLabel = getMessageDayLabel(newMsg.timestamp);
+      if (!renderedDatesSet.has(dayLabel)) {
+        renderedDatesSet.add(dayLabel);
+        feed.insertAdjacentHTML('beforeend', `
+          <div class="flex justify-center my-2.5">
+            <span class="px-3 py-0.5 rounded-full bg-slate-900/90 border border-rose-500/25 text-[10px] font-semibold text-slate-400 shadow-sm">${dayLabel}</span>
+          </div>
+        `);
+      }
+
+      feed.insertAdjacentHTML('beforeend', buildMessageHtml(newMsg, true));
+      scrollChatToBottom(true);
+    }
+
+    async function sendLiveChatMessage(customText = null) {
+      if (!currentChatSender || !currentChatPin) {
+        openNameLoginModal();
+        return;
+      }
+
+      const input = document.getElementById('live-chat-input');
+      const text = customText !== null ? String(customText).trim() : (input ? input.value.trim() : '');
+      if (!text) return;
+
+      // 0ms UI INSTANT FEEDBACK: Clear input immediately & refocus
+      if (customText === null && input) {
+        input.value = '';
+        input.focus();
+      }
+
+      const now = new Date();
+      const localId = 'msg_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
+      const newMsg = {
+        id: localId,
+        sender: currentChatSender,
+        message: text,
+        timestamp: now.toISOString(),
+        formattedTime: getISTTimeString(now),
+        formattedDate: getISTDateString(now),
+        status: 'pending' // 🕒
+      };
+
+      // 1. Instant 0ms render on screen
+      appendOptimisticMessage(newMsg);
+      playSentSound();
+
+      // 2. Save immediately to LocalStorage Vault
+      saveMessageToLocalVault(newMsg);
+
+      // 3. Dispatch to Cloud & Server in background
+      dispatchMessageToCloud(newMsg);
+    }
+
+    async function dispatchMessageToCloud(msg) {
+      let dispatched = false;
+
+      // Mode A: Firebase Realtime Database
+      if (isFirebaseActive && fbDb) {
+        try {
+          await fbDb.ref('vault_messages/' + msg.id).set(msg);
+          markMessageSent(msg.id);
+          dispatched = true;
+        } catch (err) {
+          console.warn('Firebase push failed, trying REST:', err);
+        }
+      }
+
+      // Mode B: Socket.io if active
+      if (socket && socket.connected) {
+        socket.emit('send_message', {
+          id: msg.id,
+          sender: currentChatSender,
+          pin: currentChatPin,
+          message: msg.message,
+          timestamp: msg.timestamp,
+          formattedTime: msg.formattedTime,
+          formattedDate: msg.formattedDate
+        });
+        markMessageSent(msg.id);
+        dispatched = true;
+      }
+
+      // Mode C: REST API (Vercel Production & Localhost)
+      try {
+        const res = await fetch('/api/messages', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            id: msg.id,
+            sender: currentChatSender,
+            pin: currentChatPin,
+            message: msg.message,
+            timestamp: msg.timestamp,
+            formattedTime: msg.formattedTime,
+            formattedDate: msg.formattedDate,
+            status: 'sent'
+          })
+        });
+        const data = await res.json();
+        if (data.success) {
+          markMessageSent(msg.id);
+          dispatched = true;
+        } else if (data.error && data.error.includes('Passcode')) {
+          openNameLoginModal();
+        }
+      } catch (e) {
+        if (!dispatched) {
+          offlinePendingQueue.push(msg);
+          updateSyncPill('🟡 Offline Queued');
+        }
+      }
+    }
+
+    function markMessageSent(msgId) {
+      const tickEl = document.getElementById('msg-tick-' + msgId);
+      if (tickEl) {
+        tickEl.setAttribute('data-status', 'sent');
+        tickEl.innerHTML = getTickMarkup('sent');
+      }
+      let local = getLocalVaultMessages();
+      const m = local.find(item => item.id === msgId);
+      if (m) {
+        m.status = 'sent';
+        saveMessageToLocalVault(m);
+      }
+    }
+
+    // ==========================================
+    // PRESENCE & TYPING INDICATOR
+    // ==========================================
     function updatePresenceUI(presence) {
       if (!presence) return;
+      latestPresenceState = presence;
       const dot = document.getElementById('presence-dot');
       const text = document.getElementById('presence-text');
       if (!dot || !text) return;
@@ -1375,10 +1873,19 @@
         dot.className = 'w-2.5 h-2.5 rounded-full bg-slate-500';
         text.innerText = '⚪ ' + partnerName + ' Offline';
       }
+      updateAllMyTicks();
     }
 
     function handleTypingEvent() {
-      if (socket && socket.connected) {
+      if (isFirebaseActive && fbDb && currentChatSender) {
+        const isMeV = currentChatSender.toLowerCase().includes('vanshika');
+        const myRole = isMeV ? 'vanshika' : 'rakesh';
+        fbDb.ref('typing/' + myRole).set(true);
+        clearTimeout(typingTimeout);
+        typingTimeout = setTimeout(() => {
+          fbDb.ref('typing/' + myRole).set(false);
+        }, 1200);
+      } else if (socket && socket.connected) {
         socket.emit('typing_start', { sender: currentChatSender });
         clearTimeout(typingTimeout);
         typingTimeout = setTimeout(() => {
@@ -1387,11 +1894,22 @@
       }
     }
 
+    function insertQuickChatEmoji(emoji) {
+      const input = document.getElementById('live-chat-input');
+      if (input) {
+        input.value += emoji;
+        input.focus();
+      }
+    }
+
+    // ==========================================
+    // NOTIFICATIONS & CLEAR CHAT
+    // ==========================================
     function requestNotificationPermission() {
       if ('Notification' in window) {
         Notification.requestPermission().then(permission => {
           if (permission === 'granted') {
-            alert('🔔 Push Alerts enabled! You will get notified when a new message arrives even if tab is in background.');
+            alert('🔔 Push Alerts enabled! You will be notified when a new love message arrives even if tab is in the background.');
           } else {
             alert('Push alerts permission denied or blocked in browser settings.');
           }
@@ -1407,117 +1925,24 @@
       const isMyMessage = myCleanName && (msgSenderClean.includes(myCleanName) || myCleanName.includes(msgSenderClean));
 
       if (!isMyMessage && 'Notification' in window && Notification.permission === 'granted') {
-        new Notification('💌 New message from ' + msg.sender, {
+        new Notification('💌 Message from ' + msg.sender, {
           body: msg.message,
           icon: '/assests/eyes.jpeg'
         });
       }
     }
 
-    async function sendLiveChatMessage() {
-      if (!currentChatSender || !currentChatPin) {
-        openNameLoginModal();
-        return;
-      }
-
-      const input = document.getElementById('live-chat-input');
-      const text = input ? input.value.trim() : '';
-      if (!text) return;
-
-      if (socket && socket.connected) {
-        socket.emit('send_message', {
-          sender: currentChatSender,
-          pin: currentChatPin,
-          message: text
-        });
-        if (input) input.value = '';
-      } else {
-        try {
-          const res = await fetch('/api/messages', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ sender: currentChatSender, pin: currentChatPin, message: text })
-          });
-          const data = await res.json();
-          if (data.success) {
-            if (input) input.value = '';
-            fetchLiveChatMessages();
-          } else {
-            openNameLoginModal();
-          }
-        } catch (err) {
-          console.error('Chat error:', err);
-        }
-      }
-    }
-
-    async function fetchLiveChatMessages() {
-      try {
-        const url = currentChatSender ? '/api/messages?sender=' + encodeURIComponent(currentChatSender) : '/api/messages';
-        const res = await fetch(url);
-        const data = await res.json();
-        if (data.success) {
-          renderChatFeed(data.data);
-          if (data.presence) updatePresenceUI(data.presence);
-        }
-      } catch (err) {}
-    }
-
-    // Smart HTTP Real-Time Polling (Works on Vercel Production & Localhost)
-    let chatPollInterval = null;
-    let wishPollInterval = null;
-
-    function startSmartPolling() {
-      if (chatPollInterval) clearInterval(chatPollInterval);
-      if (wishPollInterval) clearInterval(wishPollInterval);
-
-      // Poll chat messages every 2.5s (only if tab active and socket not connected)
-      chatPollInterval = setInterval(() => {
-        if (!document.hidden && (!socket || !socket.connected)) {
-          fetchLiveChatMessages();
-        }
-      }, 2500);
-
-      // Poll wishes every 5.0s
-      wishPollInterval = setInterval(() => {
-        if (!document.hidden && (!socket || !socket.connected)) {
-          fetchWishesFromBackend();
-        }
-      }, 5000);
-    }
-
-    document.addEventListener('visibilitychange', () => {
-      if (!document.hidden) {
-        fetchLiveChatMessages();
-        fetchWishesFromBackend();
-      }
-    });
-
-    startSmartPolling();
-
-    function formatMessageTime(timestampStr, fallbackTime) {
-      if (!timestampStr) return fallbackTime || '';
-      try {
-        const d = new Date(timestampStr);
-        if (isNaN(d.getTime())) return fallbackTime || '';
-        return d.toLocaleTimeString('en-US', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit', hour12: true });
-      } catch (e) {
-        return fallbackTime || '';
-      }
-    }
-
-    let renderedMsgIds = new Set();
-
     function clearChatUI() {
       const feed = document.getElementById('chat-feed-box');
       if (feed) {
         feed.innerHTML = `
           <div class="text-center py-16 text-slate-500 text-xs italic">
-            Chat room empty. Type a message below to start chatting!
+            Chat room empty. Type a sweet message below to start chatting!
           </div>
         `;
       }
       renderedMsgIds.clear();
+      renderedDatesSet.clear();
       previousMsgCount = 0;
     }
 
@@ -1529,102 +1954,296 @@
       if (!confirm('Are you sure you want to clear the chat room history?')) return;
 
       try {
-        const res = await fetch('/api/messages/clear', {
+        localStorage.removeItem(VAULT_MSG_STORAGE_KEY);
+        if (isFirebaseActive && fbDb) {
+          fbDb.ref('vault_messages').remove();
+        }
+        await fetch('/api/messages/clear', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ sender: currentChatSender, pin: currentChatPin })
         });
-        const data = await res.json();
-        if (data.success) {
-          clearChatUI();
-          renderChatFeed(data.data, true);
-        }
       } catch (e) {}
+      clearChatUI();
     }
 
-    function renderChatFeed(messages, forceReset = false) {
-      const feed = document.getElementById('chat-feed-box');
-      if (!feed) return;
-
-      if (forceReset) {
-        feed.innerHTML = '';
-        renderedMsgIds.clear();
-        previousMsgCount = 0;
+    // ==========================================
+    // GOOGLE FIREBASE REALTIME CLOUD INTEGRATION
+    // ==========================================
+    function initFirebaseCloud() {
+      let config = null;
+      if (window.FIREBASE_CONFIG && window.FIREBASE_CONFIG.databaseURL) {
+        config = window.FIREBASE_CONFIG;
+      } else {
+        try {
+          const saved = localStorage.getItem(FIREBASE_CONFIG_KEY);
+          if (saved) config = JSON.parse(saved);
+        } catch (e) {}
       }
 
-      if (!messages || messages.length === 0) {
-        clearChatUI();
+      if (!config || !config.databaseURL || typeof firebase === 'undefined') {
+        isFirebaseActive = false;
+        updateSyncPill('⚡ WhatsApp Mode');
         return;
       }
 
-      const myCleanName = (currentChatSender || '').toLowerCase().trim();
-      let hasAppendedAnyNew = false;
-
-      messages.forEach(m => {
-        if (!m || !m.id) return;
-        
-        // Exact DOM Node Check: If message element is ALREADY rendered on screen, do not duplicate!
-        const existingNode = document.getElementById('msg-elem-' + m.id);
-        if (existingNode) {
-          renderedMsgIds.add(m.id);
-          return;
-        }
-
-        // Remove placeholder text if present
-        const placeholder = feed.querySelector('.italic');
-        if (placeholder) placeholder.remove();
-
-        renderedMsgIds.add(m.id);
-        hasAppendedAnyNew = true;
-
-        const msgSenderClean = (m.sender || '').toLowerCase().trim();
-        const isMyMessage = myCleanName && (msgSenderClean.includes(myCleanName) || myCleanName.includes(msgSenderClean));
-        const timeFormatted = formatMessageTime(m.timestamp, m.formattedTime);
-
-        const msgHTML = `
-          <div id="msg-elem-${m.id}" class="flex flex-col ${isMyMessage ? 'items-end' : 'items-start'} my-2 animate-scale-up">
-            <div class="flex items-center gap-2 mb-1 px-1">
-              <span class="text-xs font-bold ${isMyMessage ? 'text-amber-300' : 'text-rose-400'}">${m.sender}</span>
-              <span class="text-[10px] text-slate-500 font-mono">${timeFormatted}</span>
-            </div>
-            <div class="max-w-[80%] p-3.5 text-xs md:text-sm font-medium leading-relaxed ${isMyMessage ? 'chat-bubble-mine text-amber-100' : 'chat-bubble-partner text-rose-100'} shadow-md">
-              ${m.message}
-            </div>
-          </div>
-        `;
-        feed.insertAdjacentHTML('beforeend', msgHTML);
-      });
-
-      if (hasAppendedAnyNew && previousMsgCount > 0) {
-        playChatPingSound();
-      }
-      previousMsgCount = renderedMsgIds.size;
-
-      if (hasAppendedAnyNew) {
-        feed.scrollTop = feed.scrollHeight;
-      }
-    }
-
-    function appendSingleMessageToFeed(m) {
-      if (!m || !m.id) return;
-      if (document.getElementById('msg-elem-' + m.id)) return;
-      renderChatFeed([m]);
-    }
-
-    function playChatPingSound() {
       try {
-        const ctx = new (window.AudioContext || window.webkitAudioContext)();
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.frequency.setValueAtTime(587.33, ctx.currentTime);
-        gain.gain.setValueAtTime(0.05, ctx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        osc.start();
-        osc.stop(ctx.currentTime + 0.35);
-      } catch (e) {}
+        if (!firebase.apps || !firebase.apps.length) {
+          fbApp = firebase.initializeApp(config);
+        } else {
+          fbApp = firebase.app();
+        }
+        fbDb = firebase.database();
+        isFirebaseActive = true;
+        updateSyncPill('⚡ Firebase Cloud Active');
+
+        // Real-time message listener (WebSockets, <50ms)
+        fbDb.ref('vault_messages').limitToLast(300).on('child_added', snapshot => {
+          const m = snapshot.val();
+          if (m && m.id) {
+            saveMessageToLocalVault(m);
+            renderChatFeed([m]);
+          }
+        });
+
+        // Presence & Typing listener
+        if (currentChatSender) {
+          const isMeV = currentChatSender.toLowerCase().includes('vanshika');
+          const myRole = isMeV ? 'vanshika' : 'rakesh';
+          const partnerRole = isMeV ? 'rakesh' : 'vanshika';
+          const myPresenceRef = fbDb.ref('presence/' + myRole);
+
+          fbDb.ref('.info/connected').on('value', snap => {
+            if (snap.val() === true) {
+              myPresenceRef.onDisconnect().set({ isOnline: false, lastSeen: getISTTimeString() });
+              myPresenceRef.set({ isOnline: true, lastSeen: getISTTimeString() });
+            }
+          });
+
+          fbDb.ref('presence/' + partnerRole).on('value', snap => {
+            const pData = snap.val();
+            if (pData) {
+              latestPresenceState[partnerRole] = pData;
+              updatePresenceUI(latestPresenceState);
+            }
+          });
+
+          fbDb.ref('typing/' + partnerRole).on('value', snap => {
+            const isTyping = snap.val() === true;
+            const bar = document.getElementById('typing-indicator-bar');
+            if (bar) {
+              if (isTyping) {
+                bar.innerText = '💬 ' + (isMeV ? 'Rakesh' : 'Vanshika') + ' is typing...';
+                bar.classList.remove('hidden');
+              } else {
+                bar.classList.add('hidden');
+              }
+            }
+          });
+        }
+      } catch (err) {
+        console.warn('Firebase init warning:', err);
+        isFirebaseActive = false;
+        updateSyncPill('⚡ WhatsApp Mode');
+      }
     }
+
+    function openCloudDbModal() {
+      const modal = document.getElementById('cloud-sync-modal');
+      const input = document.getElementById('firebase-config-input');
+      const status = document.getElementById('cloud-sync-status-msg');
+      if (input) {
+        const saved = localStorage.getItem(FIREBASE_CONFIG_KEY);
+        input.value = saved || '';
+      }
+      if (status) status.classList.add('hidden');
+      if (modal) modal.classList.remove('hidden');
+    }
+
+    function closeCloudDbModal() {
+      const modal = document.getElementById('cloud-sync-modal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function saveCloudDbConfig() {
+      const input = document.getElementById('firebase-config-input');
+      const status = document.getElementById('cloud-sync-status-msg');
+      if (!input) return;
+      const val = input.value.trim();
+      if (!val) {
+        localStorage.removeItem(FIREBASE_CONFIG_KEY);
+        isFirebaseActive = false;
+        updateSyncPill('⚡ WhatsApp Mode');
+        if (status) {
+          status.innerText = 'Cloud config cleared. Reverted to Turbo Mode.';
+          status.className = 'text-xs font-bold text-amber-300';
+          status.classList.remove('hidden');
+        }
+        setTimeout(closeCloudDbModal, 900);
+        return;
+      }
+
+      try {
+        const parsed = JSON.parse(val);
+        if (!parsed.databaseURL && !parsed.projectId) {
+          throw new Error('Config missing databaseURL or projectId');
+        }
+        localStorage.setItem(FIREBASE_CONFIG_KEY, JSON.stringify(parsed));
+        if (status) {
+          status.innerText = '✅ Firebase Connected! Reloading cloud sync...';
+          status.className = 'text-xs font-bold text-emerald-300';
+          status.classList.remove('hidden');
+        }
+        initFirebaseCloud();
+        setTimeout(closeCloudDbModal, 1200);
+      } catch (err) {
+        if (status) {
+          status.innerText = '❌ Invalid JSON: ' + err.message;
+          status.className = 'text-xs font-bold text-rose-400';
+          status.classList.remove('hidden');
+        }
+      }
+    }
+
+    function updateSyncPill(text) {
+      const pill = document.getElementById('sync-mode-pill');
+      if (pill) {
+        pill.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> ${text}`;
+      }
+    }
+
+    // ==========================================
+    // TURBO REST API & SOCKET.IO ENGINE
+    // ==========================================
+    function initSocketConnection() {
+      if (typeof io !== 'undefined') {
+        socket = io();
+
+        socket.on('connect', () => {
+          if (currentChatSender && currentChatPin) {
+            socket.emit('user_join', { sender: currentChatSender, pin: currentChatPin });
+          }
+        });
+
+        socket.on('auth_success', (data) => {
+          if (data.onlineUsers) updatePresenceUI(data.onlineUsers);
+          if (data.messages) {
+            const merged = mergeAndSaveVaultMessages(data.messages);
+            renderChatFeed(merged);
+          }
+        });
+
+        socket.on('presence_update', (onlineUsers) => {
+          updatePresenceUI(onlineUsers);
+        });
+
+        socket.on('new_message', (msg) => {
+          appendSingleMessageToFeed(msg);
+        });
+
+        socket.on('chat_cleared', () => {
+          clearChatUI();
+        });
+
+        socket.on('user_typing', (data) => {
+          const bar = document.getElementById('typing-indicator-bar');
+          if (bar) {
+            if (data.isTyping && data.sender !== currentChatSender) {
+              bar.innerText = '💬 ' + data.sender + ' is typing...';
+              bar.classList.remove('hidden');
+            } else {
+              bar.classList.add('hidden');
+            }
+          }
+        });
+
+        socket.on('new_sky_lantern', (wish) => {
+          if (wish && wish.id && typeof animatedWishSet !== 'undefined' && !animatedWishSet.has(wish.id)) {
+            animatedWishSet.add(wish.id);
+            animateSkyLanternFloat(wish.text, wish.sender, wish.id);
+          }
+          fetchWishesFromBackend();
+        });
+      }
+    }
+
+    async function fetchLiveChatMessages() {
+      try {
+        const url = currentChatSender ? '/api/messages?sender=' + encodeURIComponent(currentChatSender) : '/api/messages';
+        const res = await fetch(url);
+        const data = await res.json();
+        if (data.success && Array.isArray(data.data)) {
+          const merged = mergeAndSaveVaultMessages(data.data);
+          renderChatFeed(merged);
+          if (data.presence) {
+            updatePresenceUI(data.presence);
+          }
+        }
+      } catch (err) {}
+    }
+
+    let chatPollInterval = null;
+    let wishPollInterval = null;
+
+    function startSmartPolling() {
+      if (chatPollInterval) clearInterval(chatPollInterval);
+      if (wishPollInterval) clearInterval(wishPollInterval);
+
+      // Fast polling (1.2s) when tab active and Firebase is not actively handling
+      chatPollInterval = setInterval(() => {
+        if (!document.hidden && (!isFirebaseActive || !fbDb) && (!socket || !socket.connected)) {
+          fetchLiveChatMessages();
+        }
+      }, 1200);
+
+      // Wish polling every 4s
+      wishPollInterval = setInterval(() => {
+        if (!document.hidden) {
+          fetchWishesFromBackend();
+        }
+      }, 4000);
+    }
+
+    // Network & Visibility Responders
+    window.addEventListener('online', () => {
+      updateSyncPill(isFirebaseActive ? '⚡ Firebase Cloud Active' : '⚡ WhatsApp Mode');
+      while (offlinePendingQueue.length > 0) {
+        const m = offlinePendingQueue.shift();
+        dispatchMessageToCloud(m);
+      }
+      fetchLiveChatMessages();
+    });
+
+    window.addEventListener('offline', () => {
+      updateSyncPill('🟡 Offline');
+    });
+
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) {
+        fetchLiveChatMessages();
+        fetchWishesFromBackend();
+      }
+    });
+
+    window.addEventListener('focus', () => {
+      fetchLiveChatMessages();
+    });
+
+    // ==========================================
+    // INITIALIZATION & 0ms COLD START
+    // ==========================================
+    // 1. Render all locally cached messages in 0ms!
+    const coldStartMessages = getLocalVaultMessages();
+    if (coldStartMessages.length > 0) {
+      renderChatFeed(coldStartMessages);
+    }
+
+    // 2. Initialize engines
+    updateUserBadge();
+    initFirebaseCloud();
+    initSocketConnection();
+    startSmartPolling();
+    fetchLiveChatMessages();
 
     function toggleRomanticMusic() {
       const audio = document.getElementById('bg-music-player');

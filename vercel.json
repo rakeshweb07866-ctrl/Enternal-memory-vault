@@ -8,11 +8,7 @@
   ],
   "routes": [
     {
-      "src": "/api/messages",
-      "dest": "/server.js"
-    },
-    {
-      "src": "/api/wishes",
+      "src": "/api/(.*)",
       "dest": "/server.js"
     },
     {

@@ -123,9 +123,14 @@ function getMessages() {
 
 function saveMessage(msgObj) {
   let list = getMessages();
-  list.push(msgObj);
-  if (list.length > 100) {
-    list = list.slice(list.length - 100);
+  const existingIdx = list.findIndex(m => m.id === msgObj.id);
+  if (existingIdx !== -1) {
+    list[existingIdx] = { ...list[existingIdx], ...msgObj };
+  } else {
+    list.push(msgObj);
+  }
+  if (list.length > 500) {
+    list = list.slice(list.length - 500);
   }
   inMemoryMessages = list;
   try {
@@ -263,17 +268,61 @@ app.post('/api/messages', (req, res) => {
 
     const now = new Date();
     const newMsg = {
-      id: 'msg_' + Date.now(),
+      id: req.body.id || ('msg_' + Date.now()),
       sender: sender,
       message: message.trim(),
-      timestamp: now.toISOString(),
-      formattedTime: getISTTimeString(),
-      formattedDate: getISTDateString()
+      timestamp: req.body.timestamp || now.toISOString(),
+      formattedTime: req.body.formattedTime || getISTTimeString(),
+      formattedDate: req.body.formattedDate || getISTDateString(),
+      status: req.body.status || 'sent'
     };
 
     saveMessage(newMsg);
     if (io) io.to('love_chat_room').emit('new_message', newMsg);
     return res.json({ success: true, data: newMsg });
+  } catch (err) {
+    return res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+app.post('/api/messages/status', (req, res) => {
+  try {
+    const { sender, pin, status, messageIds } = req.body;
+    if (!isValidPin(sender, pin)) {
+      return res.status(401).json({ success: false, error: 'Unauthorized' });
+    }
+    updateHttpPresence(sender);
+    if (Array.isArray(messageIds) && messageIds.length > 0) {
+      let list = getMessages();
+      let modified = false;
+      list.forEach(m => {
+        if (messageIds.includes(m.id)) {
+          m.status = status || 'read';
+          modified = true;
+        }
+      });
+      if (modified) {
+        inMemoryMessages = list;
+        try {
+          fs.writeFileSync(MESSAGES_FILE, JSON.stringify(list, null, 2));
+        } catch (e) {}
+        if (io) io.to('love_chat_room').emit('messages_status_update', { messageIds, status: status || 'read' });
+      }
+    }
+    return res.json({ success: true });
+  } catch (err) {
+    return res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+app.post('/api/presence/ping', (req, res) => {
+  try {
+    const { sender, pin } = req.body;
+    if (isValidPin(sender, pin)) {
+      updateHttpPresence(sender);
+    }
+    cleanExpiredPresence();
+    return res.json({ success: true, presence: onlineUsers });
   } catch (err) {
     return res.status(500).json({ success: false, error: err.message });
   }
