@@ -1,0 +1,480 @@
+    :root {
+      --rose-main: #ff3b77;
+      --rose-light: #ff758c;
+      --rose-glow: rgba(255, 59, 119, 0.4);
+      --gold-accent: #ffd700;
+      --gold-glow: rgba(255, 215, 0, 0.4);
+      --bg-dark: #09020e;
+      --bg-card: rgba(255, 255, 255, 0.05);
+      --border-card: rgba(255, 255, 255, 0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: var(--bg-dark);
+      background-image: 
+        radial-gradient(circle at 15% 15%, rgba(255, 59, 119, 0.15) 0%, transparent 40%),
+        radial-gradient(circle at 85% 85%, rgba(168, 85, 247, 0.12) 0%, transparent 40%),
+        radial-gradient(circle at 50% 50%, rgba(255, 215, 0, 0.05) 0%, transparent 60%);
+      color: #f8fafc;
+      overflow-x: hidden;
+      min-height: 100vh;
+    }
+
+    .font-cinzel { font-family: 'Cinzel', serif; }
+    .font-handwriting { font-family: 'Caveat', cursive; }
+    .font-sacramento { font-family: 'Sacramento', cursive; }
+
+    /* Custom Glassmorphism Cards */
+    .glass-box {
+      background: rgba(23, 10, 31, 0.65);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), 0 0 30px rgba(255, 59, 119, 0.15);
+      border-radius: 24px;
+    }
+
+    .glass-box-rose {
+      background: linear-gradient(135deg, rgba(255, 59, 119, 0.12) 0%, rgba(168, 85, 247, 0.08) 100%);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 59, 119, 0.25);
+      box-shadow: 0 15px 35px rgba(255, 59, 119, 0.15);
+      border-radius: 24px;
+    }
+
+    /* Glowing Text Effects */
+    .glow-rose {
+      text-shadow: 0 0 20px rgba(255, 59, 119, 0.7), 0 0 40px rgba(255, 59, 119, 0.4);
+    }
+    .glow-gold {
+      text-shadow: 0 0 20px rgba(255, 215, 0, 0.7), 0 0 40px rgba(255, 215, 0, 0.3);
+    }
+
+    /* Gradient Text */
+    .text-gradient-rose {
+      background: linear-gradient(135deg, #ff758c 0%, #ff3b77 50%, #ffd700 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .text-gradient-gold {
+      background: linear-gradient(135deg, #fff 0%, #ffd700 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    /* Modern Buttons */
+    .btn-rose {
+      background: linear-gradient(135deg, #ff3b77 0%, #d92662 100%);
+      color: white;
+      box-shadow: 0 10px 25px rgba(255, 59, 119, 0.4);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .btn-rose:hover {
+      transform: translateY(-3px) scale(1.03);
+      box-shadow: 0 15px 35px rgba(255, 59, 119, 0.6);
+    }
+
+    .btn-glass {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #f8fafc;
+      transition: all 0.3s ease;
+    }
+    .btn-glass:hover {
+      background: rgba(255, 59, 119, 0.2);
+      border-color: rgba(255, 59, 119, 0.5);
+      transform: translateY(-2px);
+    }
+
+    /* WhatsApp Romantic Chat Styles */
+    .chat-bubble-mine {
+      background: linear-gradient(135deg, rgba(217, 119, 6, 0.38) 0%, rgba(225, 29, 72, 0.42) 100%);
+      border: 1px solid rgba(251, 191, 36, 0.45);
+      border-radius: 18px 18px 4px 18px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+    }
+
+    .chat-bubble-partner {
+      background: linear-gradient(135deg, rgba(147, 51, 234, 0.32) 0%, rgba(225, 29, 72, 0.38) 100%);
+      border: 1px solid rgba(244, 63, 94, 0.45);
+      border-radius: 18px 18px 18px 4px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+    }
+
+    .chat-wallpaper {
+      background-color: #06020a;
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(255, 59, 119, 0.08) 0%, transparent 35%),
+        radial-gradient(circle at 90% 80%, rgba(168, 85, 247, 0.08) 0%, transparent 35%),
+        radial-gradient(circle at 50% 50%, rgba(255, 215, 0, 0.03) 0%, transparent 50%);
+    }
+
+    .tick-blue {
+      color: #38bdf8 !important;
+    }
+
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    /* Swipe-to-Reply & Quoted Bubble Animations */
+    .bubble-swipe-container {
+      position: relative;
+      transition: transform 0.18s cubic-bezier(0.2, 0.9, 0.3, 1);
+      touch-action: pan-y;
+    }
+    .swipe-reply-indicator {
+      position: absolute;
+      left: -32px;
+      top: 50%;
+      transform: translateY(-50%) scale(0.6);
+      opacity: 0;
+      transition: all 0.2s ease;
+      pointer-events: none;
+    }
+
+    /* Floating Hearts Canvas */
+    #canvas-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* 3D Flip Card Effect for Telugu Words */
+    .flip-card {
+      background-color: transparent;
+      perspective: 1000px;
+      height: 220px;
+    }
+    .flip-card-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      text-align: center;
+      transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      transform-style: preserve-3d;
+      cursor: pointer;
+    }
+    .flip-card:hover .flip-card-inner, .flip-card.flipped .flip-card-inner {
+      transform: rotateY(180deg);
+    }
+    .flip-card-front, .flip-card-back {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      -webkit-backface-visibility: hidden;
+      backface-visibility: hidden;
+      border-radius: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .flip-card-front {
+      background: linear-gradient(145deg, rgba(35, 14, 48, 0.8), rgba(20, 7, 30, 0.9));
+      border: 1px solid rgba(255, 59, 119, 0.3);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    }
+    .flip-card-back {
+      background: linear-gradient(145deg, rgba(255, 59, 119, 0.25), rgba(168, 85, 247, 0.25));
+      border: 1px solid rgba(255, 215, 0, 0.4);
+      transform: rotateY(180deg);
+      box-shadow: 0 10px 30px rgba(255, 59, 119, 0.3);
+    }
+
+    /* 3D Realistic Envelope */
+    .envelope-container {
+      perspective: 1000px;
+      width: 100%;
+      max-width: 520px;
+      margin: 0 auto;
+    }
+    .envelope-box {
+      position: relative;
+      width: 100%;
+      height: 320px;
+      background: linear-gradient(135deg, #2b0826 0%, #150314 100%);
+      border-radius: 20px;
+      border: 1px solid rgba(255, 59, 119, 0.4);
+      box-shadow: 0 25px 60px rgba(0,0,0,0.7), 0 0 40px rgba(255, 59, 119, 0.25);
+      cursor: pointer;
+      overflow: hidden;
+      transition: all 0.5s ease;
+    }
+    .envelope-box:hover {
+      transform: translateY(-8px) scale(1.01);
+      box-shadow: 0 30px 70px rgba(0,0,0,0.8), 0 0 50px rgba(255, 59, 119, 0.4);
+    }
+
+    .wax-seal-stamp {
+      position: absolute;
+      top: 45%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 80px;
+      height: 80px;
+      background: radial-gradient(circle, #ff3b77 0%, #a80038 100%);
+      border: 3px solid #ffd700;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5), 0 0 20px rgba(255, 59, 119, 0.8);
+      z-index: 10;
+      animation: pulse-glow 2s infinite ease-in-out;
+    }
+
+    @keyframes pulse-glow {
+      0%, 100% { transform: translate(-50%, -50%) scale(1); box-shadow: 0 0 20px rgba(255,59,119,0.8); }
+      50% { transform: translate(-50%, -50%) scale(1.08); box-shadow: 0 0 35px rgba(255,215,0,0.9); }
+    }
+
+    /* Polaroid Frames */
+    .polaroid-frame {
+      background: #ffffff;
+      padding: 14px 14px 28px 14px;
+      border-radius: 6px;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      color: #1e293b;
+      position: relative;
+    }
+    .polaroid-frame:hover {
+      transform: rotate(0deg) scale(1.05) translateY(-6px);
+      z-index: 30;
+      box-shadow: 0 25px 50px rgba(255, 59, 119, 0.5);
+    }
+
+    .polaroid-frame-eyes {
+      background: linear-gradient(180deg, #ffffff 0%, #fff5f8 100%);
+      padding: 14px 14px 28px 14px;
+      border-radius: 8px;
+      border: 2px solid #ffd700;
+      box-shadow: 0 20px 45px rgba(255, 215, 0, 0.3), 0 0 25px rgba(255, 59, 119, 0.4);
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      color: #1e293b;
+      position: relative;
+    }
+    .polaroid-frame-eyes:hover {
+      transform: rotate(0deg) scale(1.07) translateY(-8px);
+      z-index: 35;
+      box-shadow: 0 30px 60px rgba(255, 215, 0, 0.5), 0 0 35px rgba(255, 59, 119, 0.6);
+    }
+
+    .photo-overlay-btn {
+      position: absolute;
+      inset: 0;
+      background: rgba(15, 5, 20, 0.75);
+      backdrop-filter: blur(4px);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+    .polaroid-frame:hover .photo-overlay-btn, .polaroid-frame-eyes:hover .photo-overlay-btn {
+      opacity: 1;
+    }
+
+    /* REAL FLOATING SKY LANTERN ANIMATION */
+    .sky-lantern-float {
+      position: fixed;
+      bottom: -160px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 9999;
+      pointer-events: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      animation: floatUpSky 16s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+      filter: drop-shadow(0 0 25px rgba(255, 111, 0, 0.6));
+    }
+
+    @keyframes floatUpSky {
+      0% {
+        transform: translateY(0) translateX(-50%) scale(0.7) rotate(-2deg);
+        opacity: 0;
+      }
+      12% {
+        opacity: 1;
+        transform: translateY(-25vh) translateX(-50%) scale(1.1) rotate(2deg);
+      }
+      85% {
+        opacity: 0.95;
+      }
+      100% {
+        transform: translateY(-125vh) translateX(-50%) scale(0.6) rotate(-3deg);
+        opacity: 0;
+      }
+    }
+
+    .lantern-glow-body {
+      width: 95px;
+      height: 125px;
+      background: radial-gradient(circle at 50% 70%, #fff7ed 0%, #ffe600 25%, #ff6f00 65%, #b91c1c 100%);
+      border-radius: 45px 45px 18px 18px;
+      box-shadow: 0 0 50px #ff6f00, 0 0 100px #ffe600, 0 0 140px rgba(255, 59, 119, 0.5);
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      padding-bottom: 12px;
+      position: relative;
+      border: 2px solid rgba(255, 215, 0, 0.7);
+    }
+
+    .lantern-flame {
+      width: 22px;
+      height: 22px;
+      background: #ffffff;
+      border-radius: 50%;
+      box-shadow: 0 0 20px #ffffff, 0 0 40px #ffe600, 0 0 60px #ff6f00;
+      animation: flameWiggle 0.5s infinite alternate ease-in-out;
+    }
+
+    @keyframes flameWiggle {
+      0% { transform: scale(1); }
+      100% { transform: scale(1.35); }
+    }
+
+    .lantern-tag {
+      background: linear-gradient(135deg, rgba(15, 5, 25, 0.96) 0%, rgba(35, 10, 30, 0.96) 100%);
+      border: 2px solid #ffd700;
+      color: #ffffff;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      padding: 10px 18px;
+      border-radius: 20px;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.8), 0 0 25px rgba(255, 215, 0, 0.5), 0 0 15px rgba(255, 59, 119, 0.6);
+      margin-top: 10px;
+      white-space: normal;
+      text-align: center;
+      max-width: 88vw;
+      word-break: break-word;
+      backdrop-filter: blur(8px);
+      letter-spacing: 0.3px;
+    }
+
+    @media (min-width: 640px) {
+      .lantern-tag {
+        max-width: 450px;
+        white-space: nowrap;
+      }
+    }
+
+    /* Custom Animations */
+    @keyframes float-gentle {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-12px); }
+    }
+    .animate-float {
+      animation: float-gentle 4s infinite ease-in-out;
+    }
+
+    .love-progress-bar {
+      height: 12px;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.1);
+      overflow: hidden;
+      position: relative;
+    }
+    .love-progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #ff3b77, #ffd700);
+      border-radius: 6px;
+      transition: width 1.5s ease-in-out;
+    }
+
+    /* 3D Realistic Heartbeat Glow & Ripple Animations */
+    @keyframes heartbeatPulse {
+      0%, 100% {
+        transform: scale(1);
+        filter: drop-shadow(0 0 15px rgba(255, 59, 119, 0.6)) drop-shadow(0 0 35px rgba(255, 59, 119, 0.3));
+      }
+      14% {
+        transform: scale(1.15);
+        filter: drop-shadow(0 0 30px rgba(255, 59, 119, 0.9)) drop-shadow(0 0 50px rgba(255, 215, 0, 0.6));
+      }
+      28% {
+        transform: scale(1.02);
+      }
+      42% {
+        transform: scale(1.22);
+        filter: drop-shadow(0 0 45px rgba(255, 59, 119, 1)) drop-shadow(0 0 65px rgba(255, 215, 0, 0.8));
+      }
+      70% {
+        transform: scale(1);
+      }
+    }
+
+    .animate-heartbeat-glow {
+      animation: heartbeatPulse 1.6s ease-in-out infinite;
+    }
+
+    @keyframes auraRingRipple {
+      0% {
+        transform: scale(0.85);
+        opacity: 0.9;
+      }
+      100% {
+        transform: scale(2.4);
+        opacity: 0;
+      }
+    }
+
+    .aura-ring {
+      position: absolute;
+      inset: -15px;
+      border-radius: 50%;
+      border: 2px solid rgba(255, 59, 119, 0.7);
+      animation: auraRingRipple 2.2s cubic-bezier(0.1, 0.8, 0.3, 1) infinite;
+      pointer-events: none;
+    }
+
+    .aura-ring-delayed {
+      animation-delay: 1.1s;
+      border-color: rgba(255, 215, 0, 0.6);
+    }
+
+    /* YouTube Background / Floating Dock Video Container */
+    .yt-player-dock-hidden {
+      position: absolute !important;
+      opacity: 0 !important;
+      pointer-events: none !important;
+      left: -9999px !important;
+      top: auto !important;
+      width: 256px !important;
+      height: 144px !important;
+    }
+
+    .yt-player-dock-visible {
+      position: relative !important;
+      opacity: 1 !important;
+      pointer-events: auto !important;
+      left: auto !important;
+      width: 16rem !important;
+      height: 9rem !important;
+    }
