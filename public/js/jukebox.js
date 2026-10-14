@@ -351,7 +351,7 @@ function playLoveSong(song) {
   const dock = document.getElementById('floating-music-dock');
   const ytToggleBtn = document.getElementById('dock-video-toggle-btn');
 
-  if (dock) dock.classList.remove('hidden');
+  if (dock) dock.classList.add('hidden');
 
   if (song.type === 'youtube') {
     if (audio) {
@@ -537,7 +537,7 @@ function updateMusicUI(playing) {
   const dockTitle = document.getElementById('dock-song-title');
   const dockArtist = document.getElementById('dock-song-artist');
   const dockDisc = document.getElementById('dock-vinyl-disc');
-  if (dock) dock.classList.remove('hidden');
+  if (dock) dock.classList.add('hidden');
   if (dockBtn) dockBtn.innerText = playing ? '⏸️' : '▶️';
   if (dockTitle && song) dockTitle.innerText = song.title;
   if (dockArtist && song) dockArtist.innerText = song.addedBy || 'Featured Love Song';

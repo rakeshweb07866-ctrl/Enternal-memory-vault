@@ -8,6 +8,14 @@ let touchStartX = 0;
 let touchStartY = 0;
 let currentSwipedBubbleId = null;
 
+// Media & Audio Voice Notes State
+let pendingChatMedia = null; // { type: 'image'|'video'|'audio', dataUrl: string, fileName: string, fileSize: number }
+let chatMediaRecorder = null;
+let chatAudioChunks = [];
+let chatVoiceRecordTimer = null;
+let chatVoiceRecordSeconds = 0;
+let chatAudioStream = null;
+
 // Sound Synthesizer (Zero External Assets)
 function playSentSound() {
   try {
@@ -186,7 +194,10 @@ function deduplicateMessagesList(list) {
     const mTime = new Date(m.timestamp || 0).getTime();
     const isDupe = result.some(prev => {
       const prevTime = new Date(prev.timestamp || 0).getTime();
-      return prev.sender === m.sender && prev.message === m.message && Math.abs(prevTime - mTime) < 4000;
+      return prev.sender === m.sender &&
+             (prev.message || '') === (m.message || '') &&
+             (prev.mediaUrl || '') === (m.mediaUrl || '') &&
+             Math.abs(prevTime - mTime) < 4000;
     });
     if (!isDupe) {
       seenIds.add(m.id);
@@ -214,7 +225,10 @@ function saveMessageToLocalVault(msg) {
   const dupeIdx = msgs.findIndex(m => {
     if (m.id === msg.id) return true;
     const prevTime = new Date(m.timestamp || 0).getTime();
-    return m.sender === msg.sender && m.message === msg.message && Math.abs(prevTime - msgTime) < 4000;
+    return m.sender === msg.sender &&
+           (m.message || '') === (msg.message || '') &&
+           (m.mediaUrl || '') === (msg.mediaUrl || '') &&
+           Math.abs(prevTime - msgTime) < 4000;
   });
   if (dupeIdx !== -1) {
     msgs[dupeIdx] = { ...msgs[dupeIdx], ...msg };
@@ -266,10 +280,56 @@ function buildMessageHtml(m, isMyMessage) {
     `;
   }
 
+  // Media (Photo, Video, Voice Note) Rendering with Download / Fullscreen capability
+  let mediaHtml = '';
+  if (m.mediaUrl) {
+    const isImage = m.mediaType === 'image' || (!m.mediaType && (m.mediaUrl.startsWith('data:image') || m.mediaUrl.match(/\.(jpeg|jpg|png|gif|webp)(\?.*)?$/i)));
+    const isVideo = m.mediaType === 'video' || (!m.mediaType && (m.mediaUrl.startsWith('data:video') || m.mediaUrl.match(/\.(mp4|webm|mov)(\?.*)?$/i)));
+    const isAudio = m.mediaType === 'audio' || (!m.mediaType && (m.mediaUrl.startsWith('data:audio') || m.mediaUrl.match(/\.(mp3|wav|ogg|webm|m4a)(\?.*)?$/i)));
+
+    if (isImage) {
+      mediaHtml = `
+        <div class="mb-2 relative rounded-xl overflow-hidden border border-white/10 group/img bg-black/40">
+          <img src="${m.mediaUrl}" alt="Photo" onclick="openChatMediaModal('${m.mediaUrl}', 'image', '${escapeChatHtml(m.fileName || 'photo.jpg')}')" class="w-full max-h-72 object-cover cursor-pointer hover:scale-[1.02] transition-transform">
+          <a href="${m.mediaUrl}" download="${m.fileName || 'memory-vault-photo.jpg'}" onclick="event.stopPropagation()" class="absolute bottom-2 right-2 px-2.5 py-1 rounded-lg bg-black/75 hover:bg-rose-600 text-white text-[10px] font-semibold flex items-center gap-1 shadow backdrop-blur-sm transition-colors cursor-pointer" title="Save Photo">
+            <span>💾 Save</span>
+          </a>
+        </div>
+      `;
+    } else if (isVideo) {
+      mediaHtml = `
+        <div class="mb-2 rounded-xl overflow-hidden border border-white/10 bg-black/80">
+          <video src="${m.mediaUrl}" controls playsinline class="w-full max-h-72 rounded-t-xl bg-black"></video>
+          <div class="p-1.5 flex items-center justify-between text-[10px] bg-slate-950/80">
+            <span class="text-slate-400 truncate max-w-[160px]">${escapeChatHtml(m.fileName || 'Video')}</span>
+            <a href="${m.mediaUrl}" download="${m.fileName || 'memory-vault-video.mp4'}" class="px-2.5 py-0.5 rounded bg-slate-800 hover:bg-rose-600 text-white font-medium flex items-center gap-1 transition-colors cursor-pointer">
+              <span>💾 Save</span>
+            </a>
+          </div>
+        </div>
+      `;
+    } else if (isAudio) {
+      mediaHtml = `
+        <div class="mb-2 p-2.5 rounded-xl bg-black/50 border border-white/10 flex flex-col gap-1.5 min-w-[220px]">
+          <div class="flex items-center justify-between text-xs font-semibold ${isMyMessage ? 'text-amber-300' : 'text-rose-300'}">
+            <span class="flex items-center gap-1"><span>🎙️</span><span>Voice Note</span></span>
+            <a href="${m.mediaUrl}" download="${m.fileName || 'voice-note.webm'}" class="text-[10px] text-slate-300 hover:text-white flex items-center gap-1 cursor-pointer" title="Save Voice Note">
+              <span>💾 Save</span>
+            </a>
+          </div>
+          <audio src="${m.mediaUrl}" controls class="w-full h-8"></audio>
+        </div>
+      `;
+    }
+  }
+
+  const textHtml = m.message ? `<div class="whitespace-pre-wrap break-words pr-1">${escapeChatHtml(m.message)}</div>` : '';
+
   return `
     <div id="msg-elem-${m.id}" 
          data-msg-sender="${escapeChatHtml(m.sender)}" 
-         data-msg-text="${escapeChatHtml(m.message)}" 
+         data-msg-text="${escapeChatHtml(m.message || '')}" 
+         data-msg-media="${m.mediaUrl ? 'has_media' : ''}"
          data-msg-time="${new Date(m.timestamp || 0).getTime()}"
          class="flex flex-col ${isMyMessage ? 'items-end' : 'items-start'} my-1 animate-scale-up group relative transition-all duration-300">
       ${!isMyMessage ? `
@@ -290,7 +350,8 @@ function buildMessageHtml(m, isMyMessage) {
              ondblclick="activateReplyMode('${m.id}')"
              class="max-w-[85%] md:max-w-[75%] px-3.5 py-2.5 text-xs md:text-sm font-medium leading-relaxed ${isMyMessage ? 'chat-bubble-mine text-amber-50' : 'chat-bubble-partner text-rose-50'} shadow-md relative transition-transform">
           ${quotedSnippetHtml}
-          <div class="whitespace-pre-wrap break-words pr-1">${escapeChatHtml(m.message)}</div>
+          ${mediaHtml}
+          ${textHtml}
           <div class="flex items-center justify-end gap-1.5 mt-1 text-[10px] font-mono select-none ${isMyMessage ? 'text-amber-200/80' : 'text-rose-200/80'}">
             <span>${timeStr}</span>
             ${tickHtml}
@@ -340,13 +401,18 @@ function renderChatFeed(messages, forceReset = false) {
       return;
     }
 
-    // 2. Strict Content & Time Deduplication
+    // 2. Strict Content, Media & Time Deduplication
     const msgTimeMs = new Date(m.timestamp || 0).getTime();
     const existingDuplicate = Array.from(feed.querySelectorAll('[data-msg-text]')).find(el => {
       const elSender = el.getAttribute('data-msg-sender');
       const elText = el.getAttribute('data-msg-text');
+      const elMedia = el.getAttribute('data-msg-media') || '';
       const elTime = Number(el.getAttribute('data-msg-time') || 0);
-      return elSender === m.sender && elText === m.message && Math.abs(elTime - msgTimeMs) < 4000;
+      const currentMediaHas = m.mediaUrl ? 'has_media' : '';
+      return elSender === m.sender &&
+             elText === (m.message || '') &&
+             elMedia === currentMediaHas &&
+             Math.abs(elTime - msgTimeMs) < 4000;
     });
     if (existingDuplicate) {
       renderedMsgIds.add(m.id);
@@ -465,7 +531,12 @@ async function sendLiveChatMessage(customText = null) {
 
   const input = document.getElementById('live-chat-input');
   const text = customText !== null ? String(customText).trim() : (input ? input.value.trim() : '');
-  if (!text) return;
+  
+  // Allow sending if there is text OR attached media
+  if (!text && !pendingChatMedia) return;
+
+  const mediaSnapshot = pendingChatMedia ? { ...pendingChatMedia } : null;
+  cancelChatMediaAttachment();
 
   const replySnapshot = activeReplyTarget ? { ...activeReplyTarget } : null;
   cancelReplyMode();
@@ -481,6 +552,9 @@ async function sendLiveChatMessage(customText = null) {
     id: localId,
     sender: currentChatSender,
     message: text,
+    mediaType: mediaSnapshot ? mediaSnapshot.type : undefined,
+    mediaUrl: mediaSnapshot ? mediaSnapshot.dataUrl : undefined,
+    fileName: mediaSnapshot ? mediaSnapshot.fileName : undefined,
     timestamp: now.toISOString(),
     formattedTime: getISTTimeString(now),
     formattedDate: getISTDateString(now),
@@ -500,10 +574,25 @@ async function sendLiveChatMessage(customText = null) {
 }
 
 async function dispatchMessageToCloud(msg) {
+  const payload = {
+    id: msg.id,
+    sender: msg.sender,
+    pin: currentChatPin,
+    message: msg.message,
+    mediaType: msg.mediaType || undefined,
+    mediaUrl: msg.mediaUrl || undefined,
+    fileName: msg.fileName || undefined,
+    timestamp: msg.timestamp,
+    formattedTime: msg.formattedTime,
+    formattedDate: msg.formattedDate,
+    status: 'sent',
+    replyTo: msg.replyTo
+  };
+
   // 1. Primary: Firebase RTDB (Single transport)
   if (isFirebaseActive && fbDb) {
     try {
-      await fbDb.ref('vault_messages/' + msg.id).set(msg);
+      await fbDb.ref('vault_messages/' + msg.id).set(payload);
       markMessageSent(msg.id);
       return;
     } catch (err) {
@@ -513,17 +602,7 @@ async function dispatchMessageToCloud(msg) {
 
   // 2. Secondary: Socket.io if active
   if (socket && socket.connected) {
-    socket.emit('send_message', {
-      id: msg.id,
-      sender: msg.sender,
-      pin: currentChatPin,
-      message: msg.message,
-      timestamp: msg.timestamp,
-      formattedTime: msg.formattedTime,
-      formattedDate: msg.formattedDate,
-      status: 'sent',
-      replyTo: msg.replyTo
-    });
+    socket.emit('send_message', payload);
     markMessageSent(msg.id);
     return;
   }
@@ -533,17 +612,7 @@ async function dispatchMessageToCloud(msg) {
     const res = await fetch('/api/messages', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        id: msg.id,
-        sender: msg.sender,
-        pin: currentChatPin,
-        message: msg.message,
-        timestamp: msg.timestamp,
-        formattedTime: msg.formattedTime,
-        formattedDate: msg.formattedDate,
-        status: 'sent',
-        replyTo: msg.replyTo
-      })
+      body: JSON.stringify(payload)
     });
     const data = await res.json();
     if (data.success) {
@@ -568,12 +637,270 @@ function markMessageSent(msgId) {
   }
 }
 
+// Quick Emojis & Reactions
+function insertQuickChatEmoji(emoji) {
+  const input = document.getElementById('live-chat-input');
+  if (!input) return;
+  input.value = (input.value ? input.value + ' ' : '') + emoji;
+  input.focus();
+}
+
 function triggerQuickChatReaction(emoji) {
   if (!currentChatSender) {
     openNameLoginModal();
     return;
   }
   sendLiveChatMessage(emoji);
+}
+
+// Media Attachment Engine (Photos, Videos, Audio)
+function triggerChatMediaPicker() {
+  const fileInput = document.getElementById('chat-media-file-input');
+  if (fileInput) {
+    fileInput.value = '';
+    fileInput.click();
+  }
+}
+
+function handleChatMediaSelected(event) {
+  const file = event.target.files && event.target.files[0];
+  if (!file) return;
+
+  if (file.size > 40 * 1024 * 1024) {
+    alert('Selected file is too large (Maximum 40MB allowed).');
+    return;
+  }
+
+  let mediaType = 'image';
+  if (file.type.startsWith('video/')) mediaType = 'video';
+  else if (file.type.startsWith('audio/')) mediaType = 'audio';
+  else if (file.type.startsWith('image/')) mediaType = 'image';
+  else {
+    alert('Please choose an image, video, or audio file.');
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    pendingChatMedia = {
+      type: mediaType,
+      dataUrl: e.target.result,
+      fileName: file.name,
+      fileSize: file.size
+    };
+    showChatMediaPreviewBar();
+  };
+  reader.readAsDataURL(file);
+}
+
+function showChatMediaPreviewBar() {
+  if (!pendingChatMedia) return;
+  const bar = document.getElementById('chat-media-preview-bar');
+  const thumb = document.getElementById('chat-media-preview-thumb');
+  const nameEl = document.getElementById('chat-media-preview-name');
+  const sizeEl = document.getElementById('chat-media-preview-size');
+
+  if (nameEl) nameEl.innerText = pendingChatMedia.fileName || 'Attached Media';
+  if (sizeEl) {
+    const kb = Math.round(pendingChatMedia.fileSize / 1024);
+    const sizeStr = kb > 1024 ? (kb / 1024).toFixed(1) + ' MB' : kb + ' KB';
+    sizeEl.innerText = `${pendingChatMedia.type.toUpperCase()} • ${sizeStr} • Ready to send`;
+  }
+  if (thumb) {
+    if (pendingChatMedia.type === 'image') {
+      thumb.innerHTML = `<img src="${pendingChatMedia.dataUrl}" class="w-full h-full object-cover">`;
+    } else if (pendingChatMedia.type === 'video') {
+      thumb.innerHTML = `<span class="text-rose-400">🎬</span>`;
+    } else {
+      thumb.innerHTML = `<span class="text-amber-400">🎵</span>`;
+    }
+  }
+  if (bar) {
+    bar.classList.remove('hidden');
+    bar.classList.add('flex');
+  }
+  const input = document.getElementById('live-chat-input');
+  if (input) input.focus();
+}
+
+function cancelChatMediaAttachment() {
+  pendingChatMedia = null;
+  const bar = document.getElementById('chat-media-preview-bar');
+  if (bar) {
+    bar.classList.add('hidden');
+    bar.classList.remove('flex');
+  }
+  const fileInput = document.getElementById('chat-media-file-input');
+  if (fileInput) fileInput.value = '';
+}
+
+// Voice Note Recording Engine (MediaRecorder API)
+async function toggleChatVoiceRecording() {
+  if (!currentChatSender || !currentChatPin) {
+    openNameLoginModal();
+    return;
+  }
+
+  if (chatMediaRecorder && chatMediaRecorder.state === 'recording') {
+    stopAndSendChatVoiceRecording();
+    return;
+  }
+
+  try {
+    chatAudioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    chatAudioChunks = [];
+    chatVoiceRecordSeconds = 0;
+
+    const options = { mimeType: 'audio/webm' };
+    if (!window.MediaRecorder || !MediaRecorder.isTypeSupported('audio/webm')) {
+      if (window.MediaRecorder && MediaRecorder.isTypeSupported('audio/mp4')) options.mimeType = 'audio/mp4';
+      else if (window.MediaRecorder && MediaRecorder.isTypeSupported('audio/ogg')) options.mimeType = 'audio/ogg';
+      else delete options.mimeType;
+    }
+
+    chatMediaRecorder = new MediaRecorder(chatAudioStream, options);
+
+    chatMediaRecorder.ondataavailable = (e) => {
+      if (e.data && e.data.size > 0) {
+        chatAudioChunks.push(e.data);
+      }
+    };
+
+    chatMediaRecorder.start();
+
+    const indicator = document.getElementById('chat-voice-recording-indicator');
+    const timerEl = document.getElementById('chat-voice-recording-timer');
+    const micBtn = document.getElementById('chat-mic-btn');
+    if (indicator) {
+      indicator.classList.remove('hidden');
+      indicator.classList.add('flex');
+    }
+    if (timerEl) timerEl.innerText = '00:00';
+    if (micBtn) {
+      micBtn.classList.add('bg-rose-600', 'text-white', 'animate-pulse');
+    }
+
+    chatVoiceRecordTimer = setInterval(() => {
+      chatVoiceRecordSeconds++;
+      const mins = String(Math.floor(chatVoiceRecordSeconds / 60)).padStart(2, '0');
+      const secs = String(chatVoiceRecordSeconds % 60).padStart(2, '0');
+      if (timerEl) timerEl.innerText = `${mins}:${secs}`;
+    }, 1000);
+
+  } catch (err) {
+    console.error('Microphone access error:', err);
+    alert('Microphone access is required to record voice notes. Please allow microphone permission in your browser.');
+  }
+}
+
+function cancelChatVoiceRecording() {
+  if (chatVoiceRecordTimer) clearInterval(chatVoiceRecordTimer);
+  if (chatMediaRecorder && chatMediaRecorder.state !== 'inactive') {
+    chatMediaRecorder.onstop = null;
+    chatMediaRecorder.stop();
+  }
+  if (chatAudioStream) {
+    chatAudioStream.getTracks().forEach(track => track.stop());
+    chatAudioStream = null;
+  }
+  chatAudioChunks = [];
+  chatMediaRecorder = null;
+
+  const indicator = document.getElementById('chat-voice-recording-indicator');
+  const micBtn = document.getElementById('chat-mic-btn');
+  if (indicator) {
+    indicator.classList.add('hidden');
+    indicator.classList.remove('flex');
+  }
+  if (micBtn) {
+    micBtn.classList.remove('bg-rose-600', 'text-white', 'animate-pulse');
+  }
+}
+
+function stopAndSendChatVoiceRecording() {
+  if (!chatMediaRecorder || chatMediaRecorder.state === 'inactive') return;
+
+  chatMediaRecorder.onstop = () => {
+    if (chatVoiceRecordTimer) clearInterval(chatVoiceRecordTimer);
+    if (chatAudioStream) {
+      chatAudioStream.getTracks().forEach(track => track.stop());
+      chatAudioStream = null;
+    }
+
+    const mime = (chatMediaRecorder && chatMediaRecorder.mimeType) || 'audio/webm';
+    const audioBlob = new Blob(chatAudioChunks, { type: mime });
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const voiceDataUrl = e.target.result;
+      const now = new Date();
+      const localId = 'msg_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
+      const replySnapshot = activeReplyTarget ? { ...activeReplyTarget } : null;
+      cancelReplyMode();
+
+      const ext = mime.includes('mp4') ? 'm4a' : 'webm';
+      const voiceMsg = {
+        id: localId,
+        sender: currentChatSender,
+        message: '',
+        mediaType: 'audio',
+        mediaUrl: voiceDataUrl,
+        fileName: `VoiceNote_${Date.now()}.${ext}`,
+        timestamp: now.toISOString(),
+        formattedTime: getISTTimeString(now),
+        formattedDate: getISTDateString(now),
+        status: 'pending',
+        replyTo: replySnapshot
+      };
+
+      appendOptimisticMessage(voiceMsg);
+      playSentSound();
+      saveMessageToLocalVault(voiceMsg);
+      dispatchMessageToCloud(voiceMsg);
+    };
+    reader.readAsDataURL(audioBlob);
+
+    const indicator = document.getElementById('chat-voice-recording-indicator');
+    const micBtn = document.getElementById('chat-mic-btn');
+    if (indicator) {
+      indicator.classList.add('hidden');
+      indicator.classList.remove('flex');
+    }
+    if (micBtn) {
+      micBtn.classList.remove('bg-rose-600', 'text-white', 'animate-pulse');
+    }
+  };
+
+  chatMediaRecorder.stop();
+}
+
+// Chat Media Fullscreen Modal Controls
+function openChatMediaModal(url, type = 'image', fileName = 'media') {
+  const modal = document.getElementById('chat-media-modal');
+  const content = document.getElementById('chat-media-modal-content');
+  const dlBtn = document.getElementById('chat-media-modal-download');
+  if (!modal || !content) return;
+
+  if (type === 'image') {
+    content.innerHTML = `<img src="${url}" class="max-w-full max-h-[75vh] object-contain rounded-xl shadow-2xl">`;
+  } else if (type === 'video') {
+    content.innerHTML = `<video src="${url}" controls autoplay class="max-w-full max-h-[75vh] rounded-xl shadow-2xl bg-black"></video>`;
+  }
+  if (dlBtn) {
+    dlBtn.href = url;
+    dlBtn.download = fileName;
+  }
+  modal.classList.remove('hidden');
+  modal.classList.add('flex');
+}
+
+function closeChatMediaModal() {
+  const modal = document.getElementById('chat-media-modal');
+  const content = document.getElementById('chat-media-modal-content');
+  if (modal) {
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+  }
+  if (content) content.innerHTML = '';
 }
 
 // Presence & Typing

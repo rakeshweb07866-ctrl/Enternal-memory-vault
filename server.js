@@ -23,7 +23,7 @@ if (Server) {
 const PORT = process.env.PORT || 4000;
 
 app.use(cors());
-app.use(express.json({ limit: '10mb' }));
+app.use(express.json({ limit: '50mb' }));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static(__dirname));
 
@@ -188,20 +188,23 @@ if (io) {
     });
 
     socket.on('send_message', (data) => {
-      const { sender, pin, message } = data || {};
+      const { sender, pin, message, mediaType, mediaUrl, fileName } = data || {};
       if (!isValidPin(sender, pin)) {
         socket.emit('chat_error', { message: 'Access Denied: Invalid Security Passcode.' });
         return;
       }
 
-      if (!message || !message.trim()) return;
+      if ((!message || !message.trim()) && !mediaUrl) return;
       updateHttpPresence(sender);
 
       const now = new Date();
       const newMsg = {
         id: data.id || ('msg_' + Date.now()),
         sender: sender,
-        message: message.trim(),
+        message: (message || '').trim(),
+        mediaType: mediaType || null,
+        mediaUrl: mediaUrl || null,
+        fileName: fileName || null,
         timestamp: data.timestamp || now.toISOString(),
         formattedTime: data.formattedTime || getISTTimeString(),
         formattedDate: data.formattedDate || getISTDateString(),
@@ -268,12 +271,12 @@ app.post('/api/auth/login', (req, res) => {
 
 app.post('/api/messages', (req, res) => {
   try {
-    const { sender, pin, message } = req.body;
+    const { sender, pin, message, mediaType, mediaUrl, fileName } = req.body;
     if (!isValidPin(sender, pin)) {
       return res.status(401).json({ success: false, error: 'Access Denied: Invalid Passcode!' });
     }
-    if (!message || !message.trim()) {
-      return res.status(400).json({ success: false, error: 'Message cannot be empty' });
+    if ((!message || !message.trim()) && !mediaUrl) {
+      return res.status(400).json({ success: false, error: 'Message or media required' });
     }
 
     updateHttpPresence(sender);
@@ -282,7 +285,10 @@ app.post('/api/messages', (req, res) => {
     const newMsg = {
       id: req.body.id || ('msg_' + Date.now()),
       sender: sender,
-      message: message.trim(),
+      message: (message || '').trim(),
+      mediaType: mediaType || null,
+      mediaUrl: mediaUrl || null,
+      fileName: fileName || null,
       timestamp: req.body.timestamp || now.toISOString(),
       formattedTime: req.body.formattedTime || getISTTimeString(),
       formattedDate: req.body.formattedDate || getISTDateString(),
@@ -425,7 +431,6 @@ app.post('/api/upload-reel', express.raw({ type: '*/*', limit: '200mb' }), (req,
     fs.writeFileSync(filePath, req.body);
     fs.writeFileSync(publicFilePath, req.body);
 
-    // Also keep default vanshika-reel.mp4 updated if it's the first reel or explicitly named
     if (targetFilename.includes('reel-1') || targetFilename === 'vanshika-reel.mp4') {
       try {
         fs.writeFileSync(path.join(targetDir, 'vanshika-reel.mp4'), req.body);
@@ -439,7 +444,162 @@ app.post('/api/upload-reel', express.raw({ type: '*/*', limit: '200mb' }), (req,
   }
 });
 
+// ==========================================
+// ADMIN-ONLY PROTECTED API ENDPOINTS
+// Only Rakesh (PIN: 1212) can access these
+// ==========================================
 
+const ADMIN_SECRET = process.env.ADMIN_SECRET || 'rakesh1212admin';
+
+function isAdminAuth(req) {
+  const pin = req.body && req.body.admin_pin;
+  const secret = req.headers['x-admin-secret'] || (req.body && req.body.admin_secret);
+  return pin === 'Vanshika170926' || secret === ADMIN_SECRET;
+}
+
+// GET: List all saved reel files on disk
+app.get('/api/admin/reels', (req, res) => {
+  const secret = req.headers['x-admin-secret'] || req.query.secret;
+  if (secret !== ADMIN_SECRET) {
+    return res.status(401).json({ success: false, error: 'Admin access denied' });
+  }
+  try {
+    const dirs = [
+      path.join(__dirname, 'assests'),
+      path.join(__dirname, 'public', 'assests')
+    ];
+    let reels = [];
+    const primary = dirs[0];
+    if (fs.existsSync(primary)) {
+      reels = fs.readdirSync(primary)
+        .filter(f => f.endsWith('.mp4'))
+        .map(f => {
+          const fullPath = path.join(primary, f);
+          const stat = fs.statSync(fullPath);
+          return {
+            filename: f,
+            url: `assests/${f}`,
+            size: stat.size,
+            sizeMB: (stat.size / (1024 * 1024)).toFixed(2) + ' MB',
+            createdAt: stat.birthtime
+          };
+        })
+        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    }
+    return res.json({ success: true, count: reels.length, data: reels });
+  } catch (err) {
+    return res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// DELETE: Remove a specific reel file from disk
+app.delete('/api/admin/reels/:filename', (req, res) => {
+  const secret = req.headers['x-admin-secret'];
+  if (secret !== ADMIN_SECRET) {
+    return res.status(401).json({ success: false, error: 'Admin access denied' });
+  }
+  try {
+    const rawName = req.params.filename;
+    const safeName = path.basename(rawName).replace(/[^a-zA-Z0-9._-]/g, '_');
+    if (!safeName.endsWith('.mp4')) {
+      return res.status(400).json({ success: false, error: 'Only .mp4 files allowed' });
+    }
+
+    let deleted = 0;
+    const dirs = [
+      path.join(__dirname, 'assests', safeName),
+      path.join(__dirname, 'public', 'assests', safeName)
+    ];
+    dirs.forEach(fp => {
+      if (fs.existsSync(fp)) {
+        fs.unlinkSync(fp);
+        deleted++;
+      }
+    });
+
+    return res.json({ success: true, deleted, message: `${safeName} deleted successfully` });
+  } catch (err) {
+    return res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// DELETE: Clear all messages (Admin only)
+app.post('/api/admin/messages/clear', (req, res) => {
+  if (!isAdminAuth(req)) {
+    return res.status(401).json({ success: false, error: 'Admin access denied' });
+  }
+  try {
+    inMemoryMessages = [];
+    try { fs.writeFileSync(MESSAGES_FILE, JSON.stringify([], null, 2)); } catch (e) {}
+    if (io) io.to('love_chat_room').emit('chat_cleared', { messages: [] });
+    return res.json({ success: true, message: 'All messages cleared!' });
+  } catch (err) {
+    return res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// DELETE: Clear all wishes (Admin only)
+app.post('/api/admin/wishes/clear', (req, res) => {
+  if (!isAdminAuth(req)) {
+    return res.status(401).json({ success: false, error: 'Admin access denied' });
+  }
+  try {
+    inMemoryWishes = [];
+    try { fs.writeFileSync(WISHES_FILE, JSON.stringify([], null, 2)); } catch (e) {}
+    return res.json({ success: true, message: 'All wishes cleared!' });
+  } catch (err) {
+    return res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// DELETE: Delete a single message by ID (Admin only)
+app.delete('/api/admin/messages/:id', (req, res) => {
+  const secret = req.headers['x-admin-secret'];
+  if (secret !== ADMIN_SECRET) {
+    return res.status(401).json({ success: false, error: 'Admin access denied' });
+  }
+  try {
+    const { id } = req.params;
+    const before = inMemoryMessages.length;
+    inMemoryMessages = inMemoryMessages.filter(m => m.id !== id);
+    try { fs.writeFileSync(MESSAGES_FILE, JSON.stringify(inMemoryMessages, null, 2)); } catch (e) {}
+    if (io) io.to('love_chat_room').emit('message_deleted', { id });
+    return res.json({ success: true, deleted: before - inMemoryMessages.length });
+  } catch (err) {
+    return res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// GET: Full admin dashboard status
+app.get('/api/admin/status', (req, res) => {
+  const secret = req.headers['x-admin-secret'] || req.query.secret;
+  if (secret !== ADMIN_SECRET) {
+    return res.status(401).json({ success: false, error: 'Admin access denied' });
+  }
+  try {
+    // Count server reels
+    let reelCount = 0;
+    const reelDir = path.join(__dirname, 'public', 'assests');
+    if (fs.existsSync(reelDir)) {
+      reelCount = fs.readdirSync(reelDir).filter(f => f.endsWith('.mp4')).length;
+    }
+    return res.json({
+      success: true,
+      stats: {
+        totalMessages: getMessages().length,
+        totalWishes: getWishes().length,
+        totalReelsOnServer: reelCount,
+        onlineUsers,
+        serverTime: new Date().toISOString(),
+        serverTimeIST: getISTTimeString()
+      }
+    });
+  } catch (err) {
+    return res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// Admin Panel Route (returns admin.html)
 app.get('/admin', (req, res) => {
   const publicAdmin = path.join(__dirname, 'public', 'admin.html');
   if (fs.existsSync(publicAdmin)) return res.sendFile(publicAdmin);
@@ -459,3 +619,4 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 module.exports = app;
+

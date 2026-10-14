@@ -12,5 +12,18 @@
       "sender": "Rakesh ㄳ",
       "message": "hh"
     }
+  },
+  {
+    "id": "msg_1791977010947_ymb7d6",
+    "sender": "Rakesh 🤵",
+    "message": "testing done",
+    "mediaType": null,
+    "mediaUrl": null,
+    "fileName": null,
+    "timestamp": "2026-10-14T11:23:30.947Z",
+    "formattedTime": "04:53 PM",
+    "formattedDate": "Oct 14",
+    "status": "sent",
+    "replyTo": null
   }
 ]

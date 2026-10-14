@@ -3,193 +3,869 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Partner Inbox — Messages from Vanshika ❤️</title>
-  
+  <title>🔐 Admin Panel — Memory Vault by Rakesh</title>
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Sacramento&display=swap" rel="stylesheet">
-  
   <script src="https://cdn.tailwindcss.com"></script>
 
   <style>
+    * { box-sizing: border-box; }
     body {
       font-family: 'Plus Jakarta Sans', sans-serif;
-      background-color: #08020c;
-      background-image: 
-        radial-gradient(circle at 20% 20%, rgba(255, 59, 119, 0.15) 0%, transparent 40%),
-        radial-gradient(circle at 80% 80%, rgba(168, 85, 247, 0.15) 0%, transparent 40%);
+      background-color: #030712;
+      background-image:
+        radial-gradient(circle at 10% 10%, rgba(16, 185, 129, 0.12) 0%, transparent 45%),
+        radial-gradient(circle at 90% 90%, rgba(255, 59, 119, 0.10) 0%, transparent 45%),
+        radial-gradient(circle at 50% 50%, rgba(139, 92, 246, 0.05) 0%, transparent 60%);
       color: #f8fafc;
       min-height: 100vh;
     }
     .font-cinzel { font-family: 'Cinzel', serif; }
-    .font-sacramento { font-family: 'Sacramento', cursive; }
+    .font-sac { font-family: 'Sacramento', cursive; }
 
-    .glass-box {
-      background: rgba(20, 8, 30, 0.7);
+    /* Login Screen */
+    #admin-login-screen {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .login-card {
+      background: rgba(10, 25, 20, 0.85);
+      backdrop-filter: blur(30px);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      box-shadow: 0 0 60px rgba(16, 185, 129, 0.15), 0 30px 80px rgba(0,0,0,0.6);
+      border-radius: 28px;
+    }
+    .pin-input {
+      background: rgba(16, 185, 129, 0.08);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      border-radius: 14px;
+      color: #d1fae5;
+      font-size: 1.8rem;
+      letter-spacing: 0.4em;
+      text-align: center;
+      outline: none;
+      transition: all 0.3s;
+    }
+    .pin-input:focus {
+      border-color: rgba(16, 185, 129, 0.7);
+      box-shadow: 0 0 20px rgba(16, 185, 129, 0.2);
+    }
+    /* Admin Dashboard */
+    #admin-dashboard { display: none; }
+
+    .glass-card {
+      background: rgba(10, 20, 16, 0.75);
       backdrop-filter: blur(20px);
-      border: 1px solid rgba(255, 59, 119, 0.25);
-      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+      border: 1px solid rgba(16, 185, 129, 0.2);
+      box-shadow: 0 15px 40px rgba(0,0,0,0.5);
       border-radius: 20px;
     }
-
-    .msg-card {
-      background: linear-gradient(135deg, rgba(255, 59, 119, 0.15) 0%, rgba(168, 85, 247, 0.1) 100%);
-      border: 1px solid rgba(255, 59, 119, 0.3);
-      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    .glass-card-rose {
+      background: rgba(20, 10, 16, 0.75);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 59, 119, 0.2);
+      box-shadow: 0 15px 40px rgba(0,0,0,0.5);
+      border-radius: 20px;
+    }
+    .glass-card-amber {
+      background: rgba(20, 16, 8, 0.75);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(245, 158, 11, 0.2);
+      box-shadow: 0 15px 40px rgba(0,0,0,0.5);
+      border-radius: 20px;
+    }
+    .stat-card {
+      background: rgba(16, 185, 129, 0.08);
+      border: 1px solid rgba(16, 185, 129, 0.25);
+      border-radius: 16px;
       transition: all 0.3s ease;
     }
-    .msg-card:hover {
-      transform: translateY(-4px);
-      border-color: rgba(255, 215, 0, 0.5);
+    .stat-card:hover {
+      background: rgba(16, 185, 129, 0.14);
+      transform: translateY(-2px);
     }
+    .tab-btn {
+      padding: 0.5rem 1.25rem;
+      border-radius: 100px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      border: 1px solid rgba(16, 185, 129, 0.25);
+      color: #6ee7b7;
+      background: transparent;
+    }
+    .tab-btn.active {
+      background: rgba(16, 185, 129, 0.2);
+      border-color: rgba(16, 185, 129, 0.6);
+      color: #fff;
+      box-shadow: 0 0 15px rgba(16, 185, 129, 0.2);
+    }
+    .tab-btn:hover:not(.active) {
+      background: rgba(16, 185, 129, 0.1);
+    }
+    .admin-btn-danger {
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid rgba(239, 68, 68, 0.4);
+      color: #fca5a5;
+      border-radius: 10px;
+      transition: all 0.25s;
+      cursor: pointer;
+    }
+    .admin-btn-danger:hover {
+      background: rgba(239, 68, 68, 0.28);
+      color: #fff;
+    }
+    .admin-btn-green {
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      color: #6ee7b7;
+      border-radius: 10px;
+      transition: all 0.25s;
+      cursor: pointer;
+    }
+    .admin-btn-green:hover {
+      background: rgba(16, 185, 129, 0.28);
+      color: #fff;
+    }
+
+    .reel-row {
+      background: rgba(16, 185, 129, 0.06);
+      border: 1px solid rgba(16, 185, 129, 0.18);
+      border-radius: 14px;
+      transition: all 0.25s;
+    }
+    .reel-row:hover {
+      background: rgba(16, 185, 129, 0.12);
+    }
+    .msg-row {
+      background: rgba(255, 59, 119, 0.06);
+      border: 1px solid rgba(255, 59, 119, 0.18);
+      border-radius: 14px;
+      transition: all 0.25s;
+    }
+    .msg-row:hover {
+      background: rgba(255, 59, 119, 0.1);
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 1.5rem;
+      right: 1.5rem;
+      z-index: 9999;
+      background: rgba(16, 185, 129, 0.92);
+      color: #fff;
+      padding: 0.85rem 1.5rem;
+      border-radius: 14px;
+      font-weight: 700;
+      font-size: 0.85rem;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+    .toast.danger {
+      background: rgba(239, 68, 68, 0.92);
+    }
+    .online-dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #10b981;
+      animation: ping 1.5s infinite;
+    }
+    .offline-dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #4b5563;
+    }
+    @keyframes ping {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.6; transform: scale(1.3); }
+    }
+    .section-panel { display: none; }
+    .section-panel.active { display: block; }
+
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: rgba(16, 185, 129, 0.05); }
+    ::-webkit-scrollbar-thumb { background: rgba(16, 185, 129, 0.25); border-radius: 5px; }
   </style>
 </head>
-<body class="p-4 md:p-8">
+<body>
 
-  <div class="max-w-5xl mx-auto">
-    <!-- Header -->
-    <header class="glass-box p-6 flex flex-wrap items-center justify-between gap-4 mb-8">
-      <div class="flex items-center gap-3">
-        <div class="w-12 h-12 rounded-full bg-gradient-to-tr from-rose-500 to-amber-300 flex items-center justify-center text-2xl shadow-lg shadow-rose-500/40 animate-pulse">
-          💌
-        </div>
-        <div>
-          <h1 class="font-cinzel font-bold text-2xl bg-gradient-to-r from-rose-400 via-pink-400 to-amber-300 bg-clip-text text-transparent">
-            VANSHIKA'S LOVE INBOX
-          </h1>
-          <p class="text-xs text-amber-300">Live Backend Messages & Sky Lantern Wishes from Her</p>
-        </div>
+  <!-- ===== LOGIN GATE ===== -->
+  <div id="admin-login-screen">
+    <div class="login-card p-8 sm:p-12 w-full max-w-md text-center mx-4">
+      <div class="w-20 h-20 rounded-full bg-gradient-to-tr from-emerald-600 to-green-400 flex items-center justify-center text-4xl mx-auto mb-6 shadow-xl shadow-emerald-500/30">
+        🔐
       </div>
+      <h1 class="font-cinzel font-bold text-2xl sm:text-3xl text-emerald-300 mb-1">ADMIN PORTAL</h1>
+      <p class="font-sac text-xl text-amber-300 mb-2">Memory Vault Control Center</p>
+      <p class="text-xs text-slate-400 mb-8">Restricted Access </p>
 
-      <div class="flex items-center gap-3">
-        <button onclick="fetchMessagesAndWishes()" class="px-4 py-2 rounded-full bg-rose-500 hover:bg-rose-600 text-white font-bold text-xs shadow-lg shadow-rose-500/30 flex items-center gap-2">
-          🔄 Refresh Inbox
+      <div class="space-y-4">
+        <input
+          id="admin-pin-input"
+          type="password"
+          placeholder="Enter Admin Password"
+          class="pin-input w-full py-4 px-6 !tracking-normal !text-base sm:!text-lg font-mono text-center"
+          onkeydown="if(event.key==='Enter') verifyAdminPin()"
+          oninput="clearPinError()"
+        >
+        <p id="pin-error" class="text-red-400 text-xs font-bold hidden">❌ Wrong PIN! Access Denied. Try again.</p>
+        <button onclick="verifyAdminPin()" class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-emerald-600 to-green-500 text-white font-cinzel font-bold text-sm uppercase tracking-wider shadow-xl shadow-emerald-500/30 hover:from-emerald-500 hover:to-green-400 transition-all active:scale-95">
+          🔓 Enter Admin Panel
         </button>
-        <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-xs font-semibold">
-          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span> Live Connected
-        </span>
-      </div>
-    </header>
-
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-      <!-- MAIN MESSAGES LIST (2 COLS) -->
-      <div class="lg:col-span-2 space-y-6">
-        <div class="glass-box p-6">
-          <h2 class="font-cinzel font-bold text-xl text-rose-300 mb-2 flex items-center gap-2">
-            <span>💖</span> Messages Sent by Vanshika (<span id="msg-count">0</span>)
-          </h2>
-          <p class="text-xs text-slate-400 mb-6">Whenever Vanshika types a love reply on the website, it appears right here in real time!</p>
-
-          <div id="messages-container" class="space-y-4">
-            <div class="text-center py-12 text-slate-500 text-xs italic">
-              Loading received messages from backend...
-            </div>
-          </div>
-        </div>
       </div>
 
-      <!-- SIDEBAR: SKY LANTERN WISHES (1 COL) -->
-      <div class="space-y-6">
-        <div class="glass-box p-6">
-          <h2 class="font-cinzel font-bold text-lg text-amber-300 mb-2 flex items-center gap-2">
-            <span>🏮</span> Sky Wishes Launched (<span id="wish-count">0</span>)
-          </h2>
-          <p class="text-xs text-slate-400 mb-4">All wishes saved in backend database</p>
-
-          <div id="wishes-container" class="space-y-3 max-h-[500px] overflow-y-auto pr-1">
-            <div class="text-center py-8 text-slate-500 text-xs italic">
-              Loading wishes...
-            </div>
-          </div>
-        </div>
-      </div>
+      <p class="mt-6 text-[10px] text-slate-600">Unauthorized access is logged and monitored.</p>
     </div>
   </div>
 
-  <script>
-    async function fetchMessagesAndWishes() {
-      try {
-        // Fetch Messages
-        const msgRes = await fetch('/api/messages');
-        const msgData = await msgRes.json();
-        
-        if (msgData.success) {
-          renderMessages(msgData.data);
-        }
+  <!-- ===== ADMIN DASHBOARD ===== -->
+  <div id="admin-dashboard" class="min-h-screen p-4 md:p-6">
+    <div class="max-w-6xl mx-auto">
 
-        // Fetch Wishes
-        const wishRes = await fetch('/api/wishes');
-        const wishData = await wishRes.json();
-
-        if (wishData.success) {
-          renderWishes(wishData.data);
-        }
-      } catch (err) {
-        console.error('Failed to fetch backend data:', err);
-      }
-    }
-
-    function renderMessages(messages) {
-      const container = document.getElementById('messages-container');
-      const count = document.getElementById('msg-count');
-
-      count.innerText = messages.length;
-
-      if (!messages || messages.length === 0) {
-        container.innerHTML = `
-          <div class="text-center py-12 text-slate-500 text-xs italic">
-            No messages received yet. When Vanshika sends a reply on the site, it will pop up here!
+      <!-- TOP HEADER -->
+      <div class="glass-card p-5 mb-6 flex flex-wrap items-center justify-between gap-4">
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-emerald-600 to-green-400 flex items-center justify-center text-2xl shadow-lg">
+            👑
           </div>
-        `;
-        return;
-      }
+          <div>
+            <h1 class="font-cinzel font-bold text-xl text-emerald-300">RAKESH'S ADMIN PANEL</h1>
+            <p class="text-xs text-slate-400">Memory Vault — Complete Control Dashboard</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-3">
+          <div id="admin-status-pill" class="text-xs text-emerald-300 bg-emerald-500/15 border border-emerald-500/30 px-3 py-1 rounded-full font-semibold">
+            ✅ Authenticated as Rakesh
+          </div>
+          <button onclick="refreshDashboard()" class="admin-btn-green px-4 py-2 text-xs font-bold flex items-center gap-1.5">
+            🔄 Refresh All
+          </button>
+          <button onclick="adminLogout()" class="admin-btn-danger px-4 py-2 text-xs font-bold flex items-center gap-1.5">
+            🚪 Logout
+          </button>
+        </div>
+      </div>
 
-      container.innerHTML = messages.map(m => `
-        <div class="msg-card rounded-2xl p-5 relative overflow-hidden">
-          <div class="flex justify-between items-center mb-3 border-b border-rose-500/20 pb-2">
-            <div class="flex items-center gap-2">
-              <span class="text-xl">👩‍❤️‍👨</span>
-              <span class="font-bold text-rose-300 text-sm">${m.sender}</span>
+      <!-- STATS ROW -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        <div class="stat-card p-4 text-center">
+          <div class="text-2xl font-black text-emerald-300" id="stat-reels">—</div>
+          <div class="text-[11px] text-slate-400 mt-1 font-semibold">Reels on Server</div>
+        </div>
+        <div class="stat-card p-4 text-center">
+          <div class="text-2xl font-black text-rose-300" id="stat-messages">—</div>
+          <div class="text-[11px] text-slate-400 mt-1 font-semibold">Total Messages</div>
+        </div>
+        <div class="stat-card p-4 text-center">
+          <div class="text-2xl font-black text-amber-300" id="stat-wishes">—</div>
+          <div class="text-[11px] text-slate-400 mt-1 font-semibold">Sky Wishes</div>
+        </div>
+        <div class="stat-card p-4 text-center">
+          <div id="stat-online" class="text-xs font-bold space-y-1.5 pt-1">
+            <div class="flex items-center justify-center gap-2">
+              <span class="offline-dot" id="vanshika-dot"></span>
+              <span class="text-slate-300 text-[11px]">Vanshika</span>
             </div>
-            <span class="text-[11px] text-amber-300/80 font-mono">${m.formattedDate || ''} • ${m.formattedTime || ''}</span>
+            <div class="flex items-center justify-center gap-2">
+              <span class="offline-dot" id="rakesh-dot"></span>
+              <span class="text-slate-300 text-[11px]">Rakesh</span>
+            </div>
+          </div>
+          <div class="text-[11px] text-slate-400 mt-1 font-semibold">Online Status</div>
+        </div>
+      </div>
+
+      <!-- NAV TABS -->
+      <div class="flex flex-wrap gap-2 mb-6">
+        <button class="tab-btn active" onclick="switchTab('reels', this)">🎬 Manage Reels</button>
+        <button class="tab-btn" onclick="switchTab('messages', this)">💬 Messages</button>
+        <button class="tab-btn" onclick="switchTab('wishes', this)">🏮 Sky Wishes</button>
+        <button class="tab-btn" onclick="switchTab('gallery', this)">🖼️ Gallery & Media</button>
+        <button class="tab-btn" onclick="switchTab('settings', this)">⚙️ Settings & Access</button>
+      </div>
+
+      <!-- ===== REELS TAB ===== -->
+      <div id="tab-reels" class="section-panel active">
+        <div class="glass-card p-6">
+          <div class="flex flex-wrap items-center justify-between gap-3 mb-5">
+            <div>
+              <h2 class="font-cinzel font-bold text-lg text-emerald-300 flex items-center gap-2">🎬 Vanshika's Reels Manager</h2>
+              <p class="text-xs text-slate-400 mt-1">Upload, preview, download, or delete reels stored on the server disk</p>
+            </div>
+            <div class="flex gap-2">
+              <button onclick="document.getElementById('admin-reel-upload').click()" class="admin-btn-green px-4 py-2 text-xs font-bold flex items-center gap-1.5">
+                📁 Upload New Reel(s)
+              </button>
+              <input type="file" id="admin-reel-upload" accept="video/mp4,video/*" multiple class="hidden" onchange="adminUploadReels(event)">
+              <button onclick="loadAdminReels()" class="admin-btn-green px-3 py-2 text-xs font-bold">
+                🔄
+              </button>
+            </div>
           </div>
 
-          <p class="text-slate-100 text-sm leading-relaxed font-medium">
-            "${m.message}"
-          </p>
+          <div id="admin-reels-list" class="space-y-3">
+            <div class="text-center py-10 text-slate-500 text-sm">Loading reels from server...</div>
+          </div>
         </div>
-      `).join('');
+      </div>
+
+      <!-- ===== MESSAGES TAB ===== -->
+      <div id="tab-messages" class="section-panel">
+        <div class="glass-card-rose p-6">
+          <div class="flex flex-wrap items-center justify-between gap-3 mb-5">
+            <div>
+              <h2 class="font-cinzel font-bold text-lg text-rose-300 flex items-center gap-2">💬 Chat Messages Manager</h2>
+              <p class="text-xs text-slate-400 mt-1">View all messages sent on the site. Delete individual ones or clear all.</p>
+            </div>
+            <div class="flex gap-2">
+              <button onclick="loadAdminMessages()" class="admin-btn-danger px-3 py-2 text-xs font-bold">🔄 Refresh</button>
+              <button onclick="confirmClearMessages()" class="admin-btn-danger px-4 py-2 text-xs font-bold flex items-center gap-1.5">
+                🗑️ Clear All Messages
+              </button>
+            </div>
+          </div>
+
+          <div id="admin-messages-list" class="space-y-3 max-h-[600px] overflow-y-auto pr-1">
+            <div class="text-center py-10 text-slate-500 text-sm">Click Refresh to load messages...</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== WISHES TAB ===== -->
+      <div id="tab-wishes" class="section-panel">
+        <div class="glass-card-amber p-6">
+          <div class="flex flex-wrap items-center justify-between gap-3 mb-5">
+            <div>
+              <h2 class="font-cinzel font-bold text-lg text-amber-300 flex items-center gap-2">🏮 Sky Lantern Wishes</h2>
+              <p class="text-xs text-slate-400 mt-1">All wishes Vanshika has launched. You can clear them all if needed.</p>
+            </div>
+            <div class="flex gap-2">
+              <button onclick="loadAdminWishes()" class="px-3 py-2 text-xs font-bold admin-btn-green">🔄 Refresh</button>
+              <button onclick="confirmClearWishes()" class="admin-btn-danger px-4 py-2 text-xs font-bold flex items-center gap-1.5">
+                🗑️ Clear All Wishes
+              </button>
+            </div>
+          </div>
+          <div id="admin-wishes-list" class="space-y-3 max-h-[500px] overflow-y-auto pr-1">
+            <div class="text-center py-10 text-slate-500 text-sm">Click Refresh to load wishes...</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== GALLERY TAB ===== -->
+      <div id="tab-gallery" class="section-panel">
+        <div class="glass-card p-6">
+          <h2 class="font-cinzel font-bold text-lg text-emerald-300 mb-2 flex items-center gap-2">🖼️ Gallery & Photo Memory Cards</h2>
+          <p class="text-xs text-slate-400 mb-6">Photos in the gallery are stored locally (in the browser). To fully clear gallery photos, click the button below. This will reset all photo cards on the main site.</p>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            <div class="stat-card p-4">
+              <div class="text-emerald-300 font-bold text-sm mb-2">📸 Photo Storage Info</div>
+              <p class="text-xs text-slate-300">Gallery photos are stored in localStorage on the browser where Vanshika uploaded them. They stay until manually cleared.</p>
+              <div class="mt-3 text-[11px] text-amber-400/80 bg-amber-500/10 border border-amber-500/20 rounded-lg p-2">
+                ℹ️ Photos cannot be directly managed from server-side since they are in the user's browser localStorage.
+              </div>
+            </div>
+            <div class="stat-card p-4">
+              <div class="text-rose-300 font-bold text-sm mb-3">🗑️ Clear Gallery (This Browser)</div>
+              <p class="text-xs text-slate-300 mb-4">This will remove all saved gallery photo data stored in this browser's localStorage. Vanshika's browser will still have her saved photos unless cleared there.</p>
+              <button onclick="clearGalleryLocalStorage()" class="admin-btn-danger px-4 py-2 text-xs font-bold w-full">
+                🗑️ Clear Gallery Data (This Browser)
+              </button>
+            </div>
+          </div>
+
+          <div class="stat-card p-4">
+            <div class="text-amber-300 font-bold text-sm mb-3">📂 Server Media Files (public/assests)</div>
+            <div id="admin-server-images-list" class="text-xs text-slate-300 space-y-1">
+              Loading...
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== SETTINGS TAB ===== -->
+      <div id="tab-settings" class="section-panel">
+        <div class="space-y-5">
+          <!-- Access Control Info -->
+          <div class="glass-card p-6">
+            <h2 class="font-cinzel font-bold text-lg text-emerald-300 mb-4 flex items-center gap-2">⚙️ Access Control Rules</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="stat-card p-4">
+                <div class="flex items-center gap-2 mb-3">
+                  <span class="text-2xl">👑</span>
+                  <div>
+                    <div class="font-bold text-emerald-300 text-sm">Rakesh (You / Admin)</div>
+                    <div class="text-[11px] text-emerald-400">PIN: 1212</div>
+                  </div>
+                </div>
+                <ul class="text-xs text-slate-300 space-y-1.5">
+                  <li class="flex items-center gap-2"><span class="text-emerald-400">✅</span> Upload reels</li>
+                  <li class="flex items-center gap-2"><span class="text-emerald-400">✅</span> Download reels</li>
+                  <li class="flex items-center gap-2"><span class="text-emerald-400">✅</span> Delete reels from server</li>
+                  <li class="flex items-center gap-2"><span class="text-emerald-400">✅</span> Manage gallery photos</li>
+                  <li class="flex items-center gap-2"><span class="text-emerald-400">✅</span> Clear all messages & wishes</li>
+                  <li class="flex items-center gap-2"><span class="text-emerald-400">✅</span> Access this admin panel</li>
+                  <li class="flex items-center gap-2"><span class="text-emerald-400">✅</span> Full site control</li>
+                </ul>
+              </div>
+              <div class="bg-rose-950/30 border border-rose-500/20 rounded-2xl p-4">
+                <div class="flex items-center gap-2 mb-3">
+                  <span class="text-2xl">👸</span>
+                  <div>
+                    <div class="font-bold text-rose-300 text-sm">Vanshika (Visitor)</div>
+                    <div class="text-[11px] text-rose-400">PIN: 1709</div>
+                  </div>
+                </div>
+                <ul class="text-xs text-slate-300 space-y-1.5">
+                  <li class="flex items-center gap-2"><span class="text-emerald-400">✅</span> View the site & all content</li>
+                  <li class="flex items-center gap-2"><span class="text-emerald-400">✅</span> Upload reels (from main site)</li>
+                  <li class="flex items-center gap-2"><span class="text-emerald-400">✅</span> Send chat messages</li>
+                  <li class="flex items-center gap-2"><span class="text-emerald-400">✅</span> Launch sky lantern wishes</li>
+                  <li class="flex items-center gap-2"><span class="text-rose-400">❌</span> Cannot delete reels</li>
+                  <li class="flex items-center gap-2"><span class="text-rose-400">❌</span> Cannot download reels</li>
+                  <li class="flex items-center gap-2"><span class="text-rose-400">❌</span> Cannot access admin panel</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- Admin Secret -->
+          <div class="glass-card p-6">
+            <h3 class="font-bold text-emerald-300 text-sm mb-3 flex items-center gap-2">🔑 Admin Secret Token</h3>
+            <p class="text-xs text-slate-400 mb-3">This token is used for all admin API calls. Keep it private!</p>
+            <div class="flex items-center gap-2">
+              <input id="admin-secret-display" type="password" value="rakesh1212admin" readonly
+                class="flex-1 bg-slate-900 border border-emerald-500/30 rounded-xl px-4 py-2 text-emerald-300 text-xs font-mono outline-none">
+              <button onclick="toggleSecretVisibility()" class="admin-btn-green px-3 py-2 text-xs font-bold">👁️</button>
+              <button onclick="copyAdminSecret()" class="admin-btn-green px-3 py-2 text-xs font-bold">📋 Copy</button>
+            </div>
+          </div>
+
+          <!-- Danger Zone -->
+          <div class="bg-red-950/30 border border-red-500/25 rounded-2xl p-6">
+            <h3 class="font-cinzel font-bold text-red-300 text-sm mb-4 flex items-center gap-2">☢️ Danger Zone</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <button onclick="confirmClearMessages()" class="admin-btn-danger py-2.5 text-xs font-bold flex items-center justify-center gap-2">
+                💬 Clear ALL Messages
+              </button>
+              <button onclick="confirmClearWishes()" class="admin-btn-danger py-2.5 text-xs font-bold flex items-center justify-center gap-2">
+                🏮 Clear ALL Wishes
+              </button>
+              <button onclick="clearGalleryLocalStorage()" class="admin-btn-danger py-2.5 text-xs font-bold flex items-center justify-center gap-2">
+                🖼️ Clear Gallery (This Browser)
+              </button>
+              <button onclick="clearReelHistoryLocalStorage()" class="admin-btn-danger py-2.5 text-xs font-bold flex items-center justify-center gap-2">
+                🎬 Clear Reel History (Browser)
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- max-w -->
+  </div><!-- dashboard -->
+
+  <!-- TOAST -->
+  <div id="admin-toast" class="toast"></div>
+
+  <script>
+    // ====== CONSTANTS ======
+    const ADMIN_PIN = 'Vanshika170926';
+    const ADMIN_SECRET = 'rakesh1212admin';
+    const ADMIN_HEADERS = { 'Content-Type': 'application/json', 'x-admin-secret': ADMIN_SECRET };
+
+    // ====== AUTH ======
+    function verifyAdminPin() {
+      const pin = document.getElementById('admin-pin-input').value.trim();
+      if (pin === ADMIN_PIN) {
+        document.getElementById('admin-login-screen').style.display = 'none';
+        document.getElementById('admin-dashboard').style.display = 'block';
+        sessionStorage.setItem('admin_authenticated', '1');
+        refreshDashboard();
+      } else {
+        document.getElementById('pin-error').classList.remove('hidden');
+        document.getElementById('admin-pin-input').value = '';
+        document.getElementById('admin-pin-input').focus();
+      }
     }
 
-    function renderWishes(wishes) {
-      const container = document.getElementById('wishes-container');
-      const count = document.getElementById('wish-count');
+    function clearPinError() {
+      document.getElementById('pin-error').classList.add('hidden');
+    }
 
-      count.innerText = wishes.length;
+    function adminLogout() {
+      sessionStorage.removeItem('admin_authenticated');
+      document.getElementById('admin-dashboard').style.display = 'none';
+      document.getElementById('admin-login-screen').style.display = 'flex';
+      document.getElementById('admin-pin-input').value = '';
+    }
 
-      if (!wishes || wishes.length === 0) {
-        container.innerHTML = `
-          <div class="text-center py-6 text-slate-500 text-xs italic">
-            No wishes launched yet.
-          </div>
-        `;
-        return;
+    // Auto re-login if already authenticated this session
+    window.addEventListener('DOMContentLoaded', () => {
+      if (sessionStorage.getItem('admin_authenticated') === '1') {
+        document.getElementById('admin-login-screen').style.display = 'none';
+        document.getElementById('admin-dashboard').style.display = 'block';
+        refreshDashboard();
+      } else {
+        document.getElementById('admin-pin-input').focus();
       }
 
-      container.innerHTML = wishes.map(w => `
-        <div class="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/30">
-          <div class="flex items-start gap-2 mb-1">
-            <span class="text-base">🏮</span>
-            <p class="text-xs text-amber-200 font-medium">"${w.text}"</p>
-          </div>
-          <p class="text-[10px] text-amber-400/60 text-right font-mono">${w.formattedTime || ''}</p>
-        </div>
-      `).join('');
+      document.getElementById('admin-pin-input').addEventListener('keydown', e => {
+        if (e.key === 'Enter') verifyAdminPin();
+      });
+    });
+
+    // ====== TABS ======
+    function switchTab(tab, btnEl) {
+      document.querySelectorAll('.section-panel').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById('tab-' + tab).classList.add('active');
+      if (btnEl) btnEl.classList.add('active');
+
+      if (tab === 'reels') loadAdminReels();
+      else if (tab === 'messages') loadAdminMessages();
+      else if (tab === 'wishes') loadAdminWishes();
+      else if (tab === 'gallery') loadGalleryInfo();
     }
 
-    // Auto Refresh every 5 seconds for live real-time sync
-    setInterval(fetchMessagesAndWishes, 5000);
-    window.addEventListener('DOMContentLoaded', fetchMessagesAndWishes);
+    // ====== TOAST ======
+    function showToast(msg, isDanger = false) {
+      const t = document.getElementById('admin-toast');
+      t.textContent = msg;
+      t.className = 'toast' + (isDanger ? ' danger' : '');
+      void t.offsetWidth;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 3000);
+    }
+
+    // ====== REFRESH ALL ======
+    async function refreshDashboard() {
+      await loadAdminStatus();
+      await loadAdminReels();
+    }
+
+    async function loadAdminStatus() {
+      try {
+        const res = await fetch('/api/admin/status?secret=' + ADMIN_SECRET);
+        const data = await res.json();
+        if (data.success) {
+          const s = data.stats;
+          document.getElementById('stat-reels').textContent = s.totalReelsOnServer || 0;
+          document.getElementById('stat-messages').textContent = s.totalMessages || 0;
+          document.getElementById('stat-wishes').textContent = s.totalWishes || 0;
+
+          const vu = s.onlineUsers && s.onlineUsers.vanshika;
+          const ru = s.onlineUsers && s.onlineUsers.rakesh;
+          const vDot = document.getElementById('vanshika-dot');
+          const rDot = document.getElementById('rakesh-dot');
+          if (vDot) {
+            vDot.className = vu && vu.isOnline ? 'online-dot' : 'offline-dot';
+          }
+          if (rDot) {
+            rDot.className = ru && ru.isOnline ? 'online-dot' : 'offline-dot';
+          }
+        }
+      } catch (e) {
+        console.warn('Status load failed:', e);
+      }
+    }
+
+    // ====== REELS ======
+    async function loadAdminReels() {
+      const container = document.getElementById('admin-reels-list');
+      try {
+        const res = await fetch('/api/admin/reels?secret=' + ADMIN_SECRET);
+        const data = await res.json();
+        if (!data.success) {
+          container.innerHTML = `<div class="text-center py-8 text-red-400 text-sm">❌ ${data.error || 'Failed to load reels'}</div>`;
+          return;
+        }
+        if (!data.data || data.data.length === 0) {
+          container.innerHTML = `<div class="text-center py-10 text-slate-500 text-sm">📂 No reels uploaded to server yet. Use "Upload New Reel(s)" above.</div>`;
+          return;
+        }
+        container.innerHTML = data.data.map(r => `
+          <div class="reel-row p-4 flex flex-wrap items-center justify-between gap-3">
+            <div class="flex items-center gap-3 min-w-0">
+              <span class="text-2xl">🎬</span>
+              <div class="min-w-0">
+                <div class="font-bold text-emerald-300 text-sm truncate">${r.filename}</div>
+                <div class="text-[11px] text-slate-400 mt-0.5">${r.sizeMB} &bull; Uploaded: ${new Date(r.createdAt).toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata', day: '2-digit', month: 'short', year: 'numeric' })}</div>
+              </div>
+            </div>
+            <div class="flex items-center gap-2 shrink-0">
+              <a href="/${r.url}" target="_blank" class="admin-btn-green px-3 py-1.5 text-xs font-bold flex items-center gap-1 no-underline">
+                ▶️ Preview
+              </a>
+              <a href="/${r.url}" download="${r.filename}" class="admin-btn-green px-3 py-1.5 text-xs font-bold flex items-center gap-1 no-underline">
+                ⬇️ Download
+              </a>
+              <button onclick="deleteServerReel('${r.filename}', this)" class="admin-btn-danger px-3 py-1.5 text-xs font-bold flex items-center gap-1">
+                🗑️ Delete
+              </button>
+            </div>
+          </div>
+        `).join('');
+        document.getElementById('stat-reels').textContent = data.count || data.data.length;
+      } catch (e) {
+        container.innerHTML = `<div class="text-center py-8 text-red-400 text-sm">❌ Could not reach server. Is it running?</div>`;
+      }
+    }
+
+    async function adminUploadReels(event) {
+      const files = event.target.files;
+      if (!files || files.length === 0) return;
+      showToast(`📤 Uploading ${files.length} reel(s)...`);
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const safeName = file.name || `vanshika-reel-${i+1}.mp4`;
+        try {
+          const res = await fetch(`/api/upload-reel?name=${encodeURIComponent(safeName)}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'video/mp4', 'x-reel-name': safeName },
+            body: file
+          });
+          const data = await res.json();
+          if (data.success) showToast(`✅ ${safeName} uploaded!`);
+        } catch (err) {
+          showToast(`❌ Failed to upload ${safeName}`, true);
+        }
+      }
+      setTimeout(async () => {
+        await loadAdminReels();
+        await loadAdminStatus();
+      }, 800);
+      event.target.value = '';
+    }
+
+    async function deleteServerReel(filename, btn) {
+      if (!confirm(`Are you sure you want to permanently delete "${filename}" from the server?\n\nThis CANNOT be undone!`)) return;
+      btn.disabled = true;
+      btn.textContent = '⏳...';
+      try {
+        const res = await fetch(`/api/admin/reels/${encodeURIComponent(filename)}`, {
+          method: 'DELETE',
+          headers: { 'x-admin-secret': ADMIN_SECRET }
+        });
+        const data = await res.json();
+        if (data.success) {
+          showToast(`✅ "${filename}" deleted from server!`);
+          await loadAdminReels();
+          await loadAdminStatus();
+        } else {
+          showToast(`❌ Delete failed: ${data.error}`, true);
+          btn.disabled = false;
+          btn.textContent = '🗑️ Delete';
+        }
+      } catch (e) {
+        showToast('❌ Network error while deleting', true);
+        btn.disabled = false;
+        btn.textContent = '🗑️ Delete';
+      }
+    }
+
+    // ====== MESSAGES ======
+    async function loadAdminMessages() {
+      const container = document.getElementById('admin-messages-list');
+      container.innerHTML = `<div class="text-center py-6 text-slate-500 text-sm">Loading messages...</div>`;
+      try {
+        const res = await fetch('/api/messages');
+        const data = await res.json();
+        if (!data.success || !data.data || data.data.length === 0) {
+          container.innerHTML = `<div class="text-center py-10 text-slate-500 text-sm">💬 No messages yet.</div>`;
+          return;
+        }
+        document.getElementById('stat-messages').textContent = data.data.length;
+        const messages = [...data.data].reverse();
+        container.innerHTML = messages.map(m => `
+          <div class="msg-row p-4 flex flex-wrap items-start justify-between gap-3" id="msg-${m.id}">
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2 mb-1.5">
+                <span class="font-bold text-rose-300 text-xs">${escHtml(m.sender)}</span>
+                <span class="text-[10px] text-slate-500 font-mono">${m.formattedDate || ''} ${m.formattedTime || ''}</span>
+                <span class="px-1.5 py-0.5 rounded-full text-[9px] font-bold ${m.status === 'read' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-amber-500/20 text-amber-400'}">${m.status || 'sent'}</span>
+              </div>
+              <p class="text-slate-200 text-xs leading-relaxed">"${escHtml(m.message)}"</p>
+            </div>
+            <button onclick="deleteOneMessage('${m.id}', this)" class="admin-btn-danger px-2.5 py-1.5 text-[11px] font-bold shrink-0">
+              🗑️
+            </button>
+          </div>
+        `).join('');
+      } catch (e) {
+        container.innerHTML = `<div class="text-center py-8 text-red-400 text-sm">❌ Failed to load messages</div>`;
+      }
+    }
+
+    async function deleteOneMessage(id, btn) {
+      if (!confirm('Delete this message?')) return;
+      btn.disabled = true;
+      btn.textContent = '⏳';
+      try {
+        const res = await fetch(`/api/admin/messages/${id}`, {
+          method: 'DELETE',
+          headers: { 'x-admin-secret': ADMIN_SECRET }
+        });
+        const data = await res.json();
+        if (data.success) {
+          document.getElementById('msg-' + id)?.remove();
+          showToast('✅ Message deleted!');
+          await loadAdminStatus();
+        } else {
+          showToast('❌ ' + (data.error || 'Failed'), true);
+          btn.disabled = false;
+          btn.textContent = '🗑️';
+        }
+      } catch (e) {
+        showToast('❌ Network error', true);
+        btn.disabled = false;
+        btn.textContent = '🗑️';
+      }
+    }
+
+    async function confirmClearMessages() {
+      if (!confirm('⚠️ This will permanently delete ALL chat messages!\n\nAre you absolutely sure?')) return;
+      try {
+        const res = await fetch('/api/admin/messages/clear', {
+          method: 'POST',
+          headers: ADMIN_HEADERS,
+          body: JSON.stringify({ admin_pin: 'Vanshika170926', admin_secret: ADMIN_SECRET })
+        });
+        const data = await res.json();
+        if (data.success) {
+          showToast('✅ All messages cleared!');
+          document.getElementById('admin-messages-list').innerHTML = `<div class="text-center py-10 text-slate-500 text-sm">💬 No messages yet.</div>`;
+          document.getElementById('stat-messages').textContent = 0;
+        } else {
+          showToast('❌ ' + (data.error || 'Failed to clear'), true);
+        }
+      } catch (e) {
+        showToast('❌ Network error', true);
+      }
+    }
+
+    // ====== WISHES ======
+    async function loadAdminWishes() {
+      const container = document.getElementById('admin-wishes-list');
+      container.innerHTML = `<div class="text-center py-6 text-slate-500 text-sm">Loading wishes...</div>`;
+      try {
+        const res = await fetch('/api/wishes');
+        const data = await res.json();
+        if (!data.success || !data.data || data.data.length === 0) {
+          container.innerHTML = `<div class="text-center py-10 text-slate-500 text-sm">🏮 No wishes yet.</div>`;
+          return;
+        }
+        document.getElementById('stat-wishes').textContent = data.data.length;
+        container.innerHTML = data.data.map(w => `
+          <div class="p-4 rounded-xl bg-amber-500/10 border border-amber-500/25">
+            <div class="flex items-start gap-2">
+              <span class="text-xl">🏮</span>
+              <div class="flex-1">
+                <p class="text-amber-200 text-xs font-medium leading-relaxed">"${escHtml(w.text)}"</p>
+                <p class="text-[10px] text-amber-400/60 mt-1 font-mono">${w.formattedTime || ''} &bull; ${w.sender || ''}</p>
+              </div>
+            </div>
+          </div>
+        `).join('');
+      } catch (e) {
+        container.innerHTML = `<div class="text-center py-8 text-red-400 text-sm">❌ Failed to load wishes</div>`;
+      }
+    }
+
+    async function confirmClearWishes() {
+      if (!confirm('⚠️ This will permanently delete ALL sky wishes!\n\nAre you sure?')) return;
+      try {
+        const res = await fetch('/api/admin/wishes/clear', {
+          method: 'POST',
+          headers: ADMIN_HEADERS,
+          body: JSON.stringify({ admin_pin: 'Vanshika170926', admin_secret: ADMIN_SECRET })
+        });
+        const data = await res.json();
+        if (data.success) {
+          showToast('✅ All wishes cleared!');
+          document.getElementById('admin-wishes-list').innerHTML = `<div class="text-center py-10 text-slate-500 text-sm">🏮 No wishes yet.</div>`;
+          document.getElementById('stat-wishes').textContent = 0;
+        } else {
+          showToast('❌ ' + (data.error || 'Failed'), true);
+        }
+      } catch (e) {
+        showToast('❌ Network error', true);
+      }
+    }
+
+    // ====== GALLERY ======
+    function loadGalleryInfo() {
+      const container = document.getElementById('admin-server-images-list');
+      const imageFiles = ['eyes.jpeg','forever.jpeg','future-wife.jpeg','magical-smile.jpeg','my-precious.jpeg','my-sweetheart.jpeg','naa-bangaram.jpeg','queen.jpeg'];
+      container.innerHTML = imageFiles.map(f => `
+        <div class="flex items-center justify-between py-1 border-b border-slate-800/50">
+          <span class="text-emerald-300 font-mono">📸 ${f}</span>
+          <a href="/assests/${f}" target="_blank" class="text-xs text-emerald-400 hover:text-emerald-200 underline">View ↗</a>
+        </div>
+      `).join('') + `<div class="text-[10px] text-slate-500 mt-2">These are the romantic photo assets displayed on the main site. Static files — managed manually via server file system.</div>`;
+    }
+
+    function clearGalleryLocalStorage() {
+      if (!confirm('Clear all gallery photo data stored in THIS browser?\n\nThis will remove uploaded photos in the gallery cards.')) return;
+      try {
+        localStorage.removeItem('vanshika_gallery_data');
+        showToast('✅ Gallery localStorage cleared!');
+      } catch (e) {
+        showToast('❌ Could not clear gallery data', true);
+      }
+    }
+
+    function clearReelHistoryLocalStorage() {
+      if (!confirm('Clear reel playlist history from THIS browser\'s localStorage?\n\nNote: Server-side reels will NOT be deleted.')) return;
+      try {
+        localStorage.removeItem('vanshika_reels_playlist_meta');
+        localStorage.removeItem('vault_vanshika_reel_data');
+        showToast('✅ Browser reel history cleared!');
+      } catch (e) {
+        showToast('❌ Could not clear reel history', true);
+      }
+    }
+
+    // ====== SETTINGS HELPERS ======
+    function toggleSecretVisibility() {
+      const inp = document.getElementById('admin-secret-display');
+      inp.type = inp.type === 'password' ? 'text' : 'password';
+    }
+
+    function copyAdminSecret() {
+      navigator.clipboard.writeText('rakesh1212admin').then(() => {
+        showToast('📋 Admin secret copied!');
+      }).catch(() => {
+        showToast('❌ Could not copy', true);
+      });
+    }
+
+    // ====== UTIL ======
+    function escHtml(str) {
+      if (!str) return '';
+      return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    // Auto-refresh stats every 30 seconds
+    setInterval(loadAdminStatus, 30000);
   </script>
 </body>
 </html>
