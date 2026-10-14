@@ -818,28 +818,34 @@ async function dispatchMessageToCloud(msg) {
     id: msg.id,
     sender: msg.sender,
     pin: currentChatPin,
-    message: msg.message,
-    mediaType: msg.mediaType || undefined,
-    mediaUrl: msg.mediaUrl || undefined,
-    fileName: msg.fileName || undefined,
-    timestamp: msg.timestamp,
-    formattedTime: msg.formattedTime,
-    formattedDate: msg.formattedDate,
+    message: msg.message || '',
+    mediaType: msg.mediaType || null,
+    mediaUrl: msg.mediaUrl || null,
+    fileName: msg.fileName || null,
+    timestamp: msg.timestamp || new Date().toISOString(),
+    formattedTime: msg.formattedTime || getISTTimeString(),
+    formattedDate: msg.formattedDate || getISTDateString(),
     status: 'sent',
-    replyTo: msg.replyTo
+    replyTo: msg.replyTo || null
   };
 
-  // 1. Firebase RTDB
+  // Clean payload for Firebase RTDB (never pass undefined properties)
+  const firebasePayload = {};
+  for (const [key, val] of Object.entries(payload)) {
+    if (val !== undefined) firebasePayload[key] = val;
+  }
+
+  // 1. Firebase RTDB (Global Cloud Sync)
   if (isFirebaseActive && fbDb) {
     try {
-      await fbDb.ref('vault_messages/' + msg.id).set(payload);
+      await fbDb.ref('vault_messages/' + msg.id).set(firebasePayload);
       markMessageSent(msg.id);
     } catch (err) {
       console.warn('Firebase push warning:', err);
     }
   }
 
-  // 2. Socket.io
+  // 2. Socket.io (Ultra-fast real-time WebSocket delivery)
   if (socket && socket.connected) {
     socket.emit('send_message', payload);
     markMessageSent(msg.id);
@@ -857,7 +863,7 @@ async function dispatchMessageToCloud(msg) {
       markMessageSent(msg.id);
     }
   } catch (e) {
-    if (!isFirebaseActive && (!socket || !socket.connected)) {
+    if (!socket || !socket.connected) {
       offlinePendingQueue.push(msg);
     }
   }
@@ -1270,22 +1276,25 @@ function handleChatTyping() {
   if (!currentChatSender || !currentChatPin) return;
 
   if (isFirebaseActive && fbDb) {
-    const isMeV = currentChatSender.toLowerCase().includes('vanshika');
-    const myRole = isMeV ? 'vanshika' : 'rakesh';
-    fbDb.ref('typing/' + myRole).set(true);
-    if (typingTimeout) clearTimeout(typingTimeout);
-    typingTimeout = setTimeout(() => {
-      fbDb.ref('typing/' + myRole).set(false);
-    }, 2200);
-    return;
+    try {
+      const isMeV = currentChatSender.toLowerCase().includes('vanshika');
+      const myRole = isMeV ? 'vanshika' : 'rakesh';
+      fbDb.ref('typing/' + myRole).set(true);
+      if (typingTimeout) clearTimeout(typingTimeout);
+      typingTimeout = setTimeout(() => {
+        try { fbDb.ref('typing/' + myRole).set(false); } catch (e) {}
+      }, 2200);
+    } catch (e) {}
   }
 
   if (socket && socket.connected) {
     socket.emit('typing', { sender: currentChatSender, isTyping: true });
+    socket.emit('typing_start', { sender: currentChatSender });
     if (typingTimeout) clearTimeout(typingTimeout);
     typingTimeout = setTimeout(() => {
       if (socket && socket.connected) {
         socket.emit('typing', { sender: currentChatSender, isTyping: false });
+        socket.emit('typing_stop', { sender: currentChatSender });
       }
     }, 2000);
   }
@@ -1415,7 +1424,7 @@ function initSocketConnection() {
 
     socket.on('auth_success', (data) => {
       if (data.onlineUsers) updatePresenceUI(data.onlineUsers);
-      if (data.messages && !isFirebaseActive) {
+      if (data.messages && Array.isArray(data.messages)) {
         const merged = mergeAndSaveVaultMessages(data.messages);
         renderChatFeed(merged);
       }
@@ -1425,8 +1434,8 @@ function initSocketConnection() {
       updatePresenceUI(onlineUsers);
     });
 
+    // Real-time message delivery over WebSocket (<5ms)
     socket.on('new_message', (msg) => {
-      if (isFirebaseActive && fbDb) return;
       appendSingleMessageToFeed(msg);
     });
 
@@ -1472,9 +1481,10 @@ async function fetchLiveChatMessages() {
 let chatPollInterval = null;
 function startSmartPolling() {
   if (chatPollInterval) clearInterval(chatPollInterval);
+  // Continuous 2.5s safety net so chat ALWAYS updates in real-time even under WiFi reconnection
   chatPollInterval = setInterval(() => {
-    if (!document.hidden && (!isFirebaseActive || !fbDb) && (!socket || !socket.connected)) {
+    if (!document.hidden && currentChatSender) {
       fetchLiveChatMessages();
     }
-  }, 1200);
+  }, 2500);
 }

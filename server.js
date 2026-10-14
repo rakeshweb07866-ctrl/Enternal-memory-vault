@@ -313,6 +313,11 @@ if (io) {
       io.to('love_chat_room').emit('new_sky_lantern', newWish);
     });
 
+    socket.on('typing', (data) => {
+      const isTyping = data && data.isTyping !== false;
+      socket.to('love_chat_room').emit('user_typing', { sender: (data && data.sender) || 'Partner', isTyping: isTyping });
+    });
+
     socket.on('typing_start', (data) => {
       socket.to('love_chat_room').emit('user_typing', { sender: data.sender, isTyping: true });
     });

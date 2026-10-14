@@ -130,12 +130,16 @@ async function confirmNameLogin() {
       if (errEl) errEl.classList.add('hidden');
       updateUserBadge();
 
-      if (isFirebaseActive) {
+      if (isFirebaseActive && typeof initFirebaseCloud === 'function') {
         initFirebaseCloud();
-      } else if (socket && socket.connected) {
+      }
+      if (socket && socket.connected) {
         socket.emit('user_join', { sender: currentChatSender, pin: currentChatPin });
-      } else {
+      } else if (typeof initSocketConnection === 'function') {
         initSocketConnection();
+      }
+      if (typeof fetchLiveChatMessages === 'function') {
+        fetchLiveChatMessages();
       }
 
       if (typeof isAnniversaryActive === 'function' && isAnniversaryActive()) {
@@ -156,7 +160,14 @@ async function confirmNameLogin() {
     localStorage.setItem('chat_user_pin', pin);
     document.getElementById('name-login-modal').classList.add('hidden');
     updateUserBadge();
-    initSocketConnection();
+    if (socket && socket.connected) {
+      socket.emit('user_join', { sender: currentChatSender, pin: currentChatPin });
+    } else if (typeof initSocketConnection === 'function') {
+      initSocketConnection();
+    }
+    if (typeof fetchLiveChatMessages === 'function') {
+      fetchLiveChatMessages();
+    }
     if (typeof isAnniversaryActive === 'function' && isAnniversaryActive()) {
       setTimeout(playGrandCinematicAnniversaryAnimation, 400);
     }
