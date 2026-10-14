@@ -264,16 +264,20 @@
       </div>
 
       <!-- STATS ROW -->
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-        <div class="stat-card p-4 text-center">
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mb-6">
+        <div class="stat-card p-4 text-center cursor-pointer" onclick="switchTab('reels', document.querySelector('[onclick*=\'reels\']'))">
           <div class="text-2xl font-black text-emerald-300" id="stat-reels">—</div>
           <div class="text-[11px] text-slate-400 mt-1 font-semibold">Reels on Server</div>
         </div>
-        <div class="stat-card p-4 text-center">
+        <div class="stat-card p-4 text-center cursor-pointer" onclick="switchTab('messages', document.querySelector('[onclick*=\'messages\']'))">
           <div class="text-2xl font-black text-rose-300" id="stat-messages">—</div>
-          <div class="text-[11px] text-slate-400 mt-1 font-semibold">Total Messages</div>
+          <div class="text-[11px] text-slate-400 mt-1 font-semibold">Active Messages</div>
         </div>
-        <div class="stat-card p-4 text-center">
+        <div class="stat-card p-4 text-center cursor-pointer" onclick="switchTab('deleted', document.getElementById('tab-btn-deleted'))">
+          <div class="text-2xl font-black text-rose-400" id="stat-deleted">—</div>
+          <div class="text-[11px] text-slate-400 mt-1 font-semibold">🗑️ Deleted Vault</div>
+        </div>
+        <div class="stat-card p-4 text-center cursor-pointer" onclick="switchTab('wishes', document.querySelector('[onclick*=\'wishes\']'))">
           <div class="text-2xl font-black text-amber-300" id="stat-wishes">—</div>
           <div class="text-[11px] text-slate-400 mt-1 font-semibold">Sky Wishes</div>
         </div>
@@ -296,6 +300,7 @@
       <div class="flex flex-wrap gap-2 mb-6">
         <button class="tab-btn active" onclick="switchTab('reels', this)">🎬 Manage Reels</button>
         <button class="tab-btn" onclick="switchTab('messages', this)">💬 Messages</button>
+        <button class="tab-btn" onclick="switchTab('deleted', this)" id="tab-btn-deleted">🗑️ Deleted Messages Vault</button>
         <button class="tab-btn" onclick="switchTab('wishes', this)">🏮 Sky Wishes</button>
         <button class="tab-btn" onclick="switchTab('gallery', this)">🖼️ Gallery & Media</button>
         <button class="tab-btn" onclick="switchTab('settings', this)">⚙️ Settings & Access</button>
@@ -344,6 +349,35 @@
 
           <div id="admin-messages-list" class="space-y-3 max-h-[600px] overflow-y-auto pr-1">
             <div class="text-center py-10 text-slate-500 text-sm">Click Refresh to load messages...</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== DELETED MESSAGES VAULT TAB ===== -->
+      <div id="tab-deleted" class="section-panel">
+        <div class="glass-card-rose p-6 border-rose-500/40">
+          <div class="flex flex-wrap items-center justify-between gap-3 mb-5">
+            <div>
+              <h2 class="font-cinzel font-bold text-lg text-rose-300 flex items-center gap-2">
+                <span>🗑️</span>
+                <span>Secret Deleted Messages Vault (Preserved for Rakesh)</span>
+              </h2>
+              <p class="text-xs text-slate-400 mt-1">
+                Any message, photo, video, or voice note deleted by Rakesh or Vanshika ("Delete For Me" or "Delete For Everyone") is permanently recorded here with audit logs.
+              </p>
+            </div>
+            <div class="flex gap-2">
+              <button onclick="loadAdminDeletedMessages()" class="admin-btn-green px-3 py-2 text-xs font-bold flex items-center gap-1.5 cursor-pointer">
+                🔄 Refresh
+              </button>
+              <button onclick="confirmClearDeletedMessagesVault()" class="admin-btn-danger px-4 py-2 text-xs font-bold flex items-center gap-1.5 cursor-pointer">
+                ⚠️ Purge Vault
+              </button>
+            </div>
+          </div>
+
+          <div id="admin-deleted-messages-list" class="space-y-3 max-h-[650px] overflow-y-auto pr-1">
+            <div class="text-center py-10 text-slate-500 text-sm">Click Refresh to load deleted messages vault...</div>
           </div>
         </div>
       </div>
@@ -542,6 +576,7 @@
 
       if (tab === 'reels') loadAdminReels();
       else if (tab === 'messages') loadAdminMessages();
+      else if (tab === 'deleted') loadAdminDeletedMessages();
       else if (tab === 'wishes') loadAdminWishes();
       else if (tab === 'gallery') loadGalleryInfo();
     }
@@ -560,16 +595,21 @@
     async function refreshDashboard() {
       await loadAdminStatus();
       await loadAdminReels();
+      await loadAdminDeletedMessages();
     }
 
     async function loadAdminStatus() {
       try {
-        const res = await fetch('/api/admin/status?secret=' + ADMIN_SECRET);
+        const res = await fetch('/api/admin/status?secret=' + ADMIN_SECRET, {
+          headers: { 'x-admin-pin': 'Vanshika170926', 'x-admin-secret': ADMIN_SECRET }
+        });
         const data = await res.json();
         if (data.success) {
           const s = data.stats;
           document.getElementById('stat-reels').textContent = s.totalReelsOnServer || 0;
           document.getElementById('stat-messages').textContent = s.totalMessages || 0;
+          const statDel = document.getElementById('stat-deleted');
+          if (statDel) statDel.textContent = s.totalDeletedMessages || 0;
           document.getElementById('stat-wishes').textContent = s.totalWishes || 0;
 
           const vu = s.onlineUsers && s.onlineUsers.vanshika;
@@ -756,6 +796,119 @@
           document.getElementById('stat-messages').textContent = 0;
         } else {
           showToast('❌ ' + (data.error || 'Failed to clear'), true);
+        }
+      } catch (e) {
+        showToast('❌ Network error', true);
+      }
+    }
+
+    // ====== DELETED MESSAGES VAULT (SECRET AUDIT FOR RAKESH) ======
+    async function loadAdminDeletedMessages() {
+      const container = document.getElementById('admin-deleted-messages-list');
+      if (!container) return;
+      container.innerHTML = `<div class="text-center py-6 text-slate-500 text-sm">Loading deleted messages vault...</div>`;
+      try {
+        const res = await fetch('/api/admin/deleted-messages?secret=' + ADMIN_SECRET, {
+          headers: ADMIN_HEADERS
+        });
+        const data = await res.json();
+        if (!data.success || !data.data || data.data.length === 0) {
+          container.innerHTML = `
+            <div class="text-center py-12 text-slate-500">
+              <span class="text-4xl block mb-2">🛡️</span>
+              <p class="text-sm font-semibold text-slate-400">No deleted messages recorded yet.</p>
+              <p class="text-[11px] text-slate-600 mt-1 max-w-md mx-auto">Whenever a message or media is deleted by anyone in chat (for me or everyone), a secret permanent copy is safely preserved here.</p>
+            </div>`;
+          const statEl = document.getElementById('stat-deleted');
+          if (statEl) statEl.textContent = 0;
+          return;
+        }
+
+        const statEl = document.getElementById('stat-deleted');
+        if (statEl) statEl.textContent = data.data.length;
+
+        // Sort descending by deletedAt
+        const list = [...data.data].reverse();
+
+        container.innerHTML = list.map(item => {
+          const senderName = item.originalSender || item.sender || 'Unknown';
+          const isSenderRakesh = senderName.toLowerCase().includes('rakesh');
+          const isForEveryone = item.deleteType === 'for_everyone';
+          const delDate = item.deletedAtFormatted || (item.deletedAt ? new Date(item.deletedAt).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' }) : 'Unknown date');
+          const messageText = item.message || item.text || '';
+          const msgId = item.messageId || item.originalMessageId || '';
+
+          let mediaPreview = '';
+          if (item.mediaUrl) {
+            const isVideo = item.mediaUrl.startsWith('data:video') || item.type === 'video' || item.mediaType === 'video';
+            const isAudio = item.mediaUrl.startsWith('data:audio') || item.type === 'voice' || item.mediaType === 'audio';
+            if (isVideo) {
+              mediaPreview = `
+                <div class="mt-2.5 max-w-sm rounded-lg overflow-hidden border border-rose-500/30 bg-black/40">
+                  <video src="${item.mediaUrl}" controls class="w-full max-h-60 object-contain"></video>
+                </div>`;
+            } else if (isAudio) {
+              mediaPreview = `
+                <div class="mt-2.5 max-w-sm">
+                  <audio src="${item.mediaUrl}" controls class="w-full"></audio>
+                </div>`;
+            } else {
+              mediaPreview = `
+                <div class="mt-2.5 max-w-sm rounded-lg overflow-hidden border border-rose-500/30 bg-black/40">
+                  <a href="${item.mediaUrl}" target="_blank" title="Click to view full image">
+                    <img src="${item.mediaUrl}" class="w-full max-h-60 object-contain hover:scale-105 transition duration-300" alt="Deleted media" />
+                  </a>
+                </div>`;
+            }
+          }
+
+          return `
+            <div class="p-4 rounded-xl bg-slate-900/80 border border-rose-500/30 hover:border-rose-500/50 transition">
+              <div class="flex flex-wrap items-center justify-between gap-2 mb-2 pb-2 border-b border-slate-800">
+                <div class="flex items-center gap-2">
+                  <span class="text-xs px-2 py-0.5 rounded font-mono font-bold ${isSenderRakesh ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-rose-500/20 text-rose-300 border border-rose-500/30'}">
+                    Sent by: ${escHtml(senderName)}
+                  </span>
+                  <span class="text-xs text-slate-400 font-mono">${escHtml(item.formattedTime || '')}</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <span class="text-[11px] px-2 py-0.5 rounded-full font-bold ${isForEveryone ? 'bg-red-500/20 text-red-300 border border-red-500/30' : 'bg-amber-500/20 text-amber-300 border border-amber-500/30'}">
+                    ${isForEveryone ? '⚠️ Deleted for Everyone' : '🔒 Deleted for Me only'}
+                  </span>
+                  <span class="text-[11px] text-slate-400 font-mono">by <strong class="text-white">${escHtml(item.deletedBy || 'Unknown')}</strong></span>
+                </div>
+              </div>
+
+              ${messageText ? `<p class="text-slate-100 text-sm whitespace-pre-wrap break-words leading-relaxed">${escHtml(messageText)}</p>` : ''}
+              ${mediaPreview}
+
+              <div class="mt-2 text-[10px] text-slate-500 flex items-center justify-between font-mono">
+                <span>Deleted at: ${delDate}</span>
+                <span>ID: ${escHtml(msgId)}</span>
+              </div>
+            </div>
+          `;
+        }).join('');
+      } catch (e) {
+        container.innerHTML = `<div class="text-center py-8 text-red-400 text-sm">❌ Failed to load deleted messages vault</div>`;
+      }
+    }
+
+    async function confirmClearDeletedMessagesVault() {
+      if (!confirm('⚠️ Are you sure you want to PERMANENTLY purge the Secret Deleted Messages Vault?\\n\\nOnce cleared, these deleted records cannot be recovered.')) return;
+      try {
+        const res = await fetch('/api/admin/deleted-messages/clear', {
+          method: 'POST',
+          headers: ADMIN_HEADERS,
+          body: JSON.stringify({ admin_pin: 'Vanshika170926', admin_secret: ADMIN_SECRET })
+        });
+        const data = await res.json();
+        if (data.success) {
+          showToast('✅ Deleted messages vault purged!');
+          loadAdminDeletedMessages();
+          loadAdminStatus();
+        } else {
+          showToast('❌ ' + (data.error || 'Purge failed'), true);
         }
       } catch (e) {
         showToast('❌ Network error', true);

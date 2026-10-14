@@ -800,7 +800,60 @@ function attachReelVideoListeners(videoEl) {
   });
 }
 
-function displayActiveReel(index, direction = 'up') {
+let reelObserver = null;
+let userManuallyPausedReel = false;
+
+function setupReelVisibilityObserver() {
+  const section = document.getElementById('vanshika-reel-section');
+  const videoEl = document.getElementById('vanshika-reel-video');
+  if (!section || !videoEl || !('IntersectionObserver' in window)) return;
+
+  if (reelObserver) {
+    try { reelObserver.disconnect(); } catch (e) {}
+  }
+
+  reelObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      const loginModal = document.getElementById('name-login-modal');
+      const isLoginOpen = loginModal && !loginModal.classList.contains('hidden');
+
+      // If user hasn't logged in yet, NEVER play
+      if (isLoginOpen) {
+        if (!videoEl.paused) videoEl.pause();
+        return;
+      }
+
+      if (entry.isIntersecting && entry.intersectionRatio >= 0.5) {
+        // User has scrolled into the reels section!
+        if (!userManuallyPausedReel && videoEl.paused) {
+          const currentReel = vanshikaReelsList && vanshikaReelsList[currentReelIndex];
+          if (currentReel && currentReel.type !== 'youtube') {
+            videoEl.play().then(() => {
+              pauseBackgroundMusicForReel();
+              const playIndicator = document.getElementById('reel-center-play-indicator');
+              if (playIndicator) playIndicator.style.opacity = '0';
+            }).catch(() => {});
+          }
+        }
+      } else {
+        // User has scrolled away from reels section - PAUSE immediately!
+        if (!videoEl.paused) {
+          videoEl.pause();
+          const playIndicator = document.getElementById('reel-center-play-indicator');
+          const playIcon = document.getElementById('reel-center-play-icon');
+          if (playIndicator) {
+            if (playIcon) playIcon.innerText = '▶️';
+            playIndicator.style.opacity = '1';
+          }
+        }
+      }
+    });
+  }, { threshold: [0, 0.5, 0.8] });
+
+  reelObserver.observe(section);
+}
+
+function displayActiveReel(index, direction = 'up', shouldAutoPlay = false) {
   const placeholderEl = document.getElementById('reel-placeholder-preview');
   const videoEl = document.getElementById('vanshika-reel-video');
   const embedEl = document.getElementById('vanshika-reel-embed');
@@ -836,13 +889,20 @@ function displayActiveReel(index, direction = 'up') {
   }
 
   // Smooth slide transition
-  if (screenMount) {
+  if (screenMount && direction !== 'none') {
     screenMount.classList.remove('reel-transition-up', 'reel-transition-down');
     void screenMount.offsetWidth;
     screenMount.classList.add(direction === 'up' ? 'reel-transition-up' : 'reel-transition-down');
   }
 
   updateReelCounter();
+
+  // Safety check: Never autoplay if login modal is currently open
+  const loginModal = document.getElementById('name-login-modal');
+  const isLoginModalOpen = loginModal && !loginModal.classList.contains('hidden');
+  if (isLoginModalOpen) {
+    shouldAutoPlay = false;
+  }
 
   if (reel.type === 'youtube') {
     if (videoEl) {
@@ -851,7 +911,8 @@ function displayActiveReel(index, direction = 'up') {
     }
     const videoId = typeof extractYouTubeVideoId === 'function' ? extractYouTubeVideoId(reel.url) : null;
     if (videoId && embedEl) {
-      embedEl.innerHTML = `<iframe class="w-full h-full rounded-[26px]" src="https://www.youtube.com/embed/${videoId}?autoplay=1&loop=1&playlist=${videoId}&playsinline=1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+      const autoParam = (shouldAutoPlay && !isLoginModalOpen) ? 'autoplay=1' : 'autoplay=0';
+      embedEl.innerHTML = `<iframe class="w-full h-full rounded-[26px]" src="https://www.youtube.com/embed/${videoId}?${autoParam}&loop=1&playlist=${videoId}&playsinline=1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
       embedEl.classList.remove('hidden');
     }
   } else {
@@ -869,25 +930,32 @@ function displayActiveReel(index, direction = 'up') {
 
     attachReelVideoListeners(videoEl);
 
-    videoEl.play().then(() => {
-      pauseBackgroundMusicForReel();
-      const playIndicator = document.getElementById('reel-center-play-indicator');
-      const playIcon = document.getElementById('reel-center-play-icon');
+    const playIndicator = document.getElementById('reel-center-play-indicator');
+    const playIcon = document.getElementById('reel-center-play-icon');
+
+    if (shouldAutoPlay && !isLoginModalOpen) {
+      videoEl.play().then(() => {
+        pauseBackgroundMusicForReel();
+        if (playIndicator) {
+          if (playIcon) playIcon.innerText = '▶️';
+          playIndicator.style.opacity = '1';
+          setTimeout(() => {
+            if (videoEl && !videoEl.paused) playIndicator.style.opacity = '0';
+          }, 400);
+        }
+      }).catch(() => {
+        if (playIndicator) {
+          if (playIcon) playIcon.innerText = '▶️';
+          playIndicator.style.opacity = '1';
+        }
+      });
+    } else {
+      videoEl.pause();
       if (playIndicator) {
         if (playIcon) playIcon.innerText = '▶️';
         playIndicator.style.opacity = '1';
-        setTimeout(() => {
-          if (videoEl && !videoEl.paused) playIndicator.style.opacity = '0';
-        }, 400);
       }
-    }).catch(() => {
-      const playIndicator = document.getElementById('reel-center-play-indicator');
-      const playIcon = document.getElementById('reel-center-play-icon');
-      if (playIndicator) {
-        if (playIcon) playIcon.innerText = '▶️';
-        playIndicator.style.opacity = '1';
-      }
-    });
+    }
   }
 }
 
@@ -904,7 +972,7 @@ function nextReel(event) {
   if (nextIdx >= vanshikaReelsList.length) {
     nextIdx = 0; // Loop to first reel
   }
-  displayActiveReel(nextIdx, 'up');
+  displayActiveReel(nextIdx, 'up', true);
 }
 
 function prevReel(event) {
@@ -920,7 +988,7 @@ function prevReel(event) {
   if (prevIdx < 0) {
     prevIdx = vanshikaReelsList.length - 1; // Wrap to last reel
   }
-  displayActiveReel(prevIdx, 'down');
+  displayActiveReel(prevIdx, 'down', true);
 }
 
 function handleReelScreenClick(event) {
@@ -939,6 +1007,7 @@ function handleReelScreenClick(event) {
   const playIcon = document.getElementById('reel-center-play-icon');
 
   if (videoEl.paused) {
+    userManuallyPausedReel = false;
     pauseBackgroundMusicForReel();
     videoEl.play().then(() => {
       if (playIndicator) {
@@ -952,6 +1021,7 @@ function handleReelScreenClick(event) {
       console.warn('Reel playback error:', e);
     });
   } else {
+    userManuallyPausedReel = true;
     videoEl.pause();
     if (playIndicator) {
       if (playIcon) playIcon.innerText = '⏸️';
@@ -1148,7 +1218,8 @@ async function initVanshikaReel() {
           timestamp: item.timestamp || new Date().toISOString()
         };
       });
-      displayActiveReel(0, 'up');
+      displayActiveReel(0, 'none', false);
+      setupReelVisibilityObserver();
       return;
     }
   } catch (e) {
@@ -1163,7 +1234,8 @@ async function initVanshikaReel() {
       if (Array.isArray(parsed) && parsed.length > 0) {
         vanshikaReelsList = parsed.filter(p => p.url && !p.url.startsWith('blob:'));
         if (vanshikaReelsList.length > 0) {
-          displayActiveReel(0, 'up');
+          displayActiveReel(0, 'none', false);
+          setupReelVisibilityObserver();
           return;
         }
       }
@@ -1183,9 +1255,11 @@ async function initVanshikaReel() {
         title: 'Reel #1',
         timestamp: new Date().toISOString()
       }];
-      displayActiveReel(0, 'up');
+      displayActiveReel(0, 'none', false);
+      setupReelVisibilityObserver();
     };
   } catch (e) {}
 
   updateReelCounter();
+  setupReelVisibilityObserver();
 }

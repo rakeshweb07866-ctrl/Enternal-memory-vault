@@ -207,6 +207,109 @@ function deduplicateMessagesList(list) {
   return result;
 }
 
+// High-Capacity IndexedDB Backing Store (Eliminates localStorage 5MB Quota Drops for Media)
+const IDB_NAME = 'MemoryVaultDB';
+const IDB_STORE = 'messages';
+function openVaultDB() {
+  return new Promise((resolve) => {
+    if (!window.indexedDB) return resolve(null);
+    try {
+      const req = window.indexedDB.open(IDB_NAME, 1);
+      req.onupgradeneeded = (e) => {
+        const db = e.target.result;
+        if (!db.objectStoreNames.contains(IDB_STORE)) {
+          db.createObjectStore(IDB_STORE, { keyPath: 'id' });
+        }
+      };
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => resolve(null);
+    } catch (e) {
+      resolve(null);
+    }
+  });
+}
+
+async function saveToIndexedDB(msg) {
+  if (!msg || !msg.id) return;
+  try {
+    const db = await openVaultDB();
+    if (!db) return;
+    const tx = db.transaction(IDB_STORE, 'readwrite');
+    tx.objectStore(IDB_STORE).put(msg);
+  } catch (e) {}
+}
+
+async function loadFromIndexedDB() {
+  try {
+    const db = await openVaultDB();
+    if (!db) return [];
+    return new Promise((resolve) => {
+      const tx = db.transaction(IDB_STORE, 'readonly');
+      const req = tx.objectStore(IDB_STORE).getAll();
+      req.onsuccess = () => resolve(req.result || []);
+      req.onerror = () => resolve([]);
+    });
+  } catch (e) {
+    return [];
+  }
+}
+
+async function deleteFromIndexedDB(id) {
+  if (!id) return;
+  try {
+    const db = await openVaultDB();
+    if (!db) return;
+    const tx = db.transaction(IDB_STORE, 'readwrite');
+    tx.objectStore(IDB_STORE).delete(id);
+  } catch (e) {}
+}
+
+// Client-side Auto Image Compression (Converts heavy 5-15MB camera photos to HD ~150KB JPEG)
+function compressImageForChat(blobOrDataUrl, maxDimension = 1280, quality = 0.82) {
+  return new Promise((resolve) => {
+    try {
+      const img = new Image();
+      img.onload = () => {
+        let width = img.naturalWidth || img.width;
+        let height = img.naturalHeight || img.height;
+
+        if (width > maxDimension || height > maxDimension) {
+          if (width > height) {
+            height = Math.round((height * maxDimension) / width);
+            width = maxDimension;
+          } else {
+            width = Math.round((width * maxDimension) / height);
+            height = maxDimension;
+          }
+        }
+
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#FFFFFF';
+        ctx.fillRect(0, 0, width, height);
+        ctx.drawImage(img, 0, 0, width, height);
+        const compressedDataUrl = canvas.toDataURL('image/jpeg', quality);
+        resolve(compressedDataUrl);
+      };
+      img.onerror = () => {
+        resolve(typeof blobOrDataUrl === 'string' ? blobOrDataUrl : null);
+      };
+      if (typeof blobOrDataUrl === 'string') {
+        img.src = blobOrDataUrl;
+      } else {
+        const reader = new FileReader();
+        reader.onload = (e) => { img.src = e.target.result; };
+        reader.onerror = () => resolve(null);
+        reader.readAsDataURL(blobOrDataUrl);
+      }
+    } catch (e) {
+      resolve(typeof blobOrDataUrl === 'string' ? blobOrDataUrl : null);
+    }
+  });
+}
+
 function getLocalVaultMessages() {
   try {
     const raw = localStorage.getItem(VAULT_MSG_STORAGE_KEY);
@@ -238,7 +341,14 @@ function saveMessageToLocalVault(msg) {
   if (msgs.length > 500) msgs = msgs.slice(msgs.length - 500);
   try {
     localStorage.setItem(VAULT_MSG_STORAGE_KEY, JSON.stringify(msgs));
-  } catch (e) {}
+  } catch (e) {
+    try {
+      const trimmed = msgs.slice(Math.max(0, msgs.length - 80));
+      localStorage.setItem(VAULT_MSG_STORAGE_KEY, JSON.stringify(trimmed));
+    } catch (err2) {}
+  }
+  // Guarantee persistent storage via IndexedDB
+  saveToIndexedDB(msg);
 }
 
 function mergeAndSaveVaultMessages(newList) {
@@ -257,7 +367,13 @@ function mergeAndSaveVaultMessages(newList) {
   if (merged.length > 500) merged = merged.slice(merged.length - 500);
   try {
     localStorage.setItem(VAULT_MSG_STORAGE_KEY, JSON.stringify(merged));
-  } catch (e) {}
+  } catch (e) {
+    try {
+      const trimmed = merged.slice(Math.max(0, merged.length - 80));
+      localStorage.setItem(VAULT_MSG_STORAGE_KEY, JSON.stringify(trimmed));
+    } catch (err2) {}
+  }
+  newList.forEach(m => saveToIndexedDB(m));
   return merged;
 }
 
@@ -283,7 +399,7 @@ function buildMessageHtml(m, isMyMessage) {
   // Media (Photo, Video, Voice Note) Rendering with Download / Fullscreen capability
   let mediaHtml = '';
   if (m.mediaUrl) {
-    const isImage = m.mediaType === 'image' || (!m.mediaType && (m.mediaUrl.startsWith('data:image') || m.mediaUrl.match(/\.(jpeg|jpg|png|gif|webp)(\?.*)?$/i)));
+    const isImage = m.mediaType === 'image' || (!m.mediaType && (m.mediaUrl.startsWith('data:image') || m.mediaUrl.match(/\.(jpeg|jpg|png|gif|webp|heic|heif|bmp|svg|avif)(\?.*)?$/i)));
     const isVideo = m.mediaType === 'video' || (!m.mediaType && (m.mediaUrl.startsWith('data:video') || m.mediaUrl.match(/\.(mp4|webm|mov)(\?.*)?$/i)));
     const isAudio = m.mediaType === 'audio' || (!m.mediaType && (m.mediaUrl.startsWith('data:audio') || m.mediaUrl.match(/\.(mp3|wav|ogg|webm|m4a)(\?.*)?$/i)));
 
@@ -358,13 +474,135 @@ function buildMessageHtml(m, isMyMessage) {
           </div>
         </div>
 
-        <!-- Desktop Hover Quick Reply Button -->
-        <button type="button" onclick="activateReplyMode('${m.id}')" title="Reply to message (or swipe/double-tap)" class="opacity-0 group-hover:opacity-100 transition-opacity duration-200 p-1.5 rounded-full bg-slate-900/80 hover:bg-rose-500 text-slate-400 hover:text-white text-xs shadow-md active:scale-90 cursor-pointer">
-          ↩️
-        </button>
+        <!-- Action Buttons (Reply + Delete) -->
+        <div class="opacity-80 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-200 flex items-center gap-1 shrink-0">
+          <button type="button" onclick="activateReplyMode('${m.id}')" title="Reply to message" class="p-1.5 rounded-full bg-slate-900/80 hover:bg-rose-500 text-slate-400 hover:text-white text-xs shadow-md active:scale-90 cursor-pointer">
+            ↩️
+          </button>
+          <button type="button" onclick="openDeleteMessageModal('${m.id}')" title="Delete message" class="p-1.5 rounded-full bg-slate-900/80 hover:bg-red-500 text-slate-400 hover:text-white text-xs shadow-md active:scale-90 cursor-pointer">
+            🗑️
+          </button>
+        </div>
       </div>
     </div>
   `;
+}
+
+// WhatsApp-Style Message Deletion Controller
+let targetMessageToDelete = null;
+
+function openDeleteMessageModal(msgId) {
+  targetMessageToDelete = msgId;
+  const modal = document.getElementById('chat-delete-modal');
+  if (!modal) return;
+
+  const btnForEveryone = document.getElementById('chat-delete-for-everyone-btn');
+  const msgNode = document.getElementById('msg-elem-' + msgId);
+  const msgSender = msgNode ? (msgNode.getAttribute('data-msg-sender') || '') : '';
+  const myClean = (currentChatSender || '').toLowerCase().trim();
+  const isMyMsg = myClean && (msgSender.toLowerCase().includes(myClean) || myClean.includes(msgSender.toLowerCase()));
+  const isAdmin = currentChatPin === 'Vanshika170926';
+
+  // Only the original sender (or Admin) can Delete For Everyone
+  if (btnForEveryone) {
+    if (isMyMsg || isAdmin) {
+      btnForEveryone.style.display = 'flex';
+    } else {
+      btnForEveryone.style.display = 'none';
+    }
+  }
+
+  modal.classList.remove('hidden');
+  modal.classList.add('flex');
+}
+
+function closeChatDeleteModal() {
+  const modal = document.getElementById('chat-delete-modal');
+  if (modal) {
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+  }
+  targetMessageToDelete = null;
+}
+
+async function executeDeleteMessage(deleteType) {
+  const msgId = targetMessageToDelete;
+  closeChatDeleteModal();
+  if (!msgId) return;
+
+  // Find local message data to preserve in audit payload
+  let local = getLocalVaultMessages();
+  const targetMsg = local.find(m => m.id === msgId);
+
+  // 1. Remove/mark immediately from local feed
+  handleMessageDeletedLocally(msgId, deleteType, currentChatSender);
+
+  // 2. Sync to Server (REST + Socket)
+  const delPayload = {
+    messageId: msgId,
+    deleteType: deleteType,
+    deletedBy: currentChatSender,
+    pin: currentChatPin,
+    message: targetMsg ? targetMsg.message : '',
+    mediaType: targetMsg ? targetMsg.mediaType : null,
+    mediaUrl: targetMsg ? targetMsg.mediaUrl : null,
+    fileName: targetMsg ? targetMsg.fileName : null
+  };
+
+  if (socket && socket.connected) {
+    socket.emit('delete_message', delPayload);
+  }
+
+  try {
+    await fetch('/api/messages/delete', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(delPayload)
+    });
+  } catch (e) {}
+
+  // 3. If Firebase active and deleteType is for_everyone, remove from Firebase
+  if (isFirebaseActive && fbDb && deleteType === 'for_everyone') {
+    try {
+      fbDb.ref('vault_messages/' + msgId).remove();
+    } catch (e) {}
+  }
+}
+
+function handleMessageDeletedLocally(msgId, deleteType, deletedBy) {
+  const isDeletedByMe = (deletedBy || '').toLowerCase().includes((currentChatSender || '').toLowerCase());
+  
+  if (deleteType === 'for_everyone') {
+    const bubble = document.getElementById('bubble-inner-' + msgId);
+    if (bubble) {
+      bubble.innerHTML = `
+        <div class="italic text-xs opacity-75 flex items-center gap-1.5 py-1 text-slate-400 select-none">
+          <span>🚫</span>
+          <span>${isDeletedByMe ? 'You deleted this message' : 'This message was deleted'}</span>
+        </div>
+      `;
+    }
+    removeMessageFromLocalVault(msgId);
+    deleteFromIndexedDB(msgId);
+  } else {
+    // for_me: completely remove from feed
+    const el = document.getElementById('msg-elem-' + msgId);
+    if (el) {
+      el.style.opacity = '0';
+      el.style.transform = 'scale(0.8)';
+      setTimeout(() => el.remove(), 250);
+    }
+    removeMessageFromLocalVault(msgId);
+    deleteFromIndexedDB(msgId);
+  }
+}
+
+function removeMessageFromLocalVault(msgId) {
+  let msgs = getLocalVaultMessages();
+  msgs = msgs.filter(m => m.id !== msgId);
+  try {
+    localStorage.setItem(VAULT_MSG_STORAGE_KEY, JSON.stringify(msgs));
+  } catch (e) {}
 }
 
 function renderChatFeed(messages, forceReset = false) {
@@ -499,7 +737,7 @@ function clearChatUI() {
       <div class="flex flex-col items-center justify-center h-full text-slate-400 text-xs italic py-8">
         <span class="text-3xl mb-2">💬</span>
         <p>Your Private Memory Vault is completely clear.</p>
-        <p class="text-[10px] text-slate-500 mt-1">Start chatting with Princess Vanshika below ✨</p>
+        <p class="text-[10px] text-slate-500 mt-1">Lets Start chatting My Princess Vanshika  ✨</p>
       </div>
     `;
   }
@@ -543,6 +781,8 @@ async function sendLiveChatMessage(customText = null) {
 
   if (customText === null && input) {
     input.value = '';
+    input.style.height = 'auto';
+    input.style.overflowY = 'hidden';
     input.focus();
   }
 
@@ -589,25 +829,23 @@ async function dispatchMessageToCloud(msg) {
     replyTo: msg.replyTo
   };
 
-  // 1. Primary: Firebase RTDB (Single transport)
+  // 1. Firebase RTDB
   if (isFirebaseActive && fbDb) {
     try {
       await fbDb.ref('vault_messages/' + msg.id).set(payload);
       markMessageSent(msg.id);
-      return;
     } catch (err) {
-      console.warn('Firebase push failed, trying fallback:', err);
+      console.warn('Firebase push warning:', err);
     }
   }
 
-  // 2. Secondary: Socket.io if active
+  // 2. Socket.io
   if (socket && socket.connected) {
     socket.emit('send_message', payload);
     markMessageSent(msg.id);
-    return;
   }
 
-  // 3. Tertiary: HTTP POST fallback
+  // 3. Server Disk Persistence (ALWAYS save to /api/messages so data/messages.json permanently survives refreshes)
   try {
     const res = await fetch('/api/messages', {
       method: 'POST',
@@ -619,7 +857,9 @@ async function dispatchMessageToCloud(msg) {
       markMessageSent(msg.id);
     }
   } catch (e) {
-    offlinePendingQueue.push(msg);
+    if (!isFirebaseActive && (!socket || !socket.connected)) {
+      offlinePendingQueue.push(msg);
+    }
   }
 }
 
@@ -637,11 +877,37 @@ function markMessageSent(msgId) {
   }
 }
 
+// Auto-Growing WhatsApp Style Chat Textarea Engine
+function handleChatInputAutoGrow(textarea) {
+  if (!textarea) return;
+  textarea.style.height = 'auto';
+  const maxHeight = 130; // ~5 lines
+  const newHeight = Math.min(textarea.scrollHeight, maxHeight);
+  textarea.style.height = newHeight + 'px';
+  if (textarea.scrollHeight > maxHeight) {
+    textarea.style.overflowY = 'auto';
+  } else {
+    textarea.style.overflowY = 'hidden';
+  }
+}
+
+function handleChatInputKeyDown(e) {
+  // Desktop: Enter sends message, Shift+Enter makes newline
+  // Mobile: Enter makes newline, user clicks circular send button
+  if (e.key === 'Enter' && !e.shiftKey) {
+    if (window.innerWidth >= 768) {
+      e.preventDefault();
+      sendLiveChatMessage();
+    }
+  }
+}
+
 // Quick Emojis & Reactions
 function insertQuickChatEmoji(emoji) {
   const input = document.getElementById('live-chat-input');
   if (!input) return;
   input.value = (input.value ? input.value + ' ' : '') + emoji;
+  handleChatInputAutoGrow(input);
   input.focus();
 }
 
@@ -662,35 +928,107 @@ function triggerChatMediaPicker() {
   }
 }
 
-function handleChatMediaSelected(event) {
+async function handleChatMediaSelected(event) {
   const file = event.target.files && event.target.files[0];
   if (!file) return;
 
-  if (file.size > 40 * 1024 * 1024) {
-    alert('Selected file is too large (Maximum 40MB allowed).');
+  if (file.size > 45 * 1024 * 1024) {
+    alert('Selected file is too large (Maximum 45MB allowed).');
     return;
   }
+
+  const rawName = file.name || 'attachment';
+  const fileExt = (rawName.split('.').pop() || '').toLowerCase();
+  const fileMime = (file.type || '').toLowerCase();
+
+  const isVideo = fileMime.startsWith('video/') || ['mp4', 'mov', 'webm', 'mkv', 'avi', 'm4v', '3gp'].includes(fileExt);
+  const isAudio = fileMime.startsWith('audio/') || ['mp3', 'wav', 'ogg', 'm4a', 'aac', 'flac'].includes(fileExt);
+  const isHeic = fileMime.includes('heic') || fileMime.includes('heif') || ['heic', 'heif'].includes(fileExt);
 
   let mediaType = 'image';
-  if (file.type.startsWith('video/')) mediaType = 'video';
-  else if (file.type.startsWith('audio/')) mediaType = 'audio';
-  else if (file.type.startsWith('image/')) mediaType = 'image';
-  else {
-    alert('Please choose an image, video, or audio file.');
-    return;
-  }
+  if (isVideo) mediaType = 'video';
+  else if (isAudio) mediaType = 'audio';
+  else mediaType = 'image';
 
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    pendingChatMedia = {
-      type: mediaType,
-      dataUrl: e.target.result,
-      fileName: file.name,
-      fileSize: file.size
+  // Immediate preview status feedback
+  const bar = document.getElementById('chat-media-preview-bar');
+  const thumb = document.getElementById('chat-media-preview-thumb');
+  const nameEl = document.getElementById('chat-media-preview-name');
+  const sizeEl = document.getElementById('chat-media-preview-size');
+
+  if (bar) {
+    bar.classList.remove('hidden');
+    bar.classList.add('flex');
+  }
+  if (nameEl) nameEl.innerText = rawName;
+  if (sizeEl) sizeEl.innerText = isHeic ? 'Optimizing iPhone HEIC photo...' : 'Processing media...';
+  if (thumb) thumb.innerHTML = '⏳';
+
+  try {
+    let finalBlob = file;
+    let finalFileName = rawName;
+
+    // Convert iPhone HEIC/HEIF to JPEG so all browsers can view it
+    if (isHeic) {
+      if (typeof heic2any === 'function') {
+        try {
+          const res = await heic2any({
+            blob: file,
+            toType: 'image/jpeg',
+            quality: 0.85
+          });
+          finalBlob = Array.isArray(res) ? res[0] : res;
+          finalFileName = rawName.replace(/\.(heic|heif)$/i, '.jpg');
+        } catch (convErr) {
+          console.warn('HEIC conversion notice:', convErr);
+        }
+      }
+    }
+
+    // Auto-compress photos to prevent browser quota exhaustion & speed up sync
+    if (mediaType === 'image') {
+      try {
+        const compressedDataUrl = await compressImageForChat(finalBlob, 1280, 0.82);
+        if (compressedDataUrl) {
+          pendingChatMedia = {
+            type: 'image',
+            dataUrl: compressedDataUrl,
+            fileName: finalFileName,
+            fileSize: Math.round(compressedDataUrl.length * 0.75)
+          };
+          showChatMediaPreviewBar();
+          return;
+        }
+      } catch (compErr) {
+        console.warn('Image auto-compression fallback:', compErr);
+      }
+    }
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      pendingChatMedia = {
+        type: mediaType,
+        dataUrl: e.target.result,
+        fileName: finalFileName,
+        fileSize: finalBlob.size || file.size
+      };
+      showChatMediaPreviewBar();
     };
-    showChatMediaPreviewBar();
-  };
-  reader.readAsDataURL(file);
+    reader.readAsDataURL(finalBlob);
+  } catch (err) {
+    console.warn('Media file read error, falling back:', err);
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      pendingChatMedia = {
+        type: mediaType,
+        dataUrl: e.target.result,
+        fileName: rawName,
+        fileSize: file.size
+      };
+      showChatMediaPreviewBar();
+    };
+    reader.readAsDataURL(file);
+  }
 }
 
 function showChatMediaPreviewBar() {
@@ -1009,6 +1347,15 @@ function initFirebaseCloud() {
       }
     });
 
+    // Real-time message deletion listener
+    fbDb.ref('vault_messages').on('child_removed', snapshot => {
+      const m = snapshot.val();
+      const id = snapshot.key || (m && m.id);
+      if (id) {
+        handleMessageDeletedLocally(id, 'for_everyone', 'Partner');
+      }
+    });
+
     // 2. Real-time Presence & Typing
     if (currentChatSender) {
       const isMeV = currentChatSender.toLowerCase().includes('vanshika');
@@ -1083,6 +1430,12 @@ function initSocketConnection() {
       appendSingleMessageToFeed(msg);
     });
 
+    socket.on('message_deleted', (data) => {
+      if (data && data.messageId) {
+        handleMessageDeletedLocally(data.messageId, data.deleteType, data.deletedBy);
+      }
+    });
+
     socket.on('chat_cleared', () => {
       clearChatUI();
     });
@@ -1102,7 +1455,6 @@ function initSocketConnection() {
 }
 
 async function fetchLiveChatMessages() {
-  if (isFirebaseActive && fbDb) return;
   try {
     const url = currentChatSender ? '/api/messages?sender=' + encodeURIComponent(currentChatSender) : '/api/messages';
     const res = await fetch(url);

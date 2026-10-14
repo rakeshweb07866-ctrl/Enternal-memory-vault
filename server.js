@@ -44,6 +44,7 @@ try {
 
 const MESSAGES_FILE = path.join(DATA_DIR, 'messages.json');
 const WISHES_FILE = path.join(DATA_DIR, 'wishes.json');
+const DELETED_MESSAGES_FILE = path.join(DATA_DIR, 'deleted_messages.json');
 
 // Strict Private Security Passcodes
 const VALID_PINS = {
@@ -110,6 +111,7 @@ function cleanExpiredPresence() {
 // Default Memory Fallbacks
 let inMemoryMessages = [];
 let inMemoryWishes = [];
+let inMemoryDeletedMessages = [];
 
 function getMessages() {
   try {
@@ -127,11 +129,14 @@ function saveMessage(msgObj) {
   if (existingIdx !== -1) {
     list[existingIdx] = { ...list[existingIdx], ...msgObj };
   } else {
-    // Check for twin duplicate by sender, message, and time within 4s
+    // Check for twin duplicate by sender, message, mediaUrl, and time within 4s
     const msgTime = new Date(msgObj.timestamp || 0).getTime();
     const dupeIdx = list.findIndex(m => {
       const prevTime = new Date(m.timestamp || 0).getTime();
-      return m.sender === msgObj.sender && m.message === msgObj.message && Math.abs(prevTime - msgTime) < 4000;
+      return m.sender === msgObj.sender &&
+             (m.message || '') === (msgObj.message || '') &&
+             (m.mediaUrl || '') === (msgObj.mediaUrl || '') &&
+             Math.abs(prevTime - msgTime) < 4000;
     });
     if (dupeIdx !== -1) {
       list[dupeIdx] = { ...list[dupeIdx], ...msgObj };
@@ -145,6 +150,26 @@ function saveMessage(msgObj) {
   inMemoryMessages = list;
   try {
     fs.writeFileSync(MESSAGES_FILE, JSON.stringify(list, null, 2));
+  } catch (err) {}
+}
+
+function getDeletedMessages() {
+  try {
+    if (fs.existsSync(DELETED_MESSAGES_FILE)) {
+      const data = JSON.parse(fs.readFileSync(DELETED_MESSAGES_FILE, 'utf8'));
+      if (Array.isArray(data)) return data;
+    }
+  } catch (err) {}
+  return inMemoryDeletedMessages;
+}
+
+function saveDeletedMessage(delObj) {
+  let list = getDeletedMessages();
+  list.unshift(delObj);
+  if (list.length > 500) list = list.slice(0, 500);
+  inMemoryDeletedMessages = list;
+  try {
+    fs.writeFileSync(DELETED_MESSAGES_FILE, JSON.stringify(list, null, 2));
   } catch (err) {}
 }
 
@@ -214,6 +239,60 @@ if (io) {
 
       saveMessage(newMsg);
       io.to('love_chat_room').emit('new_message', newMsg);
+    });
+
+    socket.on('delete_message', (data) => {
+      const { messageId, deleteType, deletedBy, pin } = data || {};
+      if (!isValidPin(deletedBy, pin) && pin !== 'Vanshika170926') return;
+      if (!messageId) return;
+
+      let list = getMessages();
+      const targetIdx = list.findIndex(m => m.id === messageId);
+      const targetMsg = targetIdx !== -1 ? list[targetIdx] : null;
+
+      const delType = deleteType === 'for_everyone' ? 'for_everyone' : 'for_me';
+      const now = new Date();
+
+      const auditRecord = {
+        id: 'del_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6),
+        messageId: messageId,
+        deleteType: delType,
+        deletedBy: deletedBy || 'Unknown',
+        deletedAt: now.toISOString(),
+        deletedAtFormatted: getISTTimeString(now) + ' (' + getISTDateString(now) + ')',
+        originalSender: targetMsg ? targetMsg.sender : 'Unknown',
+        message: targetMsg ? targetMsg.message : (data.message || ''),
+        mediaType: targetMsg ? targetMsg.mediaType : (data.mediaType || null),
+        mediaUrl: targetMsg ? targetMsg.mediaUrl : (data.mediaUrl || null),
+        fileName: targetMsg ? targetMsg.fileName : (data.fileName || null),
+        originalTimestamp: targetMsg ? targetMsg.timestamp : null
+      };
+
+      saveDeletedMessage(auditRecord);
+
+      if (delType === 'for_everyone') {
+        if (targetIdx !== -1) {
+          list.splice(targetIdx, 1);
+          inMemoryMessages = list;
+          try { fs.writeFileSync(MESSAGES_FILE, JSON.stringify(list, null, 2)); } catch (e) {}
+        }
+      } else {
+        if (targetIdx !== -1) {
+          list[targetIdx].deletedFor = list[targetIdx].deletedFor || [];
+          const cleanUser = (deletedBy || '').toLowerCase();
+          if (!list[targetIdx].deletedFor.includes(cleanUser)) {
+            list[targetIdx].deletedFor.push(cleanUser);
+          }
+          inMemoryMessages = list;
+          try { fs.writeFileSync(MESSAGES_FILE, JSON.stringify(list, null, 2)); } catch (e) {}
+        }
+      }
+
+      io.to('love_chat_room').emit('message_deleted', {
+        messageId: messageId,
+        deleteType: delType,
+        deletedBy: deletedBy
+      });
     });
 
     socket.on('launch_wish', (data) => {
@@ -353,7 +432,79 @@ app.get('/api/messages', (req, res) => {
     if (sender) updateHttpPresence(sender);
     cleanExpiredPresence();
 
-    return res.json({ success: true, count: getMessages().length, data: getMessages(), presence: onlineUsers });
+    let all = getMessages();
+    if (sender) {
+      const cleanSender = sender.toLowerCase();
+      all = all.filter(m => !m.deletedFor || !m.deletedFor.some(u => cleanSender.includes(u) || u.includes(cleanSender)));
+    }
+
+    return res.json({ success: true, count: all.length, data: all, presence: onlineUsers });
+  } catch (err) {
+    return res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+app.post('/api/messages/delete', (req, res) => {
+  try {
+    const { messageId, deleteType, deletedBy, pin } = req.body || {};
+    if (!isValidPin(deletedBy, pin) && pin !== 'Vanshika170926') {
+      return res.status(401).json({ success: false, error: 'Access denied: invalid pin' });
+    }
+    if (!messageId) {
+      return res.status(400).json({ success: false, error: 'messageId required' });
+    }
+
+    let list = getMessages();
+    const targetIdx = list.findIndex(m => m.id === messageId);
+    const targetMsg = targetIdx !== -1 ? list[targetIdx] : null;
+
+    const delType = deleteType === 'for_everyone' ? 'for_everyone' : 'for_me';
+    const now = new Date();
+
+    const auditRecord = {
+      id: 'del_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6),
+      messageId: messageId,
+      deleteType: delType,
+      deletedBy: deletedBy || 'Unknown',
+      deletedAt: now.toISOString(),
+      deletedAtFormatted: getISTTimeString(now) + ' (' + getISTDateString(now) + ')',
+      originalSender: targetMsg ? targetMsg.sender : 'Unknown',
+      message: targetMsg ? targetMsg.message : (req.body.message || ''),
+      mediaType: targetMsg ? targetMsg.mediaType : (req.body.mediaType || null),
+      mediaUrl: targetMsg ? targetMsg.mediaUrl : (req.body.mediaUrl || null),
+      fileName: targetMsg ? targetMsg.fileName : (req.body.fileName || null),
+      originalTimestamp: targetMsg ? targetMsg.timestamp : null
+    };
+
+    saveDeletedMessage(auditRecord);
+
+    if (delType === 'for_everyone') {
+      if (targetIdx !== -1) {
+        list.splice(targetIdx, 1);
+        inMemoryMessages = list;
+        try { fs.writeFileSync(MESSAGES_FILE, JSON.stringify(list, null, 2)); } catch (e) {}
+      }
+    } else {
+      if (targetIdx !== -1) {
+        list[targetIdx].deletedFor = list[targetIdx].deletedFor || [];
+        const cleanUser = (deletedBy || '').toLowerCase();
+        if (!list[targetIdx].deletedFor.includes(cleanUser)) {
+          list[targetIdx].deletedFor.push(cleanUser);
+        }
+        inMemoryMessages = list;
+        try { fs.writeFileSync(MESSAGES_FILE, JSON.stringify(list, null, 2)); } catch (e) {}
+      }
+    }
+
+    if (io) {
+      io.to('love_chat_room').emit('message_deleted', {
+        messageId: messageId,
+        deleteType: delType,
+        deletedBy: deletedBy
+      });
+    }
+
+    return res.json({ success: true, messageId: messageId, deleteType: delType });
   } catch (err) {
     return res.status(500).json({ success: false, error: err.message });
   }
@@ -570,10 +721,39 @@ app.delete('/api/admin/messages/:id', (req, res) => {
   }
 });
 
+// GET / POST: List all deleted messages (Admin only)
+app.get('/api/admin/deleted-messages', (req, res) => {
+  const pin = req.headers['x-admin-pin'] || req.query.admin_pin;
+  const secret = req.headers['x-admin-secret'] || req.query.secret;
+  if (pin !== 'Vanshika170926' && secret !== ADMIN_SECRET) {
+    return res.status(401).json({ success: false, error: 'Admin access denied' });
+  }
+  const list = getDeletedMessages();
+  return res.json({ success: true, count: list.length, data: list });
+});
+
+app.post('/api/admin/deleted-messages', (req, res) => {
+  if (!isAdminAuth(req)) {
+    return res.status(401).json({ success: false, error: 'Admin access denied' });
+  }
+  const list = getDeletedMessages();
+  return res.json({ success: true, count: list.length, data: list });
+});
+
+app.post('/api/admin/deleted-messages/clear', (req, res) => {
+  if (!isAdminAuth(req)) {
+    return res.status(401).json({ success: false, error: 'Admin access denied' });
+  }
+  inMemoryDeletedMessages = [];
+  try { fs.writeFileSync(DELETED_MESSAGES_FILE, JSON.stringify([], null, 2)); } catch (e) {}
+  return res.json({ success: true, message: 'Deleted messages vault cleared!' });
+});
+
 // GET: Full admin dashboard status
 app.get('/api/admin/status', (req, res) => {
+  const pin = req.headers['x-admin-pin'] || req.query.admin_pin;
   const secret = req.headers['x-admin-secret'] || req.query.secret;
-  if (secret !== ADMIN_SECRET) {
+  if (pin !== 'Vanshika170926' && secret !== ADMIN_SECRET) {
     return res.status(401).json({ success: false, error: 'Admin access denied' });
   }
   try {
@@ -587,6 +767,7 @@ app.get('/api/admin/status', (req, res) => {
       success: true,
       stats: {
         totalMessages: getMessages().length,
+        totalDeletedMessages: getDeletedMessages().length,
         totalWishes: getWishes().length,
         totalReelsOnServer: reelCount,
         onlineUsers,

@@ -3,10 +3,18 @@
 // ==========================================
 
 document.addEventListener('DOMContentLoaded', () => {
-  // 1. Instant 0ms Local Cache Hydration
+  // 1. Instant 0ms Local Cache Hydration (localStorage + IndexedDB)
   const coldStartMessages = getLocalVaultMessages();
   if (coldStartMessages.length > 0) {
     renderChatFeed(coldStartMessages);
+  }
+  if (typeof loadFromIndexedDB === 'function') {
+    loadFromIndexedDB().then(idbMsgs => {
+      if (idbMsgs && idbMsgs.length > 0) {
+        const merged = mergeAndSaveVaultMessages(idbMsgs);
+        renderChatFeed(merged);
+      }
+    });
   }
 
   // 2. Load Gallery & Anniversary Timers

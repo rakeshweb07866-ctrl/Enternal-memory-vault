@@ -427,20 +427,25 @@
         </div>
       </div>
 
-      <!-- Hidden File Input for Media Uploads -->
-      <input type="file" id="chat-media-file-input" accept="image/*,video/*,audio/*" class="hidden" onchange="handleChatMediaSelected(event)">
+      <!-- Hidden File Input for Media Uploads (Supports all photos including iPhone HEIC/HEIF, videos, audios) -->
+      <input type="file" id="chat-media-file-input" accept="image/*,video/*,audio/*,.heic,.heif,.HEIC,.HEIF,.mov,.MOV,.mp4,.MP4,.m4v,.webm,.png,.jpg,.jpeg,.webp,.gif,*/*" class="hidden" onchange="handleChatMediaSelected(event)">
 
-      <!-- Chat Input Area -->
-      <div class="flex items-center gap-2">
-        <button type="button" onclick="triggerChatMediaPicker()" title="Attach Photo, Video, or Audio" class="w-11 h-11 rounded-full bg-slate-900/90 hover:bg-rose-500/20 border border-rose-500/40 text-rose-300 hover:text-white flex items-center justify-center text-base transition-all active:scale-90 flex-shrink-0 cursor-pointer">
-          📎
-        </button>
-        <button type="button" id="chat-mic-btn" onclick="toggleChatVoiceRecording()" title="Record Voice Note" class="w-11 h-11 rounded-full bg-slate-900/90 hover:bg-rose-500/20 border border-rose-500/40 text-rose-300 hover:text-white flex items-center justify-center text-base transition-all active:scale-90 flex-shrink-0 cursor-pointer">
-          🎙️
-        </button>
-        <input type="text" id="live-chat-input" onfocus="checkUserLoginBeforeChat()" oninput="handleTypingEvent()" onkeydown="if(event.key==='Enter') sendLiveChatMessage()" placeholder="Type your message or caption..." class="flex-1 min-w-0 px-4 md:px-5 py-3 rounded-full bg-slate-900/90 border border-rose-500/40 text-xs md:text-sm text-white focus:outline-none focus:border-rose-400 shadow-inner">
-        <button onclick="sendLiveChatMessage()" class="btn-rose px-5 md:px-6 py-3 rounded-full text-xs font-bold uppercase tracking-wider shadow-lg shadow-rose-500/40 flex items-center gap-1 active:scale-95 transition-transform flex-shrink-0 cursor-pointer">
-          <span>Send 🚀</span>
+      <!-- WhatsApp / Instagram Style Chat Input Bar (Auto-growing multi-line textarea) -->
+      <div class="flex items-end gap-1.5 sm:gap-2">
+        <!-- Capsule Bar (📎 + Auto-growing Textarea + 🎙️) -->
+        <div class="flex-1 min-w-0 flex items-end bg-slate-900/95 border border-rose-500/40 rounded-3xl px-2.5 sm:px-3 py-1.5 shadow-inner focus-within:border-rose-400 focus-within:ring-1 focus-within:ring-rose-400/50 transition-all">
+          <button type="button" onclick="triggerChatMediaPicker()" title="Attach Photo, Video, or Audio" class="w-8 h-8 rounded-full hover:bg-rose-500/20 text-rose-300 hover:text-white flex items-center justify-center text-lg transition-transform active:scale-90 flex-shrink-0 cursor-pointer mb-0.5">
+            📎
+          </button>
+          <textarea id="live-chat-input" rows="1" onfocus="checkUserLoginBeforeChat()" oninput="handleChatInputAutoGrow(this); handleTypingEvent()" onkeydown="handleChatInputKeyDown(event)" placeholder="Message..." class="flex-1 min-w-0 px-2 py-1 bg-transparent text-xs sm:text-sm text-white placeholder-slate-400 focus:outline-none resize-none leading-relaxed max-h-32 overflow-y-hidden"></textarea>
+          <button type="button" id="chat-mic-btn" onclick="toggleChatVoiceRecording()" title="Record Voice Note" class="w-8 h-8 rounded-full hover:bg-rose-500/20 text-rose-300 hover:text-white flex items-center justify-center text-lg transition-transform active:scale-90 flex-shrink-0 cursor-pointer mb-0.5">
+            🎙️
+          </button>
+        </div>
+
+        <!-- Circular WhatsApp-style Send Button -->
+        <button onclick="sendLiveChatMessage()" title="Send Message" class="w-11 h-11 rounded-full bg-gradient-to-tr from-rose-600 to-pink-500 hover:from-rose-500 hover:to-pink-400 text-white flex items-center justify-center text-lg shadow-lg shadow-rose-500/40 active:scale-90 transition-transform flex-shrink-0 cursor-pointer mb-0.5">
+          <span class="translate-x-0.5">➤</span>
         </button>
       </div>
       <p class="text-[11px] text-slate-400 mt-2 text-center">
@@ -1830,8 +1835,41 @@
     </div>
   </div>
 
+  <!-- WHATSAPP-STYLE DELETE MESSAGE MODAL -->
+  <div id="chat-delete-modal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md hidden items-center justify-center p-4">
+    <div class="glass-box p-6 max-w-sm w-full border-rose-500/40 text-center relative shadow-2xl space-y-4 animate-scale-up">
+      <div class="w-12 h-12 rounded-full bg-red-500/20 border border-red-500/40 text-red-300 flex items-center justify-center mx-auto text-2xl shadow-inner">
+        🗑️
+      </div>
+      <div>
+        <h3 class="font-cinzel font-bold text-white text-base">Delete Message?</h3>
+        <p class="text-xs text-slate-300 mt-1">Choose how you want to remove this message from chat.</p>
+      </div>
+
+      <div class="space-y-2 pt-1 text-left">
+        <!-- Delete For Everyone -->
+        <button id="chat-delete-for-everyone-btn" onclick="executeDeleteMessage('for_everyone')" class="w-full py-2.5 px-4 rounded-xl bg-red-600/90 hover:bg-red-500 text-white font-bold text-xs flex items-center justify-center gap-2 transition cursor-pointer shadow-lg shadow-red-500/30">
+          <span>⚠️</span>
+          <span>Delete for Everyone</span>
+        </button>
+
+        <!-- Delete For Me -->
+        <button id="chat-delete-for-me-btn" onclick="executeDeleteMessage('for_me')" class="w-full py-2.5 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-rose-200 border border-rose-500/30 font-bold text-xs flex items-center justify-center gap-2 transition cursor-pointer">
+          <span>🔒</span>
+          <span>Delete for Me</span>
+        </button>
+
+        <!-- Cancel -->
+        <button type="button" onclick="closeChatDeleteModal()" class="w-full py-2 px-4 rounded-xl text-slate-400 hover:text-white font-medium text-xs transition cursor-pointer text-center">
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- Core Modular Application Scripts -->
   <script src="js/config.js"></script>
+  <script src="js/heic2any.min.js"></script>
   <script src="js/jukebox.js"></script>
   <script src="js/chat.js"></script>
   <script src="js/effects.js"></script>
