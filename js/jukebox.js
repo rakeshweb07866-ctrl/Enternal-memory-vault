@@ -199,7 +199,7 @@ function initYouTubePlayer() {
       width: '100%',
       videoId: initialVideoId,
       playerVars: {
-        autoplay: 1,
+        autoplay: 0,
         controls: 1,
         modestbranding: 1,
         rel: 0,
@@ -215,11 +215,8 @@ function initYouTubePlayer() {
           const current = currentPlayingSong || getFeaturedLoveSong();
           if (current && current.type === 'youtube' && current.videoId) {
             try {
-              ytPlayer.loadVideoById(current.videoId);
-              ytPlayer.playVideo();
-            } catch (e) {
-              console.warn('YT initial autoplay note:', e);
-            }
+              ytPlayer.cueVideoById(current.videoId);
+            } catch (e) {}
           }
         },
         onStateChange: (event) => {
@@ -757,80 +754,7 @@ function deleteCustomLoveSong(songId, event) {
   renderLoveJukeboxPlaylist();
 }
 
-let hasUserInteractedForAudio = false;
-
-function setupAutoplayUnlocker() {
-  function unlockAudioPlayback(e) {
-    // If the click/touch was directly on the play/pause button, let toggleRomanticMusic handle it
-    if (e && e.target) {
-      const target = e.target;
-      if (
-        target.id === 'music-toggle-btn' ||
-        target.id === 'dock-play-btn' ||
-        target.closest('#music-toggle-btn') ||
-        target.closest('#dock-play-btn')
-      ) {
-        cleanupListeners();
-        hasUserInteractedForAudio = true;
-        return;
-      }
-    }
-
-    if (hasUserInteractedForAudio || isPlayingMusic) return;
-    hasUserInteractedForAudio = true;
-    cleanupListeners();
-
-    const song = currentPlayingSong || getFeaturedLoveSong();
-    playLoveSong(song);
-  }
-
-  function cleanupListeners() {
-    const events = ['click', 'touchstart', 'pointerdown', 'keydown'];
-    events.forEach(evt => {
-      window.removeEventListener(evt, unlockAudioPlayback, true);
-      document.removeEventListener(evt, unlockAudioPlayback, true);
-    });
-  }
-
-  const events = ['click', 'touchstart', 'pointerdown', 'keydown'];
-  events.forEach(evt => {
-    window.addEventListener(evt, unlockAudioPlayback, { capture: true, once: true });
-    document.addEventListener(evt, unlockAudioPlayback, { capture: true, once: true });
-  });
-}
-
-function attemptAutoPlayOnRefresh(song) {
-  if (!song) song = currentPlayingSong || getFeaturedLoveSong();
-  if (!song) return;
-
-  if (song.type === 'youtube') {
-    if (ytPlayer && typeof ytPlayer.loadVideoById === 'function') {
-      try {
-        ytPlayer.loadVideoById(song.videoId);
-        ytPlayer.playVideo();
-      } catch (e) {}
-    }
-  } else {
-    const audio = document.getElementById('bg-music-player');
-    if (audio) {
-      if (!audio.src || !audio.src.includes(encodeURI(song.url))) {
-        audio.src = song.url;
-      }
-      const p = audio.play();
-      if (p !== undefined) {
-        p.then(() => {
-          isPlayingMusic = true;
-          updateMusicUI(true);
-        }).catch(() => {
-          isPlayingMusic = false;
-          updateMusicUI(false);
-        });
-      }
-    }
-  }
-}
-
-// Initial Boot: Set UI to Active / Featured Song immediately & Setup AutoPlay
+// Initial Boot: Set UI to Active / Featured Song immediately (Waits for user to click Play)
 document.addEventListener('DOMContentLoaded', () => {
   const initialSong = getFeaturedLoveSong();
   setActiveLoveSong(initialSong, false);
@@ -853,10 +777,4 @@ document.addEventListener('DOMContentLoaded', () => {
     const savedVol = Number(localStorage.getItem(VOLUME_KEY) || 0.8);
     bgAudioEl.volume = savedVol;
   }
-
-  // Attempt initial playback immediately
-  attemptAutoPlayOnRefresh(initialSong);
-
-  // Setup one-touch unlocker for browsers enforcing autoplay restrictions
-  setupAutoplayUnlocker();
 });

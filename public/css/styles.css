@@ -478,3 +478,46 @@
       width: 16rem !important;
       height: 9rem !important;
     }
+
+    /* Smartphone Reel Mockup & Emerald Theme */
+    .reel-phone-frame {
+      box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.7), 0 0 30px rgba(16, 185, 129, 0.25);
+      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s ease;
+    }
+
+    .reel-phone-frame:hover {
+      transform: translateY(-4px) scale(1.01);
+      box-shadow: 0 30px 70px -10px rgba(0, 0, 0, 0.8), 0 0 45px rgba(16, 185, 129, 0.4);
+    }
+
+    /* Instagram-Style Reel Slide Transitions */
+    @keyframes reelSlideUp {
+      0% {
+        opacity: 0.3;
+        transform: translateY(35px) scale(0.97);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    @keyframes reelSlideDown {
+      0% {
+        opacity: 0.3;
+        transform: translateY(-35px) scale(0.97);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .reel-transition-up {
+      animation: reelSlideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .reel-transition-down {
+      animation: reelSlideDown 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+

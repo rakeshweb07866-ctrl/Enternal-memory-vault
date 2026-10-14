@@ -97,6 +97,11 @@
           </audio>
         </div>
 
+        <!-- Shortcut to Vanshika's Special Reel & Eyes -->
+        <button onclick="scrollToElement('vanshika-reel-section')" class="btn-glass px-3.5 py-2 rounded-full text-xs font-bold text-emerald-300 hover:text-white border-emerald-500/40 hover:border-emerald-400 flex items-center gap-1 shadow-md shadow-emerald-950/40 cursor-pointer">
+          <span>💚</span> <span>Her Reel & Eyes</span>
+        </button>
+
         <!-- Shortcut to Live Chat -->
         <button onclick="scrollToElement('live-chat-room')" class="btn-rose px-4 py-2 rounded-full text-xs font-bold flex items-center gap-1 shadow-lg shadow-rose-500/30">
           💬 Open Live Chat
@@ -562,6 +567,216 @@
             </div>
           </div>
         </div>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- VANSHIKA'S SPECIAL OLD REEL & EMERALD EYES TRIBUTE -->
+    <!-- ========================================== -->
+    <section id="vanshika-reel-section" class="py-12 my-10 relative">
+      <!-- Ambient Glow Behind Section -->
+      <div class="absolute -top-10 left-1/2 -translate-x-1/2 w-96 h-96 bg-emerald-600/10 rounded-full blur-3xl pointer-events-none"></div>
+
+      <div class="text-center mb-10 relative z-10">
+        <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-950/60 border border-emerald-500/40 text-emerald-300 text-xs font-semibold mb-3 shadow-lg shadow-emerald-950/40 animate-pulse">
+          <span>💚</span>
+          <span>To Her Enchanting Light-Green Eyes & Cute Telugu Memories</span>
+          <span>✨</span>
+        </div>
+        <h2 class="font-cinzel text-3xl md:text-5xl text-gradient-rose font-bold mb-2">
+          You Were Always My Prettiest Girl
+        </h2>
+        <p class="font-handwriting text-2xl md:text-3xl text-amber-300 font-bold mb-2">
+          "అప్పుడు, ఇప్పుడు, ఎప్పటికీ... నువ్వే నా అందమైన రాణి 👸"
+        </p>
+        <p class="text-slate-300 text-xs md:text-sm max-w-2xl mx-auto leading-relaxed">
+          Then, now, and in every single lifetime ahead... You were my Queen back then, you are my Queen today, and you will forever be the most beautiful girl in my world!
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center max-w-5xl mx-auto">
+        
+        <!-- LEFT: SMARTPHONE REEL PLAYER MOCKUP (5 Cols) -->
+        <div class="lg:col-span-5 flex flex-col items-center">
+          <div class="reel-phone-frame w-[270px] sm:w-[300px] h-[480px] sm:h-[530px] rounded-[36px] p-3 bg-gradient-to-b from-slate-900 via-slate-950 to-emerald-950/40 border-4 border-emerald-500/50 shadow-2xl shadow-emerald-500/20 relative flex flex-col overflow-hidden group select-none">
+            
+            <!-- Phone Notch & Speaker -->
+            <div class="absolute top-4 left-1/2 -translate-x-1/2 w-28 h-4 bg-slate-950 rounded-full z-20 flex items-center justify-center gap-2 border border-slate-800">
+              <div class="w-2 h-2 rounded-full bg-emerald-500/60 animate-ping"></div>
+              <div class="w-10 h-1 rounded-full bg-slate-700"></div>
+            </div>
+
+            <!-- Reel Top Info Header Overlay -->
+            <div class="absolute top-10 left-4 right-4 z-20 flex items-center justify-between text-white pointer-events-none drop-shadow-md">
+              <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span class="text-[11px] font-bold text-amber-300">Vanshika's Reels</span>
+              </div>
+              <div class="flex items-center gap-1.5">
+                <span id="reel-counter-badge" class="text-[10px] bg-black/60 px-2 py-0.5 rounded-full text-emerald-300 border border-emerald-500/40 font-mono shadow">
+                  Reel 1 / 1 🎬
+                </span>
+              </div>
+            </div>
+
+            <!-- Video Screen Container (Click anywhere on screen to Play / Pause, Wheel/Swipe to Scroll Reels) -->
+            <div id="reel-screen-mount" onclick="handleReelScreenClick(event)" class="w-full h-full rounded-[26px] bg-black overflow-hidden relative flex items-center justify-center cursor-pointer select-none">
+              
+              <!-- Video Tag (Native controls removed so clicks anywhere trigger play/pause, ended triggers next) -->
+              <video id="vanshika-reel-video" class="w-full h-full object-cover hidden pointer-events-none" playsinline preload="auto"></video>
+
+              <!-- Iframe Embed Container (for Instagram / YouTube Shorts / external embeds) -->
+              <div id="vanshika-reel-embed" class="w-full h-full hidden"></div>
+
+              <!-- Romantic Placeholder / Preview Thumbnail when not loaded yet -->
+              <div id="reel-placeholder-preview" class="w-full h-full relative flex flex-col items-center justify-between p-6 text-center select-none bg-gradient-to-b from-slate-950 via-slate-900 to-emerald-950">
+                <div class="w-full h-44 rounded-2xl overflow-hidden border border-emerald-400/40 shadow-lg relative my-auto group-hover:scale-102 transition-transform">
+                  <img src="assests/eyes.jpeg" onerror="this.src='assests/queen.jpeg'" alt="Her Eyes" class="w-full h-full object-cover">
+                  <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent"></div>
+                  <div class="absolute bottom-2 left-2 right-2 text-center">
+                    <p class="text-[11px] font-bold text-emerald-300">Her Rare Light-Green Eyes 💚</p>
+                  </div>
+                </div>
+
+                <div class="my-auto space-y-2">
+                  <button type="button" onclick="triggerReelPicker()" class="w-14 h-14 rounded-full bg-gradient-to-tr from-emerald-500 to-rose-500 text-white text-2xl flex items-center justify-center mx-auto shadow-xl shadow-emerald-500/40 hover:scale-110 active:scale-95 transition-all cursor-pointer">
+                    ▶️
+                  </button>
+                  <p class="text-xs font-bold text-white">Click to Play or Attach Reels</p>
+                  <p class="text-[10px] text-slate-400 max-w-[200px]">Upload her cute Telugu reels (select multiple) or paste video link</p>
+                </div>
+
+                <div class="w-full pt-2 border-t border-slate-800/80">
+                  <span class="text-[9px] text-emerald-400 font-mono">"Appudu, Ippudu, Eppatiki Naa Rani"</span>
+                </div>
+              </div>
+
+              <!-- Center Play / Pause Indicator (Shows smoothly when paused) -->
+              <div id="reel-center-play-indicator" class="absolute inset-0 flex items-center justify-center pointer-events-none transition-all duration-300 opacity-0 z-20">
+                <div class="w-16 h-16 rounded-full bg-black/60 backdrop-blur-md border border-white/30 flex items-center justify-center text-2xl text-white shadow-2xl scale-95 transition-transform">
+                  <span id="reel-center-play-icon">▶️</span>
+                </div>
+              </div>
+
+              <!-- Reel Bottom Clean Badge (Non-intrusive, leaves 100% of video visible) -->
+              <div class="absolute bottom-3 left-3 right-16 z-20 pointer-events-none drop-shadow-md">
+              </div>
+            </div>
+
+            <!-- Reel Action Buttons (Floating on the right of phone screen) -->
+            <div class="absolute right-3 bottom-12 z-30 flex flex-col items-center gap-2.5">
+              <button onclick="prevReel(event)" class="reel-action-btn w-8 h-8 rounded-full bg-slate-950/80 hover:bg-emerald-600 text-white text-xs flex items-center justify-center shadow-lg border border-emerald-500/40 cursor-pointer transition-all hover:scale-110" title="Previous Reel (Scroll Up)">
+                ▲
+              </button>
+              <button onclick="nextReel(event)" class="reel-action-btn w-8 h-8 rounded-full bg-slate-950/80 hover:bg-emerald-600 text-white text-xs flex items-center justify-center shadow-lg border border-emerald-500/40 cursor-pointer transition-all hover:scale-110" title="Next Reel (Scroll Down)">
+                ▼
+              </button>
+              <button onclick="downloadCurrentReel(event)" class="reel-action-btn w-8 h-8 rounded-full bg-slate-950/80 hover:bg-emerald-600 text-white text-xs flex items-center justify-center shadow-lg border border-emerald-500/40 cursor-pointer transition-all hover:scale-110" title="Download This Reel">
+                ⬇️
+              </button>
+              <button onclick="triggerEmeraldSparkles()" class="reel-action-btn w-8 h-8 rounded-full bg-slate-950/80 hover:bg-emerald-600 text-white text-xs flex items-center justify-center shadow-lg border border-emerald-500/40 cursor-pointer transition-all hover:scale-110" title="Green Hearts Shower">
+                💚
+              </button>
+              <button onclick="triggerAnniversaryConfetti()" class="reel-action-btn w-8 h-8 rounded-full bg-slate-950/80 hover:bg-rose-600 text-white text-xs flex items-center justify-center shadow-lg border border-rose-500/40 cursor-pointer transition-all hover:scale-110" title="Love Confetti">
+                ✨
+              </button>
+              <button onclick="toggleReelMute(event)" id="reel-mute-btn" class="reel-action-btn w-8 h-8 rounded-full bg-slate-950/80 hover:bg-amber-600 text-white text-[11px] flex items-center justify-center shadow-lg border border-amber-500/40 cursor-pointer transition-all hover:scale-110" title="Sound Mute/Unmute">
+                🔊
+              </button>
+            </div>
+          </div>
+
+          <!-- Bottom Quick Actions for Rakesh to manage Reels -->
+          <div class="flex items-center gap-2 mt-4 flex-wrap justify-center">
+            <button onclick="triggerReelPicker()" class="px-3.5 py-1.5 rounded-full bg-emerald-600/30 hover:bg-emerald-600 text-emerald-300 hover:text-white border border-emerald-500/40 text-xs font-semibold flex items-center gap-1.5 transition-all shadow-md cursor-pointer" title="Upload one or multiple reels">
+              <span>📁</span> Add Reel(s) (MP4)
+            </button>
+            <button onclick="openReelLinkPrompt()" class="px-3.5 py-1.5 rounded-full bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white border border-rose-500/30 text-xs font-semibold flex items-center gap-1.5 transition-all shadow-md cursor-pointer">
+              <span>🔗</span> Paste Link
+            </button>
+            <button onclick="downloadCurrentReel(event)" class="px-3 py-1.5 rounded-full bg-slate-900 hover:bg-emerald-950/80 text-emerald-300 hover:text-emerald-200 border border-emerald-500/30 text-xs font-semibold flex items-center gap-1.5 transition-all shadow-md cursor-pointer" title="Download Current Reel Video">
+              <span>⬇️</span> Download Reel
+            </button>
+            <button id="btn-delete-current-reel" onclick="deleteCurrentReel(event)" class="px-2.5 py-1.5 rounded-full bg-slate-900 hover:bg-rose-950/80 text-rose-400 hover:text-rose-200 border border-rose-500/30 text-xs font-semibold flex items-center gap-1 transition-all shadow-md cursor-pointer hidden" title="Delete this reel from playlist">
+              <span>🗑️</span>
+            </button>
+            <input type="file" id="vanshika-reel-file-input" accept="video/*" multiple class="hidden" onchange="handleReelFileUpload(event)">
+          </div>
+        </div>
+
+        <!-- RIGHT: RAKESH'S HEARTFELT REASSURANCE NOTE & ROMANTIC TOUCH (7 Cols) -->
+        <div class="lg:col-span-7 space-y-6">
+          
+          <!-- Romantic Letter Card -->
+          <div class="glass-box-rose p-6 md:p-8 rounded-3xl border border-emerald-500/40 shadow-2xl relative overflow-hidden">
+            <div class="absolute -top-12 -right-12 w-40 h-40 bg-emerald-500/10 rounded-full blur-2xl pointer-events-none"></div>
+
+            <div class="flex items-center justify-between gap-3 border-b border-rose-500/20 pb-4 mb-4">
+              <div class="flex items-center gap-2">
+                <span class="text-2xl">💌</span>
+                <span class="font-cinzel font-bold text-amber-300 text-base md:text-lg">A Letter From Rakesh's Heart</span>
+              </div>
+              <span class="text-[11px] font-mono text-emerald-400 bg-emerald-950/70 px-2.5 py-1 rounded-full border border-emerald-500/30">
+                To My Green-Eyed Queen 💚
+              </span>
+            </div>
+
+            <!-- Letter Body -->
+            <div class="text-slate-100 text-xs md:text-sm leading-relaxed space-y-3.5 font-normal">
+              <p>
+                <strong class="text-rose-300 font-bold text-sm md:text-base">Dearest Vanshika,</strong>
+              </p>
+              
+              <p>
+                Yesterday when you sent me that old funny Telugu reel of yours, you laughed so hard and told me that you didn't look pretty in your old videos... But do you know what my heart truly saw?
+              </p>
+
+              <div class="p-4 rounded-2xl bg-gradient-to-r from-emerald-950/70 to-slate-900 border-l-4 border-emerald-400 my-2 space-y-2">
+                <p class="font-bold text-emerald-200 text-sm flex items-center gap-2">
+                  <span>💚</span> <span>Those Rare, Enchanting Light-Green Eyes:</span>
+                </p>
+                <p class="text-slate-300 text-xs italic leading-relaxed">
+                  "All my eyes could see was that captivating magic in your rare light-green eyes—a pure innocence that brings peace to my entire universe! The cute, effortless way you spoke in Telugu, your carefree smile, and your natural, timeless beauty!"
+                </p>
+              </div>
+
+              <p>
+                Never, ever doubt your beauty, my sweetheart. You were breathtakingly gorgeous back then, you are effortlessly stunning today, and in every tomorrow yet to come, you will always be the most beautiful Queen in my world.
+              </p>
+
+              <p class="font-handwriting text-2xl text-amber-300 font-bold pt-2">
+                "In my eyes, you were perfection then, you are perfection now, and you will be my soulmate forever." ❤️
+              </p>
+
+              <div class="pt-3 border-t border-rose-500/20 flex items-center justify-between text-xs text-slate-400">
+                <span>Telugu: <em>"నువ్వు ఎప్పటికీ నా బంగారమే" (You will forever be my golden treasure)</em></span>
+                <span class="font-bold text-rose-300">— Yours Forever, Rakesh 👑</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Interactive Reaction Stamps Bar -->
+          <div class="p-4 rounded-2xl bg-slate-950/80 border border-emerald-500/30 shadow-xl space-y-3">
+            <p class="text-xs font-bold text-amber-300 flex items-center gap-1.5">
+              <span>✨</span> Send Love Reactions To This Memory:
+            </p>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+              <button onclick="reactToReel('eyes')" class="p-2.5 rounded-xl bg-emerald-950/60 hover:bg-emerald-900/80 border border-emerald-500/40 text-emerald-200 text-xs font-bold flex items-center justify-center gap-1.5 transition-all hover:scale-102 active:scale-95 cursor-pointer shadow-md">
+                <span>💚</span> Light-Green Eyes
+              </button>
+              <button onclick="reactToReel('beauty')" class="p-2.5 rounded-xl bg-rose-950/60 hover:bg-rose-900/80 border border-rose-500/40 text-rose-200 text-xs font-bold flex items-center justify-center gap-1.5 transition-all hover:scale-102 active:scale-95 cursor-pointer shadow-md">
+                <span>👸</span> Prettiest Ever
+              </button>
+              <button onclick="reactToReel('telugu')" class="p-2.5 rounded-xl bg-amber-950/60 hover:bg-amber-900/80 border border-amber-500/40 text-amber-200 text-xs font-bold flex items-center justify-center gap-1.5 transition-all hover:scale-102 active:scale-95 cursor-pointer shadow-md">
+                <span>🌺</span> Naa Bangaram
+              </button>
+            </div>
+            <!-- Reaction dynamic message feedback -->
+            <div id="reel-reaction-toast" class="text-center text-xs font-bold text-emerald-300 min-h-[18px] transition-all"></div>
+          </div>
+
+        </div>
+
       </div>
     </section>
 

@@ -97,6 +97,7 @@ function loadSavedGalleryData() {
 
   if (typeof fetchLiveChatMessages === 'function') fetchLiveChatMessages();
   fetchWishesFromBackend();
+  initVanshikaReel();
 }
 
 // 3. 1-Month Anniversary Celebration Engine
@@ -529,4 +530,662 @@ function renderSavedWishes(wishes) {
       <span class="text-[10px] text-amber-400/60 font-mono">${w.date || ''}</span>
     </div>
   `).join('');
+}
+
+// ==========================================
+// VANSHIKA'S SPECIAL REEL & GREEN EYES ENGINE
+// ==========================================
+
+const REEL_STORAGE_KEY = 'vault_vanshika_reel_data';
+const REELS_PLAYLIST_KEY = 'vanshika_reels_playlist_meta';
+const REEL_DB_NAME = 'VanshikaReelDB';
+const REEL_STORE_NAME = 'reel_store';
+
+let vanshikaReelsList = [];
+let currentReelIndex = 0;
+let isReelTransitioning = false;
+let reelWheelThrottleTimer = null;
+let reelTouchStartY = 0;
+
+function openReelDB() {
+  return new Promise((resolve) => {
+    try {
+      if (!window.indexedDB) return resolve(null);
+      const req = indexedDB.open(REEL_DB_NAME, 2);
+      req.onupgradeneeded = (e) => {
+        const db = e.target.result;
+        if (!db.objectStoreNames.contains(REEL_STORE_NAME)) {
+          db.createObjectStore(REEL_STORE_NAME);
+        }
+      };
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => resolve(null);
+    } catch (e) {
+      resolve(null);
+    }
+  });
+}
+
+async function saveAllReelsToIndexedDB(reels) {
+  try {
+    const db = await openReelDB();
+    if (!db) return false;
+    const storeData = reels.map(r => ({
+      id: r.id,
+      type: r.type,
+      fileName: r.fileName,
+      title: r.title,
+      timestamp: r.timestamp,
+      url: r.type === 'local_video' ? '' : r.url,
+      blob: r.blob || null
+    }));
+    const tx = db.transaction(REEL_STORE_NAME, 'readwrite');
+    tx.objectStore(REEL_STORE_NAME).put(storeData, 'active_reels_playlist');
+    // Also save active reel blob for legacy fallback
+    if (reels.length > 0 && reels[0].blob) {
+      tx.objectStore(REEL_STORE_NAME).put(reels[0].blob, 'active_reel_blob');
+    }
+    return new Promise((resolve) => {
+      tx.oncomplete = () => resolve(true);
+      tx.onerror = () => resolve(false);
+    });
+  } catch (e) {
+    return false;
+  }
+}
+
+async function loadAllReelsFromIndexedDB() {
+  try {
+    const db = await openReelDB();
+    if (!db) return null;
+    const tx = db.transaction(REEL_STORE_NAME, 'readonly');
+    const store = tx.objectStore(REEL_STORE_NAME);
+    const req = store.get('active_reels_playlist');
+    return new Promise((resolve) => {
+      req.onsuccess = () => {
+        if (req.result && Array.isArray(req.result) && req.result.length > 0) {
+          resolve(req.result);
+        } else {
+          // Backward compatibility check for older single 'active_reel_blob'
+          const singleReq = store.get('active_reel_blob');
+          singleReq.onsuccess = () => {
+            if (singleReq.result) {
+              resolve([{
+                id: 'reel_legacy',
+                type: 'local_video',
+                blob: singleReq.result,
+                fileName: 'vanshika-reel-1.mp4',
+                timestamp: new Date().toISOString()
+              }]);
+            } else {
+              resolve(null);
+            }
+          };
+          singleReq.onerror = () => resolve(null);
+        }
+      };
+      req.onerror = () => resolve(null);
+    });
+  } catch (e) {
+    return null;
+  }
+}
+
+function syncReelsMetadataToLocalStorage() {
+  try {
+    const meta = vanshikaReelsList.map(r => ({
+      id: r.id,
+      type: r.type,
+      fileName: r.fileName,
+      title: r.title,
+      url: r.type === 'local_video' ? '' : r.url,
+      timestamp: r.timestamp
+    }));
+    localStorage.setItem(REELS_PLAYLIST_KEY, JSON.stringify(meta));
+  } catch (e) {}
+}
+
+function triggerReelPicker() {
+  const input = document.getElementById('vanshika-reel-file-input');
+  if (input) input.click();
+}
+
+async function uploadReelToServer(file, customName) {
+  try {
+    const safeName = customName || file.name || 'vanshika-reel.mp4';
+    const url = `/api/upload-reel?name=${encodeURIComponent(safeName)}`;
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'video/mp4',
+        'x-reel-name': safeName
+      },
+      body: file
+    });
+    const data = await res.json();
+    if (data.success && data.url) return data.url;
+  } catch (e) {}
+  return null;
+}
+
+async function handleReelFileUpload(event) {
+  const files = event.target.files;
+  if (!files || files.length === 0) return;
+
+  const wasEmpty = vanshikaReelsList.length === 0;
+  showReelToast(`🎉 Loading ${files.length} Reel(s)...`);
+
+  for (let i = 0; i < files.length; i++) {
+    const file = files[i];
+    const blob = new Blob([file], { type: file.type || 'video/mp4' });
+    const blobUrl = URL.createObjectURL(blob);
+    const newReel = {
+      id: 'reel_' + Date.now() + '_' + i,
+      type: 'local_video',
+      url: blobUrl,
+      blob: blob,
+      fileName: file.name || `vanshika-reel-${vanshikaReelsList.length + 1}.mp4`,
+      title: `Reel #${vanshikaReelsList.length + 1}`,
+      timestamp: new Date().toISOString()
+    };
+    vanshikaReelsList.push(newReel);
+
+    // Save copy to server disk in background
+    uploadReelToServer(file, `vanshika-reel-${vanshikaReelsList.length}.mp4`).then(serverUrl => {
+      if (serverUrl) newReel.serverUrl = serverUrl;
+    }).catch(() => {});
+  }
+
+  // Persist into IndexedDB and LocalStorage
+  await saveAllReelsToIndexedDB(vanshikaReelsList);
+  syncReelsMetadataToLocalStorage();
+
+  if (wasEmpty) {
+    currentReelIndex = 0;
+  } else {
+    // Jump to the newly added reel
+    currentReelIndex = vanshikaReelsList.length - files.length;
+  }
+
+  displayActiveReel(currentReelIndex, 'up');
+  showReelToast(`✨ ${vanshikaReelsList.length} Reel(s) ready! Scroll up/down to watch!`);
+
+  event.target.value = '';
+}
+
+function openReelLinkPrompt() {
+  const url = prompt('Paste Reel Video Link (MP4 URL, Instagram Reel, YouTube Shorts):');
+  if (!url || !url.trim()) return;
+
+  const cleanUrl = url.trim();
+  const isYt = cleanUrl.includes('youtube.com') || cleanUrl.includes('youtu.be');
+  const newReel = {
+    id: 'reel_' + Date.now(),
+    type: isYt ? 'youtube' : 'video_url',
+    url: cleanUrl,
+    fileName: `vanshika-reel-${vanshikaReelsList.length + 1}.mp4`,
+    title: `Reel #${vanshikaReelsList.length + 1}`,
+    timestamp: new Date().toISOString()
+  };
+
+  vanshikaReelsList.push(newReel);
+  saveAllReelsToIndexedDB(vanshikaReelsList);
+  syncReelsMetadataToLocalStorage();
+
+  currentReelIndex = vanshikaReelsList.length - 1;
+  displayActiveReel(currentReelIndex, 'up');
+  showReelToast('🎉 Video link added to Reels!');
+}
+
+function pauseBackgroundMusicForReel() {
+  if (typeof isPlayingMusic !== 'undefined' && isPlayingMusic) {
+    if (typeof ytPlayer !== 'undefined' && ytPlayer && typeof ytPlayer.pauseVideo === 'function') {
+      try { ytPlayer.pauseVideo(); } catch (e) {}
+    }
+    const audio = document.getElementById('bg-music-player');
+    if (audio) {
+      try { audio.pause(); } catch (e) {}
+    }
+    isPlayingMusic = false;
+    if (typeof updateMusicUI === 'function') {
+      updateMusicUI(false);
+    }
+  }
+}
+
+function updateReelCounter() {
+  const badge = document.getElementById('reel-counter-badge');
+  if (!badge) return;
+  if (!vanshikaReelsList || vanshikaReelsList.length === 0) {
+    badge.innerText = 'No Reels 🎬';
+  } else {
+    badge.innerText = `Reel ${currentReelIndex + 1} / ${vanshikaReelsList.length} 🎬`;
+  }
+}
+
+function attachReelVideoListeners(videoEl) {
+  if (videoEl._hasMultiReelListeners) return;
+  videoEl._hasMultiReelListeners = true;
+
+  videoEl.addEventListener('play', () => {
+    pauseBackgroundMusicForReel();
+    const playIndicator = document.getElementById('reel-center-play-indicator');
+    const playIcon = document.getElementById('reel-center-play-icon');
+    if (playIndicator) {
+      if (playIcon) playIcon.innerText = '▶️';
+      playIndicator.style.opacity = '1';
+      setTimeout(() => {
+        if (videoEl && !videoEl.paused) playIndicator.style.opacity = '0';
+      }, 400);
+    }
+  });
+
+  videoEl.addEventListener('pause', () => {
+    const playIndicator = document.getElementById('reel-center-play-indicator');
+    const playIcon = document.getElementById('reel-center-play-icon');
+    if (playIndicator) {
+      if (playIcon) playIcon.innerText = '⏸️';
+      playIndicator.style.opacity = '1';
+    }
+  });
+
+  // When a reel finishes: Automatically move to next reel in serial order!
+  videoEl.addEventListener('ended', () => {
+    if (vanshikaReelsList.length > 1) {
+      nextReel();
+    } else {
+      videoEl.currentTime = 0;
+      videoEl.play().catch(() => {});
+    }
+  });
+}
+
+function displayActiveReel(index, direction = 'up') {
+  const placeholderEl = document.getElementById('reel-placeholder-preview');
+  const videoEl = document.getElementById('vanshika-reel-video');
+  const embedEl = document.getElementById('vanshika-reel-embed');
+  const screenMount = document.getElementById('reel-screen-mount');
+  const deleteBtn = document.getElementById('btn-delete-current-reel');
+
+  if (!vanshikaReelsList || vanshikaReelsList.length === 0) {
+    if (placeholderEl) placeholderEl.classList.remove('hidden');
+    if (videoEl) {
+      videoEl.pause();
+      videoEl.src = '';
+      videoEl.classList.add('hidden');
+    }
+    if (embedEl) {
+      embedEl.innerHTML = '';
+      embedEl.classList.add('hidden');
+    }
+    if (deleteBtn) deleteBtn.classList.add('hidden');
+    updateReelCounter();
+    return;
+  }
+
+  if (index < 0) index = 0;
+  if (index >= vanshikaReelsList.length) index = vanshikaReelsList.length - 1;
+  currentReelIndex = index;
+
+  const reel = vanshikaReelsList[currentReelIndex];
+
+  if (placeholderEl) placeholderEl.classList.add('hidden');
+  if (deleteBtn) {
+    if (vanshikaReelsList.length > 1) deleteBtn.classList.remove('hidden');
+    else deleteBtn.classList.add('hidden');
+  }
+
+  // Smooth slide transition
+  if (screenMount) {
+    screenMount.classList.remove('reel-transition-up', 'reel-transition-down');
+    void screenMount.offsetWidth;
+    screenMount.classList.add(direction === 'up' ? 'reel-transition-up' : 'reel-transition-down');
+  }
+
+  updateReelCounter();
+
+  if (reel.type === 'youtube') {
+    if (videoEl) {
+      videoEl.pause();
+      videoEl.classList.add('hidden');
+    }
+    const videoId = typeof extractYouTubeVideoId === 'function' ? extractYouTubeVideoId(reel.url) : null;
+    if (videoId && embedEl) {
+      embedEl.innerHTML = `<iframe class="w-full h-full rounded-[26px]" src="https://www.youtube.com/embed/${videoId}?autoplay=1&loop=1&playlist=${videoId}&playsinline=1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+      embedEl.classList.remove('hidden');
+    }
+  } else {
+    if (embedEl) {
+      embedEl.innerHTML = '';
+      embedEl.classList.add('hidden');
+    }
+    if (!videoEl) return;
+
+    const sourceUrl = reel.url || (reel.blob ? URL.createObjectURL(reel.blob) : '');
+    if (videoEl.src !== sourceUrl) {
+      videoEl.src = sourceUrl;
+    }
+    videoEl.classList.remove('hidden');
+
+    attachReelVideoListeners(videoEl);
+
+    videoEl.play().then(() => {
+      pauseBackgroundMusicForReel();
+      const playIndicator = document.getElementById('reel-center-play-indicator');
+      const playIcon = document.getElementById('reel-center-play-icon');
+      if (playIndicator) {
+        if (playIcon) playIcon.innerText = '▶️';
+        playIndicator.style.opacity = '1';
+        setTimeout(() => {
+          if (videoEl && !videoEl.paused) playIndicator.style.opacity = '0';
+        }, 400);
+      }
+    }).catch(() => {
+      const playIndicator = document.getElementById('reel-center-play-indicator');
+      const playIcon = document.getElementById('reel-center-play-icon');
+      if (playIndicator) {
+        if (playIcon) playIcon.innerText = '▶️';
+        playIndicator.style.opacity = '1';
+      }
+    });
+  }
+}
+
+function nextReel(event) {
+  if (event) {
+    try { event.stopPropagation(); } catch (e) {}
+  }
+  if (!vanshikaReelsList || vanshikaReelsList.length <= 1) return;
+  if (isReelTransitioning) return;
+  isReelTransitioning = true;
+  setTimeout(() => { isReelTransitioning = false; }, 400);
+
+  let nextIdx = currentReelIndex + 1;
+  if (nextIdx >= vanshikaReelsList.length) {
+    nextIdx = 0; // Loop to first reel
+  }
+  displayActiveReel(nextIdx, 'up');
+}
+
+function prevReel(event) {
+  if (event) {
+    try { event.stopPropagation(); } catch (e) {}
+  }
+  if (!vanshikaReelsList || vanshikaReelsList.length <= 1) return;
+  if (isReelTransitioning) return;
+  isReelTransitioning = true;
+  setTimeout(() => { isReelTransitioning = false; }, 400);
+
+  let prevIdx = currentReelIndex - 1;
+  if (prevIdx < 0) {
+    prevIdx = vanshikaReelsList.length - 1; // Wrap to last reel
+  }
+  displayActiveReel(prevIdx, 'down');
+}
+
+function handleReelScreenClick(event) {
+  if (event && event.target && event.target.closest('.reel-action-btn')) {
+    return;
+  }
+
+  const videoEl = document.getElementById('vanshika-reel-video');
+
+  if (!vanshikaReelsList || vanshikaReelsList.length === 0 || !videoEl || videoEl.classList.contains('hidden')) {
+    triggerReelPicker();
+    return;
+  }
+
+  const playIndicator = document.getElementById('reel-center-play-indicator');
+  const playIcon = document.getElementById('reel-center-play-icon');
+
+  if (videoEl.paused) {
+    pauseBackgroundMusicForReel();
+    videoEl.play().then(() => {
+      if (playIndicator) {
+        if (playIcon) playIcon.innerText = '▶️';
+        playIndicator.style.opacity = '1';
+        setTimeout(() => {
+          if (videoEl && !videoEl.paused) playIndicator.style.opacity = '0';
+        }, 400);
+      }
+    }).catch(e => {
+      console.warn('Reel playback error:', e);
+    });
+  } else {
+    videoEl.pause();
+    if (playIndicator) {
+      if (playIcon) playIcon.innerText = '⏸️';
+      playIndicator.style.opacity = '1';
+    }
+  }
+}
+
+function toggleReelPlayPause() {
+  handleReelScreenClick();
+}
+
+function toggleReelMute(event) {
+  if (event) {
+    try { event.stopPropagation(); } catch (e) {}
+  }
+  const videoEl = document.getElementById('vanshika-reel-video');
+  const muteBtn = document.getElementById('reel-mute-btn');
+  if (!videoEl) return;
+
+  videoEl.muted = !videoEl.muted;
+  if (muteBtn) {
+    muteBtn.innerText = videoEl.muted ? '🔇' : '🔊';
+  }
+}
+
+async function downloadCurrentReel(event) {
+  if (event) {
+    try { event.stopPropagation(); } catch (e) {}
+  }
+  if (!vanshikaReelsList || vanshikaReelsList.length === 0) {
+    showReelToast("⚠️ Please upload a reel first to download!");
+    return;
+  }
+
+  const currentReel = vanshikaReelsList[currentReelIndex];
+  if (!currentReel) return;
+
+  if (currentReel.type === 'youtube') {
+    showReelToast("ℹ️ YouTube video opened in link mode.");
+    return;
+  }
+
+  showReelToast("📥 Preparing Vanshika's Reel download... ✨");
+
+  try {
+    let downloadUrl = '';
+    let shouldRevoke = false;
+
+    if (currentReel.blob) {
+      downloadUrl = URL.createObjectURL(currentReel.blob);
+      shouldRevoke = true;
+    } else if (currentReel.url && currentReel.url.startsWith('blob:')) {
+      downloadUrl = currentReel.url;
+    } else if (currentReel.url) {
+      try {
+        const res = await fetch(currentReel.url);
+        const fetchedBlob = await res.blob();
+        downloadUrl = URL.createObjectURL(fetchedBlob);
+        shouldRevoke = true;
+      } catch (err) {
+        downloadUrl = currentReel.url;
+      }
+    }
+
+    if (!downloadUrl) {
+      showReelToast("⚠️ Video file not available for download.");
+      return;
+    }
+
+    const a = document.createElement('a');
+    a.href = downloadUrl;
+    const downloadName = currentReel.fileName || `vanshika-princess-reel-${currentReelIndex + 1}.mp4`;
+    a.download = downloadName.endsWith('.mp4') ? downloadName : `${downloadName}.mp4`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+
+    if (shouldRevoke) {
+      setTimeout(() => URL.revokeObjectURL(downloadUrl), 10000);
+    }
+
+    showReelToast(`✅ Downloaded: ${a.download} 👸`);
+  } catch (err) {
+    console.error('Download error:', err);
+    showReelToast("⚠️ Download failed, please try again.");
+  }
+}
+
+async function deleteCurrentReel(event) {
+  if (event) {
+    try { event.stopPropagation(); } catch (e) {}
+  }
+  if (!vanshikaReelsList || vanshikaReelsList.length === 0) return;
+
+  const confirmDelete = confirm(`Are you sure you want to remove Reel #${currentReelIndex + 1}?`);
+  if (!confirmDelete) return;
+
+  vanshikaReelsList.splice(currentReelIndex, 1);
+  await saveAllReelsToIndexedDB(vanshikaReelsList);
+  syncReelsMetadataToLocalStorage();
+
+  if (currentReelIndex >= vanshikaReelsList.length) {
+    currentReelIndex = Math.max(0, vanshikaReelsList.length - 1);
+  }
+  displayActiveReel(currentReelIndex, 'down');
+  showReelToast("🗑️ Reel removed from playlist.");
+}
+
+function setupReelScrollInteractions() {
+  const mount = document.getElementById('reel-screen-mount');
+  if (!mount || mount._hasScrollAttached) return;
+  mount._hasScrollAttached = true;
+
+  // 1. Mouse Wheel Scroll (Desktop)
+  mount.addEventListener('wheel', (e) => {
+    if (!vanshikaReelsList || vanshikaReelsList.length <= 1) return;
+    e.preventDefault();
+
+    if (reelWheelThrottleTimer) return;
+    reelWheelThrottleTimer = setTimeout(() => { reelWheelThrottleTimer = null; }, 350);
+
+    if (e.deltaY > 15) {
+      nextReel();
+    } else if (e.deltaY < -15) {
+      prevReel();
+    }
+  }, { passive: false });
+
+  // 2. Touch Swipe (Mobile)
+  mount.addEventListener('touchstart', (e) => {
+    if (e.touches && e.touches.length > 0) {
+      reelTouchStartY = e.touches[0].clientY;
+    }
+  }, { passive: true });
+
+  mount.addEventListener('touchend', (e) => {
+    if (!vanshikaReelsList || vanshikaReelsList.length <= 1) return;
+    if (e.changedTouches && e.changedTouches.length > 0) {
+      const diffY = reelTouchStartY - e.changedTouches[0].clientY;
+      if (Math.abs(diffY) > 40) {
+        if (diffY > 0) {
+          nextReel();
+        } else {
+          prevReel();
+        }
+      }
+    }
+  }, { passive: true });
+}
+
+function showReelToast(msg) {
+  const toast = document.getElementById('reel-reaction-toast');
+  if (!toast) return;
+  toast.innerText = msg;
+  setTimeout(() => {
+    if (toast.innerText === msg) toast.innerText = '';
+  }, 4000);
+}
+
+function reactToReel(type) {
+  if (type === 'eyes') {
+    if (typeof triggerEmeraldSparkles === 'function') triggerEmeraldSparkles();
+    showReelToast('💚 "Those rare light-green eyes have my whole heart forever!"');
+  } else if (type === 'beauty') {
+    if (typeof triggerAnniversaryConfetti === 'function') triggerAnniversaryConfetti();
+    showReelToast('👸 "You were gorgeous back then, and you are the prettiest girl in the world today!"');
+  } else if (type === 'telugu') {
+    if (typeof triggerEmeraldSparkles === 'function') triggerEmeraldSparkles();
+    if (typeof triggerAnniversaryConfetti === 'function') triggerAnniversaryConfetti();
+    showReelToast('🌺 "Nuvvu eppatiki naa pranam, naa bangaram! (Forever my soul & my treasure)"');
+  }
+}
+
+async function initVanshikaReel() {
+  setupReelScrollInteractions();
+
+  // 1. Try loading from IndexedDB
+  try {
+    const storedList = await loadAllReelsFromIndexedDB();
+    if (storedList && Array.isArray(storedList) && storedList.length > 0) {
+      vanshikaReelsList = storedList.map((item, idx) => {
+        let url = item.url;
+        if (item.blob) {
+          url = URL.createObjectURL(item.blob);
+        }
+        return {
+          id: item.id || `reel_${idx}`,
+          type: item.type || (item.blob ? 'local_video' : 'video_url'),
+          blob: item.blob || null,
+          url: url,
+          fileName: item.fileName || `vanshika-reel-${idx + 1}.mp4`,
+          title: item.title || `Reel #${idx + 1}`,
+          timestamp: item.timestamp || new Date().toISOString()
+        };
+      });
+      displayActiveReel(0, 'up');
+      return;
+    }
+  } catch (e) {
+    console.warn('IndexedDB reel load error:', e);
+  }
+
+  // 2. Check localStorage metadata
+  try {
+    const savedMeta = localStorage.getItem(REELS_PLAYLIST_KEY);
+    if (savedMeta) {
+      const parsed = JSON.parse(savedMeta);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        vanshikaReelsList = parsed.filter(p => p.url && !p.url.startsWith('blob:'));
+        if (vanshikaReelsList.length > 0) {
+          displayActiveReel(0, 'up');
+          return;
+        }
+      }
+    }
+  } catch (e) {}
+
+  // 3. Fallback: check static file on server
+  try {
+    const testVideo = document.createElement('video');
+    testVideo.src = 'assests/vanshika-reel.mp4';
+    testVideo.oncanplay = () => {
+      vanshikaReelsList = [{
+        id: 'reel_default',
+        type: 'video_url',
+        url: 'assests/vanshika-reel.mp4',
+        fileName: 'vanshika-reel-1.mp4',
+        title: 'Reel #1',
+        timestamp: new Date().toISOString()
+      }];
+      displayActiveReel(0, 'up');
+    };
+  } catch (e) {}
+
+  updateReelCounter();
 }

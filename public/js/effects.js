@@ -84,6 +84,30 @@ function triggerAnniversaryConfetti() {
   }
 }
 
+// 2b. Emerald Sparkles & Green Hearts Shower for Vanshika's Eyes Tribute
+function triggerEmeraldSparkles() {
+  const emojis = ['💚', '✨', '❇️', '👸', '💚', '🌟'];
+  for (let i = 0; i < 35; i++) {
+    const spark = document.createElement('div');
+    spark.innerText = emojis[Math.floor(Math.random() * emojis.length)];
+    spark.className = 'fixed z-50 text-xl md:text-2xl pointer-events-none select-none';
+    spark.style.left = (Math.random() * 85 + 5) + 'vw';
+    spark.style.top = (Math.random() * 80 + 10) + 'vh';
+    spark.style.filter = 'drop-shadow(0 0 10px rgba(16, 185, 129, 0.8))';
+    spark.style.transform = `scale(${Math.random() * 0.8 + 0.6}) rotate(${Math.random() * 40 - 20}deg)`;
+    spark.style.transition = 'all 2.5s cubic-bezier(0.2, 0.8, 0.2, 1)';
+    spark.style.opacity = '1';
+    document.body.appendChild(spark);
+
+    requestAnimationFrame(() => {
+      spark.style.transform = `translateY(-${Math.random() * 120 + 80}px) scale(${Math.random() * 0.5 + 1.2})`;
+      spark.style.opacity = '0';
+    });
+
+    setTimeout(() => spark.remove(), 2600);
+  }
+}
+
 // 3. Grand Fullscreen Cinematic Fireworks Engine
 let fireworksAnimFrame = null;
 let fireworksCanvas = null;
