@@ -106,6 +106,7 @@ const IS_ANNIVERSARY_PREVIEW_TEST = false;
 
 function isAnniversaryActive() {
   if (IS_ANNIVERSARY_PREVIEW_TEST) return true;
+  if (typeof window !== 'undefined' && (window.location.search.includes('anniv=1') || sessionStorage.getItem('anniv_preview_force') === '1')) return true;
   const now = new Date();
   const annivDate = new Date('2026-10-17T00:00:00');
   return now >= annivDate;
@@ -138,12 +139,18 @@ function updateAnniversaryTimer() {
       if (badge) badge.innerHTML = '🎉 HAPPY 1ST MONTH ANNIVERSARY VANSHIKA! 🎉';
       
       const giftTag = document.getElementById('gift-lock-tag');
-      if (giftTag) giftTag.innerHTML = '🎁 UNLOCKED TODAY: YOUR 1-MONTH SURPRISE GIFT!';
+      if (giftTag) giftTag.innerHTML = '🎁 UNLOCKED TODAY: YOUR 1-MONTH SURPRISE GIFTS!';
 
       const banner = document.getElementById('princess-royal-banner');
       if (banner) {
         banner.classList.remove('hidden');
         banner.classList.add('flex');
+      }
+
+      const floatingBadge = document.getElementById('oct17-floating-badge');
+      if (floatingBadge) {
+        floatingBadge.classList.remove('hidden');
+        floatingBadge.classList.add('block');
       }
     } else {
       const badge = document.querySelector('#anniversary-section .inline-flex span');
@@ -157,10 +164,323 @@ function updateAnniversaryTimer() {
         banner.classList.add('hidden');
         banner.classList.remove('flex');
       }
+
+      const floatingBadge = document.getElementById('oct17-floating-badge');
+      if (floatingBadge) {
+        floatingBadge.classList.add('hidden');
+        floatingBadge.classList.remove('block');
+      }
     }
   }
 }
 setInterval(updateAnniversaryTimer, 1000);
+
+// ==========================================
+// OCTOBER 17 SPECIAL: CARDS & BALLOONS ENGINE
+// ==========================================
+
+function openOct17LetterModal() {
+  const modal = document.getElementById('oct17-letter-modal');
+  if (modal) {
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+    playAnniversaryChime();
+  }
+}
+
+function closeOct17LetterModal() {
+  const modal = document.getElementById('oct17-letter-modal');
+  if (modal) {
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+  }
+}
+
+function switchToBalloonGameFromLetter() {
+  closeOct17LetterModal();
+  setTimeout(openOct17BalloonModal, 250);
+}
+
+function openOct17BalloonModal() {
+  const modal = document.getElementById('oct17-balloon-modal');
+  if (modal) {
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+    playAnniversaryChime();
+  }
+}
+
+function closeOct17BalloonModal() {
+  const modal = document.getElementById('oct17-balloon-modal');
+  if (modal) {
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+  }
+  stopAnnivPhotoAutoCycle();
+}
+
+// 4-Balloon Sequential Popping Game
+let annivPoppedStep = 0;
+const annivBalloonsConfig = [
+  { step: 1, id: 'balloon-1', word: 'You', colorClass: 'text-rose-300 glow-rose' },
+  { step: 2, id: 'balloon-2', word: ' are my Lady Princess', colorClass: 'text-amber-300 glow-gold' },
+  { step: 3, id: 'balloon-3', word: ' whom I love for forever', colorClass: 'text-emerald-300' },
+  { step: 4, id: 'balloon-4', word: ' ❤️', colorClass: 'text-rose-400 glow-rose' }
+];
+
+function playBalloonPopSound() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(380, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(70, ctx.currentTime + 0.08);
+    gain.gain.setValueAtTime(0.35, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.08);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start();
+    osc.stop(ctx.currentTime + 0.09);
+  } catch (e) {}
+}
+
+function playAnniversaryChime() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    [523.25, 659.25, 783.99, 1046.50].forEach((freq, idx) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, ctx.currentTime + idx * 0.09);
+      gain.gain.setValueAtTime(0.12, ctx.currentTime + idx * 0.09);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + idx * 0.09 + 0.45);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(ctx.currentTime + idx * 0.09);
+      osc.stop(ctx.currentTime + idx * 0.09 + 0.5);
+    });
+  } catch (e) {}
+}
+
+function popAnnivBalloon(step) {
+  const target = annivBalloonsConfig[step - 1];
+  if (!target) return;
+  const balloonEl = document.getElementById(target.id);
+  if (!balloonEl || balloonEl.dataset.popped === 'true') return;
+
+  balloonEl.dataset.popped = 'true';
+  playBalloonPopSound();
+
+  // Burst animation
+  balloonEl.style.animation = 'popBurst 0.25s forwards';
+  setTimeout(() => {
+    balloonEl.style.visibility = 'hidden';
+  }, 230);
+
+  // Trigger floating particle burst at balloon location
+  createBalloonPopParticles(balloonEl, step);
+
+  // Append word to revealed text banner
+  const banner = document.getElementById('balloon-revealed-text');
+  if (banner) {
+    const wordSpan = document.createElement('span');
+    wordSpan.className = `${target.colorClass} animate-scale-up`;
+    wordSpan.textContent = target.word;
+    banner.appendChild(wordSpan);
+  }
+
+  annivPoppedStep++;
+
+  // When all 4 are popped, trigger grand heart shower & reveal photo showcase
+  if (annivPoppedStep >= 4) {
+    setTimeout(() => {
+      playAnniversaryChime();
+      triggerMassiveHeartShower();
+
+      const stage = document.getElementById('balloon-stage');
+      if (stage) stage.classList.add('hidden');
+
+      const finalReveal = document.getElementById('balloon-final-reveal');
+      if (finalReveal) {
+        finalReveal.classList.remove('hidden');
+        finalReveal.classList.add('flex');
+      }
+
+      startAnnivPhotoAutoCycle();
+    }, 600);
+  }
+}
+
+function resetAnnivBalloons() {
+  annivPoppedStep = 0;
+  stopAnnivPhotoAutoCycle();
+
+  const banner = document.getElementById('balloon-revealed-text');
+  if (banner) banner.innerHTML = '';
+
+  const stage = document.getElementById('balloon-stage');
+  if (stage) {
+    stage.classList.remove('hidden');
+    stage.classList.add('flex');
+  }
+
+  const finalReveal = document.getElementById('balloon-final-reveal');
+  if (finalReveal) {
+    finalReveal.classList.add('hidden');
+    finalReveal.classList.remove('flex');
+  }
+
+  annivBalloonsConfig.forEach((cfg, idx) => {
+    const el = document.getElementById(cfg.id);
+    if (el) {
+      el.dataset.popped = 'false';
+      el.style.visibility = 'visible';
+      el.style.animation = `floatBalloon ${3.2 + idx * 0.2}s ease-in-out infinite alternate`;
+      el.style.animationDelay = `${idx * 0.3}s`;
+    }
+  });
+}
+
+function createBalloonPopParticles(el, step) {
+  const colors = ['#ff3b77', '#ffd700', '#10b981', '#38bdf8', '#ff758c'];
+  const rect = el.getBoundingClientRect();
+  const cx = rect.left + rect.width / 2;
+  const cy = rect.top + rect.height / 3;
+
+  for (let i = 0; i < 14; i++) {
+    const p = document.createElement('div');
+    const angle = (Math.PI * 2 * i) / 14;
+    const dist = 35 + Math.random() * 45;
+    const destX = Math.cos(angle) * dist;
+    const destY = Math.sin(angle) * dist;
+    const color = colors[Math.floor(Math.random() * colors.length)];
+    const isHeart = Math.random() > 0.4;
+
+    p.style.cssText = `
+      position: fixed;
+      left: ${cx}px;
+      top: ${cy}px;
+      z-index: 150;
+      pointer-events: none;
+      transform: translate(-50%, -50%) scale(1);
+      transition: all 0.55s cubic-bezier(0.16, 1, 0.3, 1);
+      color: ${color};
+      font-size: ${isHeart ? '18px' : '12px'};
+    `;
+    p.textContent = isHeart ? '💖' : '✨';
+    document.body.appendChild(p);
+
+    requestAnimationFrame(() => {
+      p.style.transform = `translate(calc(-50% + ${destX}px), calc(-50% + ${destY}px)) scale(0)`;
+      p.style.opacity = '0';
+    });
+
+    setTimeout(() => p.remove(), 600);
+  }
+}
+
+function triggerMassiveHeartShower() {
+  const hearts = ['❤️', '💖', '💕', '✨', '🌹', '💍', '👑', '🌺'];
+  const total = 45;
+
+  for (let i = 0; i < total; i++) {
+    setTimeout(() => {
+      const h = document.createElement('div');
+      const startX = Math.random() * window.innerWidth;
+      const size = 18 + Math.random() * 26;
+      const duration = 2.5 + Math.random() * 2;
+      const drift = (Math.random() - 0.5) * 120;
+      const heartIcon = hearts[Math.floor(Math.random() * hearts.length)];
+
+      h.style.cssText = `
+        position: fixed;
+        left: ${startX}px;
+        top: -40px;
+        font-size: ${size}px;
+        z-index: 140;
+        pointer-events: none;
+        user-select: none;
+        transition: transform ${duration}s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity ${duration}s ease-in;
+        transform: translateY(0) rotate(0deg);
+        opacity: 0.95;
+      `;
+      h.textContent = heartIcon;
+      document.body.appendChild(h);
+
+      requestAnimationFrame(() => {
+        h.style.transform = `translate(${drift}px, ${window.innerHeight + 60}px) rotate(${Math.random() * 360}deg)`;
+        h.style.opacity = '0';
+      });
+
+      setTimeout(() => h.remove(), duration * 1000);
+    }, i * 70);
+  }
+}
+
+// Animated Photo Carousel Data & Logic
+const annivPhotosData = [
+  { src: 'assests/eyes.jpeg', caption: 'Her Enchanting Light-Green Eyes 💚' },
+  { src: 'assests/naa-bangaram.jpeg', caption: 'Naa Bangaram, My Lady Princess 👸' },
+  { src: 'assests/queen.jpeg', caption: 'The Prettiest Queen in the Entire Universe 👑' },
+  { src: 'assests/future-wife.jpeg', caption: 'My Beautiful Future Wife 💍' },
+  { src: 'assests/magical-smile.jpeg', caption: 'Her Smile That Lights Up My World ✨' },
+  { src: 'assests/forever.jpeg', caption: 'Ellappudu Neethone — Forever & Always 💖' }
+];
+let currentAnnivPhotoIndex = 0;
+let annivPhotoTimer = null;
+
+function updateAnnivPhotoDisplay() {
+  const imgEl = document.getElementById('anniv-photo-img');
+  const capEl = document.getElementById('anniv-photo-caption');
+  const countEl = document.getElementById('anniv-photo-counter');
+  const dotsEl = document.getElementById('anniv-photo-dots');
+  const photo = annivPhotosData[currentAnnivPhotoIndex];
+  if (!photo) return;
+
+  if (imgEl) {
+    imgEl.style.opacity = '0';
+    imgEl.style.transform = 'scale(0.96)';
+    setTimeout(() => {
+      imgEl.src = photo.src;
+      imgEl.style.opacity = '1';
+      imgEl.style.transform = 'scale(1)';
+    }, 180);
+  }
+  if (capEl) capEl.textContent = photo.caption;
+  if (countEl) countEl.textContent = `${currentAnnivPhotoIndex + 1} / ${annivPhotosData.length}`;
+
+  if (dotsEl) {
+    const dots = dotsEl.querySelectorAll('span');
+    dots.forEach((dot, idx) => {
+      dot.className = idx === currentAnnivPhotoIndex
+        ? 'w-2.5 h-2.5 rounded-full bg-amber-400 transition-all scale-125'
+        : 'w-2.5 h-2.5 rounded-full bg-slate-700 transition-all';
+    });
+  }
+}
+
+function nextAnnivPhoto() {
+  currentAnnivPhotoIndex = (currentAnnivPhotoIndex + 1) % annivPhotosData.length;
+  updateAnnivPhotoDisplay();
+}
+
+function prevAnnivPhoto() {
+  currentAnnivPhotoIndex = (currentAnnivPhotoIndex - 1 + annivPhotosData.length) % annivPhotosData.length;
+  updateAnnivPhotoDisplay();
+}
+
+function startAnnivPhotoAutoCycle() {
+  stopAnnivPhotoAutoCycle();
+  annivPhotoTimer = setInterval(nextAnnivPhoto, 3600);
+}
+
+function stopAnnivPhotoAutoCycle() {
+  if (annivPhotoTimer) {
+    clearInterval(annivPhotoTimer);
+    annivPhotoTimer = null;
+  }
+}
 
 function openAnniversarySurpriseModal() {
   if (!isAnniversaryActive()) {

@@ -521,3 +521,143 @@
       animation: reelSlideDown 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
 
+    /* ==========================================
+       OCTOBER 17 1ST MONTH ANNIVERSARY BALLOONS & GIFTS
+       ========================================== */
+    @keyframes floatBalloon {
+      0% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-12px) rotate(2deg); }
+      100% { transform: translateY(0) rotate(-2deg); }
+    }
+
+    @keyframes popBurst {
+      0% { transform: scale(1); opacity: 1; filter: brightness(1.6); }
+      50% { transform: scale(1.5); opacity: 0.8; filter: brightness(2.2); }
+      100% { transform: scale(0); opacity: 0; }
+    }
+
+    .balloon-item {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+      user-select: none;
+      touch-action: manipulation;
+      transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .balloon-item:hover {
+      transform: translateY(-8px) scale(1.08);
+    }
+    .balloon-item:active {
+      transform: scale(0.92);
+    }
+
+    .heart-balloon-container {
+      width: 72px;
+      height: 68px;
+      position: relative;
+      transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .heart-balloon-svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+      filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.45));
+      transition: filter 0.25s ease;
+    }
+    .balloon-pink .heart-balloon-svg {
+      filter: drop-shadow(0 0 16px rgba(255, 59, 119, 0.75));
+    }
+    .balloon-gold .heart-balloon-svg {
+      filter: drop-shadow(0 0 16px rgba(245, 158, 11, 0.75));
+    }
+    .balloon-green .heart-balloon-svg {
+      filter: drop-shadow(0 0 16px rgba(16, 185, 129, 0.75));
+    }
+    .balloon-blue .heart-balloon-svg {
+      filter: drop-shadow(0 0 16px rgba(56, 189, 248, 0.75));
+    }
+
+    .balloon-item:hover .heart-balloon-container {
+      transform: translateY(-6px) scale(1.08);
+    }
+
+    .balloon-body {
+      width: 72px;
+      height: 92px;
+      border-radius: 50% 50% 50% 50% / 45% 45% 55% 55%;
+      position: relative;
+      box-shadow: inset -6px -6px 14px rgba(0,0,0,0.4), 0 10px 25px rgba(0,0,0,0.4);
+      transition: all 0.2s ease;
+    }
+
+    /* 3D Gloss Highlight */
+    .balloon-body::before {
+      content: '';
+      position: absolute;
+      top: 14px;
+      left: 14px;
+      width: 18px;
+      height: 28px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0) 80%);
+      transform: rotate(-30deg);
+    }
+
+    /* Balloon Bottom Knot */
+    .balloon-knot {
+      width: 10px;
+      height: 8px;
+      border-radius: 2px 2px 4px 4px;
+      margin-top: -2px;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* Balloon String */
+    .balloon-string {
+      width: 1.5px;
+      height: 55px;
+      background: linear-gradient(to bottom, rgba(255,255,255,0.7), rgba(255,255,255,0.15));
+      margin-top: -1px;
+    }
+
+    /* Individual Balloon Colors (Pink, Gold, Green, Blue) */
+    .balloon-pink .balloon-body {
+      background: radial-gradient(circle at 35% 35%, #ff758c 0%, #ff3b77 60%, #a80537 100%);
+      box-shadow: 0 0 25px rgba(255, 59, 119, 0.6), inset -6px -6px 14px rgba(0,0,0,0.35);
+    }
+    .balloon-pink .balloon-knot { background: #d92662; }
+
+    .balloon-gold .balloon-body {
+      background: radial-gradient(circle at 35% 35%, #fef08a 0%, #f59e0b 60%, #b45309 100%);
+      box-shadow: 0 0 25px rgba(245, 158, 11, 0.6), inset -6px -6px 14px rgba(0,0,0,0.35);
+    }
+    .balloon-gold .balloon-knot { background: #d97706; }
+
+    .balloon-green .balloon-body {
+      background: radial-gradient(circle at 35% 35%, #6ee7b7 0%, #10b981 60%, #047857 100%);
+      box-shadow: 0 0 25px rgba(16, 185, 129, 0.6), inset -6px -6px 14px rgba(0,0,0,0.35);
+    }
+    .balloon-green .balloon-knot { background: #059669; }
+
+    .balloon-blue .balloon-body {
+      background: radial-gradient(circle at 35% 35%, #7dd3fc 0%, #0284c7 60%, #0369a1 100%);
+      box-shadow: 0 0 25px rgba(2, 132, 199, 0.6), inset -6px -6px 14px rgba(0,0,0,0.35);
+    }
+    .balloon-blue .balloon-knot { background: #0284c7; }
+
+    @media (max-width: 640px) {
+      .heart-balloon-container { width: 58px; height: 55px; }
+      .balloon-body { width: 58px; height: 75px; }
+      .balloon-string { height: 40px; }
+    }
+
+    @media (max-width: 380px) {
+      .heart-balloon-container { width: 48px; height: 46px; }
+      .balloon-string { height: 32px; }
+    }
+
+
+

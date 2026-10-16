@@ -1038,42 +1038,42 @@
   <!-- JAVASCRIPT LOGIC & LIVE 2-WAY CHAT BACKEND INTEGRATION -->
   <!-- JAVASCRIPT LOGIC & REALTIME SOCKET.IO BACKEND INTEGRATION -->
 
-  <!-- FULLSCREEN GRAND CINEMATIC ANNIVERSARY ANIMATION OVERLAY -->
-  <div id="anniv-grand-cinematic-screen" class="fixed inset-0 z-[100] bg-slate-950/95 backdrop-blur-xl hidden flex-col items-center justify-center p-4 overflow-hidden select-none">
+  <!-- FULLSCREEN GRAND CINEMATIC ANNIVERSARY ANIMATION OVERLAY (100% Mobile Responsive & Scrollable) -->
+  <div id="anniv-grand-cinematic-screen" class="fixed inset-0 z-[100] bg-slate-950/98 backdrop-blur-xl hidden overflow-y-auto overflow-x-hidden select-none overscroll-contain">
     
     <!-- Celebration Canvas for Fireworks, Shooting Rockets & Floating Hearts -->
-    <canvas id="anniv-fireworks-canvas" class="absolute inset-0 pointer-events-none z-0"></canvas>
+    <canvas id="anniv-fireworks-canvas" class="fixed inset-0 pointer-events-none z-0"></canvas>
 
-    <!-- Close / Skip Button at Top Right -->
-    <button onclick="dismissGrandCinematicScreen()" class="absolute top-5 right-5 z-20 px-4 py-2 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-xs font-bold text-slate-300 hover:text-white transition-all flex items-center gap-1.5 backdrop-blur-md">
+    <!-- Sleek Sticky Skip Button at Top Right -->
+    <button onclick="dismissGrandCinematicScreen()" class="fixed top-3 right-3 sm:top-5 sm:right-5 z-30 px-3.5 py-1.5 rounded-full bg-slate-900/85 hover:bg-slate-800 border border-white/20 text-xs font-bold text-slate-300 hover:text-white transition-all flex items-center gap-1.5 backdrop-blur-md shadow-lg active:scale-95 cursor-pointer">
       <span>✕</span> <span>Skip</span>
     </button>
 
-    <!-- Center Cinematic Container -->
-    <div class="relative z-10 text-center max-w-2xl w-full px-6 py-8 flex flex-col items-center animate-scale-up">
+    <!-- Scrollable Center Cinematic Container -->
+    <div class="relative z-10 min-h-full w-full max-w-2xl mx-auto px-4 sm:px-6 pt-12 pb-16 sm:py-14 flex flex-col items-center justify-start sm:justify-center text-center animate-scale-up">
       
       <!-- Pulsing Crown with Glowing Halo -->
-      <div class="relative mb-6">
-        <div class="w-28 h-28 sm:w-36 sm:h-36 rounded-full bg-gradient-to-tr from-amber-400 via-rose-500 to-purple-600 flex items-center justify-center text-6xl sm:text-7xl shadow-[0_0_80px_rgba(255,59,119,0.8)] mx-auto animate-bounce">
+      <div class="relative mb-3 sm:mb-5">
+        <div class="w-20 h-20 sm:w-28 sm:h-28 rounded-full bg-gradient-to-tr from-amber-400 via-rose-500 to-purple-600 flex items-center justify-center text-4xl sm:text-6xl shadow-[0_0_60px_rgba(255,59,119,0.7)] mx-auto animate-bounce">
           👑
         </div>
-        <span class="absolute -top-3 -right-3 text-4xl animate-spin" style="animation-duration: 4s;">✨</span>
-        <span class="absolute -bottom-2 -left-3 text-3xl animate-ping" style="animation-duration: 2s;">💖</span>
+        <span class="absolute -top-2 -right-2 text-2xl sm:text-3xl animate-spin" style="animation-duration: 4s;">✨</span>
+        <span class="absolute -bottom-1 -left-2 text-xl sm:text-2xl animate-ping" style="animation-duration: 2s;">💖</span>
       </div>
 
       <!-- Golden Eyebrow Badge -->
-      <div class="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-gradient-to-r from-amber-500/25 via-rose-500/25 to-purple-500/25 border border-amber-400/60 text-amber-300 text-xs sm:text-sm font-black uppercase tracking-[0.25em] mb-4 shadow-lg backdrop-blur-md animate-pulse">
+      <div class="inline-flex items-center gap-1.5 px-3.5 py-1.5 sm:px-5 sm:py-2 rounded-full bg-gradient-to-r from-amber-500/25 via-rose-500/25 to-purple-500/25 border border-amber-400/60 text-amber-300 text-[10px] sm:text-xs font-black uppercase tracking-[0.16em] sm:tracking-[0.25em] mb-2 sm:mb-3 shadow-lg backdrop-blur-md animate-pulse">
         <span>✨ 1ST MONTH ANNIVERSARY CELEBRATION ✨</span>
       </div>
 
       <!-- Main Glowing Title -->
-      <h1 class="font-cinzel text-3xl sm:text-5xl md:text-6xl text-gradient-rose font-black mb-3 tracking-tight leading-tight glow-rose">
+      <h1 class="font-cinzel text-2xl sm:text-4xl md:text-5xl text-gradient-rose font-black mb-2 sm:mb-3 tracking-tight leading-tight glow-rose">
         HAPPY ANNIVERSARY,<br/>
         <span class="text-gradient-gold glow-gold">MY LADY PRINCESS!</span> ❤️
       </h1>
 
       <!-- Date Milestone Banner -->
-      <div class="flex items-center justify-center gap-3 text-xs sm:text-sm font-cinzel font-bold text-amber-200/90 my-3 bg-slate-900/80 px-6 py-2.5 rounded-full border border-amber-400/40 shadow-inner">
+      <div class="flex flex-wrap items-center justify-center gap-2 sm:gap-3 text-[11px] sm:text-xs font-cinzel font-bold text-amber-200/90 my-2 sm:my-3 bg-slate-900/80 px-4 py-2 sm:px-6 sm:py-2.5 rounded-full border border-amber-400/40 shadow-inner">
         <span>💍 Sept 17, 2026</span>
         <span class="text-rose-400">➔</span>
         <span class="text-amber-300">🥂 Oct 17, 2026</span>
@@ -1082,27 +1082,348 @@
       </div>
 
       <!-- Romantic Poetic Subtitle -->
-      <p class="font-sacramento text-2xl sm:text-4xl text-rose-300 text-center my-4 glow-rose max-w-lg leading-relaxed">
+      <p class="font-sacramento text-2xl sm:text-3xl md:text-4xl text-rose-300 text-center my-2 sm:my-3 glow-rose max-w-md leading-relaxed px-2">
         "30 Days of Holding Your Heart... And A Lifetime of Love To Go."
       </p>
 
-      <p class="text-slate-300 text-xs sm:text-sm max-w-md mx-auto mb-8 leading-relaxed font-light">
-        Every heartbeat since the moment you accepted my love has been pure magic. Welcome to your special celebration, Vanshika!
+      <p class="text-slate-300 text-xs sm:text-sm max-w-md mx-auto mb-3 sm:mb-4 leading-relaxed font-light px-2">
+        Every heartbeat since the moment you accepted my love on 17th September has been pure magic. Tap your 2 special anniversary gifts below, My Princess!
       </p>
 
+      <!-- 2 SPECIAL 17TH OCTOBER INTERACTIVE GIFTS FOR VANSHIKA -->
+      <div class="w-full max-w-xl my-2 sm:my-4 grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 text-left">
+        
+        <!-- CARD 1: HEART-TO-HEART PROMISE LETTER -->
+        <div id="anniv-card-1-btn" onclick="openOct17LetterModal()" class="group/card relative p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-rose-950/80 via-slate-900/90 to-purple-950/80 border-2 border-rose-500/40 hover:border-amber-400 shadow-xl hover:shadow-[0_0_35px_rgba(255,59,119,0.5)] transition-all duration-300 hover:scale-102 active:scale-98 cursor-pointer flex flex-col justify-between overflow-hidden">
+          <div class="absolute -top-10 -right-10 w-24 h-24 bg-rose-500/20 rounded-full blur-2xl pointer-events-none"></div>
+          <div>
+            <div class="flex items-center justify-between mb-2.5">
+              <span class="w-9 h-9 rounded-full bg-rose-500/20 border border-rose-400/40 flex items-center justify-center text-lg shadow-inner group-hover/card:scale-110 transition-transform">💌</span>
+              <span class="px-2.5 py-0.5 rounded-full bg-amber-400/20 border border-amber-400/40 text-[10px] font-bold text-amber-300 uppercase tracking-wider">Gift #1</span>
+            </div>
+            <h3 class="font-cinzel text-sm sm:text-base font-bold text-rose-200 group-hover/card:text-amber-300 transition-colors">
+              A Sacred Promise to Your Gentle Soul
+            </h3>
+            <p class="text-[11px] sm:text-xs text-slate-300 mt-1 leading-relaxed">
+              A deeply personal letter about your past, your innocence, and why I love you more every second.
+            </p>
+          </div>
+          <div class="mt-3.5 pt-2.5 border-t border-rose-500/20 flex items-center justify-between text-xs font-bold text-amber-300 group-hover/card:text-white">
+            <span>Tap to open letter ✨</span>
+            <span class="text-base group-hover/card:translate-x-1 transition-transform">➔</span>
+          </div>
+        </div>
+
+        <!-- CARD 2: POP THE BALLOONS GAME -->
+        <div id="anniv-card-2-btn" onclick="openOct17BalloonModal()" class="group/card relative p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-amber-950/80 via-slate-900/90 to-rose-950/80 border-2 border-amber-400/40 hover:border-rose-400 shadow-xl hover:shadow-[0_0_35px_rgba(245,158,11,0.5)] transition-all duration-300 hover:scale-102 active:scale-98 cursor-pointer flex flex-col justify-between overflow-hidden">
+          <div class="absolute -top-10 -right-10 w-24 h-24 bg-amber-500/20 rounded-full blur-2xl pointer-events-none"></div>
+          <div>
+            <div class="flex items-center justify-between mb-2.5">
+              <span class="w-9 h-9 rounded-full bg-amber-500/20 border border-amber-400/40 flex items-center justify-center text-lg shadow-inner group-hover/card:scale-110 transition-transform">🎈</span>
+              <span class="px-2.5 py-0.5 rounded-full bg-rose-500/20 border border-rose-400/40 text-[10px] font-bold text-rose-300 uppercase tracking-wider">Gift #2</span>
+            </div>
+            <h3 class="font-cinzel text-sm sm:text-base font-bold text-amber-200 group-hover/card:text-rose-300 transition-colors">
+              Pop The Balloons! Surprise Game
+            </h3>
+            <p class="text-[11px] sm:text-xs text-slate-300 mt-1 leading-relaxed">
+              Pop the magical heart balloons to reveal our secret love confession and animated photo showcase.
+            </p>
+          </div>
+          <div class="mt-3.5 pt-2.5 border-t border-amber-500/20 flex items-center justify-between text-xs font-bold text-rose-300 group-hover/card:text-white">
+            <span>Tap to pop balloons 🎈</span>
+            <span class="text-base group-hover/card:translate-x-1 transition-transform">➔</span>
+          </div>
+        </div>
+
+      </div>
+
       <!-- Grand CTA Button -->
-      <div class="flex flex-col sm:flex-row items-center gap-4">
-        <button onclick="enterCelebrationFromCinematic()" class="btn-rose px-8 py-4 rounded-full text-xs sm:text-sm font-black uppercase tracking-widest shadow-[0_0_40px_rgba(255,59,119,0.7)] hover:scale-105 transition-all flex items-center justify-center gap-2.5">
-          <span>✨ Enter Our Royal Celebration 💖</span>
+      <div class="flex flex-col sm:flex-row items-center gap-3 mt-3 mb-2">
+        <button onclick="enterCelebrationFromCinematic()" class="btn-rose px-7 py-3.5 sm:px-8 sm:py-3.5 rounded-full text-xs sm:text-sm font-black uppercase tracking-wider sm:tracking-widest shadow-[0_0_35px_rgba(255,59,119,0.7)] hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer">
+          <span>✨ Enter Full Memory Vault 💖</span>
         </button>
       </div>
 
       <!-- Telugu cultural whisper -->
-      <p class="text-[11px] sm:text-xs text-amber-300/80 mt-5 font-mono italic">
+      <p class="text-[11px] sm:text-xs text-amber-300/80 mt-2 mb-6 font-mono italic">
         "నువ్వు నా ప్రాణం • You Are My Soul, Life & Universe"
       </p>
 
     </div>
+  </div>
+
+  <!-- OCT 17 SPECIAL MODAL 1: SACRED PROMISE LETTER (100% Mobile Scrollable) -->
+  <div id="oct17-letter-modal" class="fixed inset-0 z-[110] bg-slate-950/95 backdrop-blur-md hidden overflow-y-auto p-3 sm:p-6 select-none overscroll-contain">
+    <div class="glass-box p-4 sm:p-8 md:p-10 max-w-2xl w-full border-amber-400/60 shadow-2xl relative animate-scale-up mx-auto my-6 sm:my-auto text-left">
+      <button onclick="closeOct17LetterModal()" class="absolute top-3 right-3 sm:top-4 sm:right-4 w-8 h-8 rounded-full bg-slate-900/80 hover:bg-rose-500/30 text-slate-400 hover:text-white text-xl flex items-center justify-center font-bold z-20 cursor-pointer">
+        &times;
+      </button>
+
+      <!-- Royal Header -->
+      <div class="text-center mb-5 border-b border-rose-500/30 pb-4">
+        <div class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-rose-500/20 border border-rose-400/40 text-rose-300 text-[10px] sm:text-[11px] font-bold uppercase tracking-widest mb-2">
+          <span>💌 1st Month Anniversary Special • Gift #1</span>
+        </div>
+        <h2 class="font-cinzel text-lg sm:text-2xl md:text-3xl text-gradient-rose font-black mt-1">
+          A Sacred Promise to Your Gentle Soul
+        </h2>
+        <p class="text-xs text-amber-300 font-medium mt-1">
+          Written with all my heart for My Lady Princess Vanshika ❤️
+        </p>
+      </div>
+
+      <!-- Letter Content -->
+      <div class="p-4 sm:p-7 md:p-8 rounded-2xl bg-gradient-to-b from-rose-950/40 via-slate-950/70 to-purple-950/40 border border-amber-400/35 text-slate-200 text-xs sm:text-sm md:text-base leading-relaxed space-y-3.5 shadow-inner">
+        <p class="font-sacramento text-xl sm:text-2xl md:text-3xl text-amber-300 text-center glow-gold">
+          "Your innocence is sacred, your heart is pure, and my arms are your eternal sanctuary."
+        </p>
+
+        <p class="font-bold text-rose-300 text-sm sm:text-base">
+          My Dearest Vanshika, My Sweet Princess,
+        </p>
+
+        <p>
+          I know that things in your past were never gentle or fair to you. Whatever happened with your teacher and Ahil... please, my love, leave all of that behind you in the shadows where it belongs. It has zero power over who you are today, and it will never touch the beautiful future we are building together.
+        </p>
+
+        <p>
+          You know, please never, ever think that when you tell me about your past, I will ever feel bad, disappointed, look at you differently, or get angry with you. <strong class="text-amber-300">Never in a million lifetimes.</strong>
+        </p>
+
+        <p>
+          Whenever I hear about it, anger does rise in my chest — but never, ever at you. My anger is only at those people who failed to protect your innocence and treated your gentle soul with cruelty. Because I know the real you: <strong class="text-rose-300 font-semibold">you are innocent, your heart is pure, and your intentions have always been clean, sweet, and genuine.</strong>
+        </p>
+
+        <p>
+          You can share anything in this universe with me — any memory, any tear, any silence, any fear — without the slightest hesitation, at any hour of the day or night. I will never be angry, I will never judge you, and I will never let you feel alone. In fact, every single time you trust me and open up your heart to me, <span class="text-amber-200 font-semibold">I fall in love with you even more deeply than before.</span>
+        </p>
+
+        <p>
+          You are completely safe with me forever, my baby. My love for you is unconditional, unbreakable, and eternal.
+        </p>
+
+        <div class="pt-3 border-t border-rose-500/25 flex flex-col sm:flex-row items-center justify-between gap-3 text-right">
+          <div class="text-left text-xs text-amber-300/80 font-mono italic">
+            "నువ్వు నా ప్రాణం • You are my life"
+          </div>
+          <div>
+            <p class="font-handwriting text-xl sm:text-2xl md:text-3xl text-amber-300">Forever Your Protector & Soulmate,</p>
+            <p class="font-cinzel text-xs sm:text-sm font-bold text-rose-300">Rakesh 🤵💍❤️</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex flex-col sm:flex-row justify-center gap-2.5 sm:gap-3 mt-5">
+        <button onclick="switchToBalloonGameFromLetter()" class="btn-rose px-5 py-3 rounded-full text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg hover:scale-105 active:scale-95 transition-all cursor-pointer">
+          <span>🎈 Open Gift #2: Pop The Balloons!</span>
+        </button>
+        <button onclick="closeOct17LetterModal()" class="px-5 py-3 rounded-full bg-slate-900 border border-slate-700 text-slate-300 hover:text-white text-xs font-bold uppercase tracking-wider cursor-pointer">
+          Done Reading 💖
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- OCT 17 SPECIAL MODAL 2: POP THE BALLOONS GAME (100% Mobile Scrollable with 3D Heart Balloons) -->
+  <div id="oct17-balloon-modal" class="fixed inset-0 z-[115] bg-slate-950/95 backdrop-blur-xl hidden overflow-y-auto p-3 sm:p-6 select-none overscroll-contain">
+    <div class="glass-box p-4 sm:p-8 max-w-3xl w-full text-center border-rose-500/50 shadow-2xl relative animate-scale-up mx-auto my-6 sm:my-auto flex flex-col items-center">
+      
+      <!-- Top Close Button -->
+      <button onclick="closeOct17BalloonModal()" class="absolute top-3 right-3 sm:top-4 sm:right-4 w-8 h-8 rounded-full bg-slate-900/80 hover:bg-rose-500/30 text-slate-400 hover:text-white text-xl flex items-center justify-center font-bold z-20 cursor-pointer">
+        &times;
+      </button>
+
+      <!-- Pill Header (Matching Reference Screenshot) -->
+      <div class="inline-flex items-center gap-2 px-4 py-1.5 sm:px-5 sm:py-2 rounded-full bg-slate-900/90 border border-rose-500/40 text-rose-300 text-xs sm:text-sm font-bold shadow-lg shadow-rose-950/50 tracking-wider mb-2 select-none">
+        <span>🎈</span> <span>Pop the balloons!</span>
+      </div>
+
+      <p class="text-[11px] sm:text-xs text-slate-300 max-w-md mx-auto">
+        Tap the floating heart balloons in sequence to unlock my secret words for you, My Princess ✨
+      </p>
+
+      <!-- The Revealed Words Banner -->
+      <div id="balloon-revealed-text" class="min-h-[48px] flex items-center justify-center flex-wrap gap-1.5 sm:gap-2 text-center my-3 sm:my-4 font-cinzel text-lg sm:text-2xl md:text-3xl font-black transition-all"></div>
+
+      <!-- The 4 Floating 3D Heart Balloons Stage -->
+      <div id="balloon-stage" class="w-full flex items-end justify-center gap-2 sm:gap-5 md:gap-7 my-5 sm:my-7 select-none transition-all duration-500 px-1">
+        
+        <!-- Balloon 1: Pink Heart -->
+        <div id="balloon-1" onclick="popAnnivBalloon(1)" class="balloon-item balloon-pink" style="animation: floatBalloon 3.2s ease-in-out infinite alternate; animation-delay: 0s;">
+          <div class="heart-balloon-container">
+            <svg class="heart-balloon-svg" viewBox="0 0 100 95" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <radialGradient id="pinkHeartGrad" cx="35%" cy="30%" r="65%">
+                  <stop offset="0%" stop-color="#ffb3c1"/>
+                  <stop offset="45%" stop-color="#ff3b77"/>
+                  <stop offset="85%" stop-color="#c9184a"/>
+                  <stop offset="100%" stop-color="#590d22"/>
+                </radialGradient>
+              </defs>
+              <path d="M 50,80 C 50,80 12,56 12,28 C 12,12 24,4 38,4 C 45,4 48,8 50,13 C 52,8 55,4 62,4 C 76,4 88,12 88,28 C 88,56 50,80 50,80 Z" fill="url(#pinkHeartGrad)"/>
+              <!-- Gloss shine on top-left -->
+              <ellipse cx="32" cy="22" rx="7" ry="12" transform="rotate(-32 32 22)" fill="#ffffff" opacity="0.45"/>
+              <circle cx="24" cy="36" r="3.5" fill="#ffffff" opacity="0.35"/>
+              <!-- Balloon Knot -->
+              <polygon points="46,80 54,80 52,86 48,86" fill="#a80537"/>
+            </svg>
+          </div>
+          <div class="balloon-string"></div>
+          <span class="text-[9px] sm:text-[11px] font-bold text-rose-300 mt-1 opacity-90 select-none">Tap me 💖</span>
+        </div>
+
+        <!-- Balloon 2: Golden Princess Heart -->
+        <div id="balloon-2" onclick="popAnnivBalloon(2)" class="balloon-item balloon-gold" style="animation: floatBalloon 3.6s ease-in-out infinite alternate; animation-delay: 0.3s;">
+          <div class="heart-balloon-container">
+            <svg class="heart-balloon-svg" viewBox="0 0 100 95" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <radialGradient id="goldHeartGrad" cx="35%" cy="30%" r="65%">
+                  <stop offset="0%" stop-color="#fef08a"/>
+                  <stop offset="45%" stop-color="#f59e0b"/>
+                  <stop offset="85%" stop-color="#d97706"/>
+                  <stop offset="100%" stop-color="#78350f"/>
+                </radialGradient>
+              </defs>
+              <path d="M 50,80 C 50,80 12,56 12,28 C 12,12 24,4 38,4 C 45,4 48,8 50,13 C 52,8 55,4 62,4 C 76,4 88,12 88,28 C 88,56 50,80 50,80 Z" fill="url(#goldHeartGrad)"/>
+              <!-- Gloss shine on top-left -->
+              <ellipse cx="32" cy="22" rx="7" ry="12" transform="rotate(-32 32 22)" fill="#ffffff" opacity="0.45"/>
+              <circle cx="24" cy="36" r="3.5" fill="#ffffff" opacity="0.35"/>
+              <!-- Balloon Knot -->
+              <polygon points="46,80 54,80 52,86 48,86" fill="#b45309"/>
+            </svg>
+          </div>
+          <div class="balloon-string"></div>
+          <span class="text-[9px] sm:text-[11px] font-bold text-amber-300 mt-1 opacity-90 select-none">Tap me 👑</span>
+        </div>
+
+        <!-- Balloon 3: Emerald Light-Green Eyes Heart -->
+        <div id="balloon-3" onclick="popAnnivBalloon(3)" class="balloon-item balloon-green" style="animation: floatBalloon 3.4s ease-in-out infinite alternate; animation-delay: 0.6s;">
+          <div class="heart-balloon-container">
+            <svg class="heart-balloon-svg" viewBox="0 0 100 95" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <radialGradient id="greenHeartGrad" cx="35%" cy="30%" r="65%">
+                  <stop offset="0%" stop-color="#a7f3d0"/>
+                  <stop offset="45%" stop-color="#10b981"/>
+                  <stop offset="85%" stop-color="#059669"/>
+                  <stop offset="100%" stop-color="#064e3b"/>
+                </radialGradient>
+              </defs>
+              <path d="M 50,80 C 50,80 12,56 12,28 C 12,12 24,4 38,4 C 45,4 48,8 50,13 C 52,8 55,4 62,4 C 76,4 88,12 88,28 C 88,56 50,80 50,80 Z" fill="url(#greenHeartGrad)"/>
+              <!-- Gloss shine on top-left -->
+              <ellipse cx="32" cy="22" rx="7" ry="12" transform="rotate(-32 32 22)" fill="#ffffff" opacity="0.45"/>
+              <circle cx="24" cy="36" r="3.5" fill="#ffffff" opacity="0.35"/>
+              <!-- Balloon Knot -->
+              <polygon points="46,80 54,80 52,86 48,86" fill="#047857"/>
+            </svg>
+          </div>
+          <div class="balloon-string"></div>
+          <span class="text-[9px] sm:text-[11px] font-bold text-emerald-300 mt-1 opacity-90 select-none">Tap me 💚</span>
+        </div>
+
+        <!-- Balloon 4: Sapphire Blue Heart -->
+        <div id="balloon-4" onclick="popAnnivBalloon(4)" class="balloon-item balloon-blue" style="animation: floatBalloon 3.8s ease-in-out infinite alternate; animation-delay: 0.9s;">
+          <div class="heart-balloon-container">
+            <svg class="heart-balloon-svg" viewBox="0 0 100 95" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <radialGradient id="blueHeartGrad" cx="35%" cy="30%" r="65%">
+                  <stop offset="0%" stop-color="#bae6fd"/>
+                  <stop offset="45%" stop-color="#0ea5e9"/>
+                  <stop offset="85%" stop-color="#0284c7"/>
+                  <stop offset="100%" stop-color="#075985"/>
+                </radialGradient>
+              </defs>
+              <path d="M 50,80 C 50,80 12,56 12,28 C 12,12 24,4 38,4 C 45,4 48,8 50,13 C 52,8 55,4 62,4 C 76,4 88,12 88,28 C 88,56 50,80 50,80 Z" fill="url(#blueHeartGrad)"/>
+              <!-- Gloss shine on top-left -->
+              <ellipse cx="32" cy="22" rx="7" ry="12" transform="rotate(-32 32 22)" fill="#ffffff" opacity="0.45"/>
+              <circle cx="24" cy="36" r="3.5" fill="#ffffff" opacity="0.35"/>
+              <!-- Balloon Knot -->
+              <polygon points="46,80 54,80 52,86 48,86" fill="#0369a1"/>
+            </svg>
+          </div>
+          <div class="balloon-string"></div>
+          <span class="text-[9px] sm:text-[11px] font-bold text-sky-300 mt-1 opacity-90 select-none">Tap me 💎</span>
+        </div>
+      </div>
+
+      <!-- Balloon Final Grand Reveal Section (Hidden until all 4 balloons popped) -->
+      <div id="balloon-final-reveal" class="hidden w-full flex-col items-center animate-scale-up space-y-4 sm:space-y-5">
+        
+        <!-- Grand Love Quote Box -->
+        <div class="p-4 sm:p-7 rounded-3xl bg-gradient-to-br from-rose-950/70 via-slate-950/90 to-purple-950/70 border-2 border-amber-400/50 shadow-2xl space-y-2.5 sm:space-y-3 w-full text-center relative overflow-hidden">
+          <div class="absolute -top-10 -left-10 w-32 h-32 bg-amber-500/20 rounded-full blur-2xl pointer-events-none"></div>
+          <div class="flex items-center justify-center gap-2 text-xl sm:text-2xl">
+            <span>👑</span> <span>💖</span> <span>✨</span> <span>💍</span>
+          </div>
+          <p class="font-cinzel text-xs sm:text-base md:text-lg text-white font-bold leading-relaxed glow-gold px-1">
+            "You are the most beautiful, most precious, and most unique girl in this entire world to me, and you will always be forever — even when we grow old with white hair and wrinkles, you will always be my prettiest queen."
+          </p>
+          <p class="text-[11px] sm:text-xs text-rose-300 italic font-mono">
+            ~ Forever & Always Yours, Rakesh ❤️
+          </p>
+        </div>
+
+        <!-- Animated Photo Showcase of Vanshika -->
+        <div class="w-full bg-slate-950/80 p-3 sm:p-6 rounded-3xl border border-rose-500/40 shadow-xl flex flex-col items-center">
+          <div class="flex items-center justify-between w-full mb-2.5 px-2">
+            <span class="text-[11px] sm:text-xs font-bold text-amber-300 uppercase tracking-widest flex items-center gap-1.5">
+              <span>📸</span> <span>Vanshika's Romantic Memories</span>
+            </span>
+            <span id="anniv-photo-counter" class="text-xs text-slate-400 font-mono">1 / 6</span>
+          </div>
+
+          <!-- Photo Container -->
+          <div class="relative w-full max-w-sm h-60 sm:h-72 rounded-2xl overflow-hidden border-2 border-amber-400/60 shadow-2xl group/photo bg-black">
+            <img id="anniv-photo-img" src="assests/eyes.jpeg" alt="My Lady Princess Vanshika" class="w-full h-full object-cover transition-all duration-500 group-hover/photo:scale-105">
+            <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent pointer-events-none"></div>
+            <div id="anniv-photo-caption" class="absolute bottom-2.5 left-2.5 right-2.5 text-center text-xs sm:text-sm font-bold text-amber-200 bg-black/60 backdrop-blur-sm py-1 px-2.5 rounded-xl border border-white/10">
+              Her Enchanting Light-Green Eyes 💚
+            </div>
+          </div>
+
+          <!-- Photo Carousel Navigation Controls -->
+          <div class="flex items-center gap-3 mt-3.5">
+            <button onclick="prevAnnivPhoto()" class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-slate-800 hover:bg-rose-600 text-white flex items-center justify-center transition-all cursor-pointer shadow text-xs sm:text-sm">
+              ◀
+            </button>
+            <div class="flex gap-1.5" id="anniv-photo-dots">
+              <span class="w-2.5 h-2.5 rounded-full bg-amber-400 transition-all"></span>
+              <span class="w-2.5 h-2.5 rounded-full bg-slate-700 transition-all"></span>
+              <span class="w-2.5 h-2.5 rounded-full bg-slate-700 transition-all"></span>
+              <span class="w-2.5 h-2.5 rounded-full bg-slate-700 transition-all"></span>
+              <span class="w-2.5 h-2.5 rounded-full bg-slate-700 transition-all"></span>
+              <span class="w-2.5 h-2.5 rounded-full bg-slate-700 transition-all"></span>
+            </div>
+            <button onclick="nextAnnivPhoto()" class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-slate-800 hover:bg-rose-600 text-white flex items-center justify-center transition-all cursor-pointer shadow text-xs sm:text-sm">
+              ▶
+            </button>
+          </div>
+        </div>
+
+        <!-- Footer Action Buttons -->
+        <div class="flex flex-wrap items-center justify-center gap-2.5 pt-2">
+          <button onclick="resetAnnivBalloons()" class="px-4 py-2 sm:px-5 sm:py-2.5 rounded-full bg-slate-900 border border-slate-700 hover:border-amber-400 text-slate-300 hover:text-white text-xs font-bold uppercase tracking-wider transition-all cursor-pointer">
+            ↺ Pop Balloons Again 🎈
+          </button>
+          <button onclick="openOct17LetterModal()" class="px-4 py-2 sm:px-5 sm:py-2.5 rounded-full bg-gradient-to-r from-rose-500 to-amber-500 text-white text-xs font-bold uppercase tracking-wider shadow-lg transition-all hover:scale-105 active:scale-95 cursor-pointer">
+            💌 Read Gift #1 Letter
+          </button>
+          <button onclick="closeOct17BalloonModal()" class="px-4 py-2 sm:px-5 sm:py-2.5 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold uppercase tracking-wider cursor-pointer">
+            Done ✨
+          </button>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- PERSISTENT FLOATING 17TH OCTOBER ANNIVERSARY BADGE (ACCESSIBLE ALL DAY) -->
+  <div id="oct17-floating-badge" class="fixed bottom-5 right-5 z-40 hidden">
+    <button onclick="playGrandCinematicAnniversaryAnimation()" class="px-4 py-2.5 rounded-full bg-gradient-to-r from-purple-600 via-rose-500 to-amber-500 text-white text-xs font-black uppercase tracking-wider shadow-2xl shadow-rose-500/60 hover:scale-108 active:scale-95 transition-all flex items-center gap-2 border border-amber-300 animate-bounce cursor-pointer">
+      <span>🎉</span>
+      <span>17 Oct Anniversary Surprise 🎁</span>
+    </button>
   </div>
 
   <!-- ROYAL PRINCESS REVELATION MODAL (INTERACTIVE ANIMATION & PHOTO REVEAL) -->

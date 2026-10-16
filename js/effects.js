@@ -319,12 +319,21 @@ function dismissGrandCinematicScreen() {
   fireworksActive = false;
   if (fireworksAnimFrame) cancelAnimationFrame(fireworksAnimFrame);
   if (fireworksCtx && fireworksCanvas) fireworksCtx.clearRect(0, 0, fireworksCanvas.width, fireworksCanvas.height);
+  const isUserLoggedIn = sessionStorage.getItem('chat_user_name') && sessionStorage.getItem('chat_user_pin');
+  if (!isUserLoggedIn && typeof openNameLoginModal === 'function') {
+    setTimeout(openNameLoginModal, 300);
+  }
 }
 
 function enterCelebrationFromCinematic() {
   dismissGrandCinematicScreen();
   sessionStorage.setItem('anniv_cinematic_played', 'true');
-  setTimeout(() => {
-    openPrincessWelcomeModal(true);
-  }, 300);
+  const isUserLoggedIn = sessionStorage.getItem('chat_user_name') && sessionStorage.getItem('chat_user_pin');
+  if (!isUserLoggedIn && typeof openNameLoginModal === 'function') {
+    setTimeout(openNameLoginModal, 300);
+  } else {
+    setTimeout(() => {
+      if (typeof openPrincessWelcomeModal === 'function') openPrincessWelcomeModal(true);
+    }, 300);
+  }
 }
