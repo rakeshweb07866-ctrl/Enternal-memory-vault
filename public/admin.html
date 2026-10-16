@@ -267,7 +267,8 @@
       </div>
 
       <!-- STATS ROW -->
-      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mb-6">
+      <!-- STATS ROW -->
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
         <div class="stat-card p-4 text-center cursor-pointer" onclick="switchTab('reels', document.querySelector('[onclick*=\'reels\']'))">
           <div class="text-2xl font-black text-emerald-300" id="stat-reels">—</div>
           <div class="text-[11px] text-slate-400 mt-1 font-semibold">Reels on Server</div>
@@ -279,6 +280,10 @@
         <div class="stat-card p-4 text-center cursor-pointer" onclick="switchTab('deleted', document.getElementById('tab-btn-deleted'))">
           <div class="text-2xl font-black text-rose-400" id="stat-deleted">—</div>
           <div class="text-[11px] text-slate-400 mt-1 font-semibold">🗑️ Deleted Vault</div>
+        </div>
+        <div class="stat-card p-4 text-center cursor-pointer" onclick="switchTab('sessions', document.getElementById('tab-btn-sessions'))">
+          <div class="text-2xl font-black text-sky-400" id="stat-sessions">—</div>
+          <div class="text-[11px] text-slate-400 mt-1 font-semibold">📱 Devices & Logins</div>
         </div>
         <div class="stat-card p-4 text-center cursor-pointer" onclick="switchTab('wishes', document.querySelector('[onclick*=\'wishes\']'))">
           <div class="text-2xl font-black text-amber-300" id="stat-wishes">—</div>
@@ -304,6 +309,7 @@
         <button class="tab-btn active" onclick="switchTab('reels', this)">🎬 Manage Reels</button>
         <button class="tab-btn" onclick="switchTab('messages', this)">💬 Messages</button>
         <button class="tab-btn" onclick="switchTab('deleted', this)" id="tab-btn-deleted">🗑️ Deleted Messages Vault</button>
+        <button class="tab-btn" onclick="switchTab('sessions', this)" id="tab-btn-sessions">📱 Devices & Logins</button>
         <button class="tab-btn" onclick="switchTab('wishes', this)">🏮 Sky Wishes</button>
         <button class="tab-btn" onclick="switchTab('gallery', this)">🖼️ Gallery & Media</button>
         <button class="tab-btn" onclick="switchTab('settings', this)">⚙️ Settings & Access</button>
@@ -381,6 +387,51 @@
 
           <div id="admin-deleted-messages-list" class="space-y-3 max-h-[650px] overflow-y-auto pr-1">
             <div class="text-center py-10 text-slate-500 text-sm">Click Refresh to load deleted messages vault...</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== SESSIONS & DEVICE LOGINS TAB (Instagram Style) ===== -->
+      <div id="tab-sessions" class="section-panel">
+        <div class="glass-card p-6 border-sky-500/40">
+          <div class="flex flex-wrap items-center justify-between gap-4 mb-6 pb-4 border-b border-white/10">
+            <div>
+              <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-sky-500/20 border border-sky-400/40 text-sky-300 text-[11px] font-bold uppercase tracking-wider mb-2">
+                <span>🛡️ Real-Time Device Security Monitor</span>
+              </div>
+              <h2 class="font-cinzel font-bold text-lg sm:text-xl text-sky-300 flex items-center gap-2">
+                <span>📱</span>
+                <span>Where You're Logged In</span>
+              </h2>
+              <p class="text-xs text-slate-400 mt-1 max-w-xl">
+                See all phones, tablets, and computers that logged into your Memory Vault. Track device models, OS, browsers, IP addresses, and exact timestamps.
+              </p>
+            </div>
+            <div class="flex flex-wrap items-center gap-2">
+              <button onclick="terminateAllOtherSessions()" class="admin-btn-danger px-3.5 py-2 text-xs font-bold flex items-center gap-1.5 shadow">
+                <span>🚨 Log Out All Other Devices</span>
+              </button>
+              <button onclick="clearSessionHistory()" class="px-3 py-2 text-xs font-bold rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-white/10">
+                🗑️ Clear History
+              </button>
+              <button onclick="loadAdminSessions()" class="admin-btn-green px-3.5 py-2 text-xs font-bold flex items-center gap-1">
+                <span>🔄 Refresh</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Filter Pills -->
+          <div class="flex flex-wrap gap-2 mb-5">
+            <button onclick="filterSessions('all', this)" id="sess-filter-all" class="session-filter-btn px-3 py-1.5 rounded-lg text-xs font-bold bg-sky-500/30 text-sky-200 border border-sky-400/50">All Sessions (<span id="count-all-sess">0</span>)</button>
+            <button onclick="filterSessions('active', this)" id="sess-filter-active" class="session-filter-btn px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-900 text-slate-400 border border-white/10 hover:text-emerald-300">🟢 Active Now (<span id="count-active-sess">0</span>)</button>
+            <button onclick="filterSessions('vanshika', this)" id="sess-filter-vanshika" class="session-filter-btn px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-900 text-slate-400 border border-white/10 hover:text-rose-300">👸 Vanshika (<span id="count-vanshika-sess">0</span>)</button>
+            <button onclick="filterSessions('rakesh', this)" id="sess-filter-rakesh" class="session-filter-btn px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-900 text-slate-400 border border-white/10 hover:text-amber-300">🤵 Rakesh (<span id="count-rakesh-sess">0</span>)</button>
+            <button onclick="filterSessions('failed', this)" id="sess-filter-failed" class="session-filter-btn px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-900 text-slate-400 border border-white/10 hover:text-red-300">⚠️ Security Alerts (<span id="count-failed-sess">0</span>)</button>
+          </div>
+
+          <!-- Sessions List Container -->
+          <div id="admin-sessions-list" class="space-y-3 max-h-[650px] overflow-y-auto pr-1">
+            <div class="text-center py-10 text-slate-500 text-sm">Click Refresh to load device login sessions...</div>
           </div>
         </div>
       </div>
@@ -580,6 +631,7 @@
       if (tab === 'reels') loadAdminReels();
       else if (tab === 'messages') loadAdminMessages();
       else if (tab === 'deleted') loadAdminDeletedMessages();
+      else if (tab === 'sessions') loadAdminSessions();
       else if (tab === 'wishes') loadAdminWishes();
       else if (tab === 'gallery') loadGalleryInfo();
     }
@@ -599,6 +651,7 @@
       await loadAdminStatus();
       await loadAdminReels();
       await loadAdminDeletedMessages();
+      await loadAdminSessions();
     }
 
     async function loadAdminStatus() {
@@ -613,6 +666,8 @@
           document.getElementById('stat-messages').textContent = s.totalMessages || 0;
           const statDel = document.getElementById('stat-deleted');
           if (statDel) statDel.textContent = s.totalDeletedMessages || 0;
+          const statSess = document.getElementById('stat-sessions');
+          if (statSess) statSess.textContent = (s.totalActiveSessions !== undefined ? s.totalActiveSessions : s.totalSessions) || 0;
           document.getElementById('stat-wishes').textContent = s.totalWishes || 0;
 
           const vu = s.onlineUsers && s.onlineUsers.vanshika;
@@ -1012,6 +1067,241 @@
       }).catch(() => {
         showToast('❌ Could not copy', true);
       });
+    }
+
+    // ====== SESSIONS & WHERE YOU'RE LOGGED IN ======
+    let allAdminSessions = [];
+    let currentSessionFilter = 'all';
+
+    async function loadAdminSessions() {
+      const container = document.getElementById('admin-sessions-list');
+      if (!container) return;
+      try {
+        const res = await fetch('/api/admin/sessions?secret=' + ADMIN_SECRET, {
+          headers: { 'x-admin-pin': 'Vanshika170926', 'x-admin-secret': ADMIN_SECRET }
+        });
+        const data = await res.json();
+        if (!data.success) {
+          container.innerHTML = `<div class="text-center py-8 text-red-400 text-sm">❌ ${data.error || 'Failed to load sessions'}</div>`;
+          return;
+        }
+
+        allAdminSessions = data.data || [];
+        updateSessionCounts();
+        renderAdminSessionsList();
+      } catch (e) {
+        container.innerHTML = `<div class="text-center py-8 text-red-400 text-sm">❌ Network error loading sessions</div>`;
+      }
+    }
+
+    function updateSessionCounts() {
+      const allCount = allAdminSessions.length;
+      const activeCount = allAdminSessions.filter(s => s.status === 'active' || s.isOnlineNow).length;
+      const vanshikaCount = allAdminSessions.filter(s => s.sender && s.sender.includes('Vanshika')).length;
+      const rakeshCount = allAdminSessions.filter(s => s.sender && s.sender.includes('Rakesh')).length;
+      const failedCount = allAdminSessions.filter(s => s.status === 'failed_attempt').length;
+
+      const cAll = document.getElementById('count-all-sess');
+      const cActive = document.getElementById('count-active-sess');
+      const cVan = document.getElementById('count-vanshika-sess');
+      const cRak = document.getElementById('count-rakesh-sess');
+      const cFail = document.getElementById('count-failed-sess');
+      const statSess = document.getElementById('stat-sessions');
+
+      if (cAll) cAll.textContent = allCount;
+      if (cActive) cActive.textContent = activeCount;
+      if (cVan) cVan.textContent = vanshikaCount;
+      if (cRak) cRak.textContent = rakeshCount;
+      if (cFail) cFail.textContent = failedCount;
+      if (statSess) statSess.textContent = activeCount;
+    }
+
+    function filterSessions(filterType, btnEl) {
+      currentSessionFilter = filterType;
+      document.querySelectorAll('.session-filter-btn').forEach(b => {
+        b.className = 'session-filter-btn px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-900 text-slate-400 border border-white/10 hover:text-white cursor-pointer';
+      });
+      if (btnEl) {
+        btnEl.className = 'session-filter-btn px-3 py-1.5 rounded-lg text-xs font-bold bg-sky-500/30 text-sky-200 border border-sky-400/50 cursor-pointer';
+      }
+      renderAdminSessionsList();
+    }
+
+    function renderAdminSessionsList() {
+      const container = document.getElementById('admin-sessions-list');
+      if (!container) return;
+
+      let filtered = [...allAdminSessions];
+      if (currentSessionFilter === 'active') {
+        filtered = filtered.filter(s => s.status === 'active' || s.isOnlineNow);
+      } else if (currentSessionFilter === 'vanshika') {
+        filtered = filtered.filter(s => s.sender && s.sender.includes('Vanshika'));
+      } else if (currentSessionFilter === 'rakesh') {
+        filtered = filtered.filter(s => s.sender && s.sender.includes('Rakesh'));
+      } else if (currentSessionFilter === 'failed') {
+        filtered = filtered.filter(s => s.status === 'failed_attempt');
+      }
+
+      if (filtered.length === 0) {
+        container.innerHTML = `<div class="text-center py-10 text-slate-500 text-sm">No device sessions found for this filter.</div>`;
+        return;
+      }
+
+      container.innerHTML = filtered.map(s => {
+        const isFailed = s.status === 'failed_attempt';
+        const isTerminated = s.status === 'terminated';
+        const isOnline = s.isOnlineNow;
+
+        // Device Icon
+        let devIcon = '📱';
+        if (s.deviceType === 'desktop') devIcon = '💻';
+        else if (s.deviceType === 'tablet') devIcon = '📟';
+
+        // Identity Badge
+        let userBadge = '';
+        if (s.sender && s.sender.includes('Vanshika')) {
+          userBadge = `<span class="px-2.5 py-0.5 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/40 text-[11px] font-bold">👸 Vanshika</span>`;
+        } else if (s.sender && s.sender.includes('Rakesh')) {
+          userBadge = `<span class="px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[11px] font-bold">🤵 Rakesh</span>`;
+        } else {
+          userBadge = `<span class="px-2.5 py-0.5 rounded-full bg-red-500/20 text-red-300 border border-red-500/40 text-[11px] font-bold">⚠️ Security Alert</span>`;
+        }
+
+        // Status Pill
+        let statusPill = '';
+        if (isFailed) {
+          statusPill = `<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-500/20 text-red-300 border border-red-500/40 text-[11px] font-black tracking-wide animate-pulse">❌ Failed Passcode Attempt</span>`;
+        } else if (isOnline) {
+          statusPill = `<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/50 text-[11px] font-bold"><span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span> 🟢 Active Now</span>`;
+        } else if (isTerminated) {
+          statusPill = `<span class="px-3 py-1 rounded-full bg-slate-800 text-slate-400 border border-white/5 text-[11px] font-semibold">⚪ Logged Out</span>`;
+        } else {
+          statusPill = `<span class="px-3 py-1 rounded-full bg-sky-950/60 text-sky-300 border border-sky-500/30 text-[11px] font-semibold">Active Session</span>`;
+        }
+
+        // Border styling
+        let borderClass = 'border-slate-800 bg-slate-900/60';
+        if (isFailed) borderClass = 'border-red-500/40 bg-red-950/20 shadow-[0_0_15px_rgba(239,68,68,0.2)]';
+        else if (isOnline) borderClass = 'border-emerald-500/40 bg-emerald-950/20 shadow-[0_0_15px_rgba(16,185,129,0.2)]';
+        else if (s.sender && s.sender.includes('Vanshika')) borderClass = 'border-rose-500/30 bg-rose-950/10';
+
+        return `
+          <div class="p-4 sm:p-5 rounded-2xl border ${borderClass} flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-all hover:bg-slate-900/90">
+            <!-- Left Info -->
+            <div class="flex items-start gap-3.5 min-w-0">
+              <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-sky-600/30 to-blue-500/20 border border-sky-400/30 flex items-center justify-center text-2xl flex-shrink-0 shadow">
+                ${devIcon}
+              </div>
+              <div class="min-w-0">
+                <div class="flex flex-wrap items-center gap-2 mb-1">
+                  <h4 class="font-bold text-sm sm:text-base text-white tracking-wide">${escHtml(s.deviceName)}</h4>
+                  ${userBadge}
+                </div>
+                <div class="text-xs text-slate-300 flex flex-wrap items-center gap-x-3 gap-y-1 mt-1 font-light">
+                  <span>📱 <strong class="text-sky-300 font-semibold">${escHtml(s.os)}</strong></span>
+                  <span>🌐 <strong class="text-amber-300 font-semibold">${escHtml(s.browser)}</strong></span>
+                  <span class="text-slate-400">Screen: ${escHtml(s.screen)}</span>
+                </div>
+                <div class="text-[11px] text-slate-400 flex flex-wrap items-center gap-x-3 gap-y-0.5 mt-1.5 font-mono">
+                  <span>IP: <span class="text-slate-200">${escHtml(s.ip)}</span></span>
+                  <span>•</span>
+                  <span>🕒 Login: <span class="text-slate-300 font-sans">${escHtml(s.loginTimeIST)}</span></span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right Actions -->
+            <div class="flex items-center gap-2.5 sm:self-center flex-shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-white/5">
+              ${statusPill}
+              ${!isTerminated && !isFailed ? `
+                <button onclick="terminateDeviceSession('${s.id}', '${escHtml(s.deviceName)}')" class="px-3 py-1.5 rounded-xl bg-red-500/15 hover:bg-red-500/30 text-red-300 hover:text-white border border-red-500/40 text-xs font-bold transition-all shadow cursor-pointer">
+                  🚫 Log Out
+                </button>
+              ` : ''}
+              <button onclick="deleteSessionLog('${s.id}')" title="Delete Log Entry" class="w-8 h-8 rounded-xl bg-slate-800 hover:bg-rose-900/40 text-slate-400 hover:text-rose-300 flex items-center justify-center text-xs transition-colors cursor-pointer">
+                🗑️
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function terminateDeviceSession(sessionId, deviceName) {
+      if (!confirm(`Are you sure you want to remotely LOG OUT "${deviceName}"?\n\nThis will immediately disconnect that device and lock it back at the passcode screen.`)) return;
+
+      try {
+        const res = await fetch('/api/admin/sessions/terminate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'x-admin-pin': 'Vanshika170926', 'x-admin-secret': ADMIN_SECRET },
+          body: JSON.stringify({ admin_pin: 'Vanshika170926', sessionId })
+        });
+        const data = await res.json();
+        if (data.success) {
+          showToast(`✅ "${deviceName}" logged out remotely!`);
+          await loadAdminSessions();
+        } else {
+          showToast(`❌ ${data.error || 'Failed to terminate session'}`, true);
+        }
+      } catch (e) {
+        showToast('❌ Network error', true);
+      }
+    }
+
+    async function terminateAllOtherSessions() {
+      if (!confirm('🚨 Log out of ALL other devices?\n\nThis will immediately kick out any phone or PC connected to your Memory Vault and require entering the passcode again.')) return;
+
+      try {
+        const res = await fetch('/api/admin/sessions/terminate-all', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'x-admin-pin': 'Vanshika170926', 'x-admin-secret': ADMIN_SECRET },
+          body: JSON.stringify({ admin_pin: 'Vanshika170926' })
+        });
+        const data = await res.json();
+        if (data.success) {
+          showToast(`✅ ${data.message || 'All other devices logged out!'}`);
+          await loadAdminSessions();
+        } else {
+          showToast(`❌ ${data.error || 'Failed to terminate all sessions'}`, true);
+        }
+      } catch (e) {
+        showToast('❌ Network error', true);
+      }
+    }
+
+    async function deleteSessionLog(sessionId) {
+      try {
+        const res = await fetch('/api/admin/sessions/' + sessionId, {
+          method: 'DELETE',
+          headers: { 'x-admin-pin': 'Vanshika170926', 'x-admin-secret': ADMIN_SECRET }
+        });
+        const data = await res.json();
+        if (data.success) {
+          showToast('🗑️ Session log entry removed');
+          allAdminSessions = allAdminSessions.filter(s => s.id !== sessionId);
+          updateSessionCounts();
+          renderAdminSessionsList();
+        }
+      } catch (e) {}
+    }
+
+    async function clearSessionHistory() {
+      if (!confirm('Clear all session history records from server?\n\nActive tracking will continue for future logins.')) return;
+
+      try {
+        const res = await fetch('/api/admin/sessions/clear', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'x-admin-pin': 'Vanshika170926', 'x-admin-secret': ADMIN_SECRET },
+          body: JSON.stringify({ admin_pin: 'Vanshika170926' })
+        });
+        const data = await res.json();
+        if (data.success) {
+          showToast('✅ Session history cleared');
+          allAdminSessions = [];
+          updateSessionCounts();
+          renderAdminSessionsList();
+        }
+      } catch (e) {}
     }
 
     // ====== UTIL ======

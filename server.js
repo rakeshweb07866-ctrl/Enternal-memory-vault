@@ -45,6 +45,109 @@ try {
 const MESSAGES_FILE = path.join(DATA_DIR, 'messages.json');
 const WISHES_FILE = path.join(DATA_DIR, 'wishes.json');
 const DELETED_MESSAGES_FILE = path.join(DATA_DIR, 'deleted_messages.json');
+const SESSIONS_FILE = path.join(DATA_DIR, 'login_sessions.json');
+
+// Device & User-Agent Parser for Instagram-Style Device Tracker
+function parseDeviceDetails(uaString, clientDevice = {}) {
+  const ua = uaString || '';
+  let deviceType = 'desktop';
+  let deviceName = 'Windows PC';
+  let os = 'Windows';
+  let browser = 'Chrome';
+
+  // 1. Detect OS
+  if (/Windows NT 10.0/i.test(ua)) os = 'Windows 10/11';
+  else if (/Windows NT 6.3/i.test(ua)) os = 'Windows 8.1';
+  else if (/Windows NT 6.1/i.test(ua)) os = 'Windows 7';
+  else if (/Windows/i.test(ua)) os = 'Windows';
+  else if (/Android/i.test(ua)) {
+    const v = ua.match(/Android\s+([\d.]+)/i);
+    os = v ? `Android ${v[1]}` : 'Android';
+    deviceType = 'mobile';
+  } else if (/iPhone/i.test(ua)) {
+    const v = ua.match(/OS\s+([\d_]+)/i);
+    os = v ? `iOS ${v[1].replace(/_/g, '.')}` : 'iOS';
+    deviceType = 'mobile';
+  } else if (/iPad/i.test(ua)) {
+    const v = ua.match(/OS\s+([\d_]+)/i);
+    os = v ? `iPadOS ${v[1].replace(/_/g, '.')}` : 'iPadOS';
+    deviceType = 'tablet';
+  } else if (/Macintosh|Mac OS X/i.test(ua)) {
+    os = 'macOS';
+  } else if (/Linux/i.test(ua)) {
+    os = 'Linux';
+  }
+
+  // 2. Detect Browser
+  if (/Edg\/([\d.]+)/i.test(ua)) {
+    browser = `Edge ${ua.match(/Edg\/([\d.]+)/i)[1].split('.')[0]}`;
+  } else if (/SamsungBrowser\/([\d.]+)/i.test(ua)) {
+    browser = `Samsung Internet ${ua.match(/SamsungBrowser\/([\d.]+)/i)[1].split('.')[0]}`;
+  } else if (/OPR\/([\d.]+)/i.test(ua)) {
+    browser = 'Opera';
+  } else if (/Chrome\/([\d.]+)/i.test(ua)) {
+    browser = `Chrome ${ua.match(/Chrome\/([\d.]+)/i)[1].split('.')[0]}`;
+  } else if (/Safari\/([\d.]+)/i.test(ua) && !/Chrome/i.test(ua)) {
+    browser = 'Safari';
+  } else if (/Firefox\/([\d.]+)/i.test(ua)) {
+    browser = `Firefox ${ua.match(/Firefox\/([\d.]+)/i)[1].split('.')[0]}`;
+  }
+
+  // 3. Detect Device Model / Friendly Name
+  if (/iPhone/i.test(ua)) {
+    deviceType = 'mobile';
+    deviceName = 'Apple iPhone';
+  } else if (/iPad/i.test(ua)) {
+    deviceType = 'tablet';
+    deviceName = 'Apple iPad';
+  } else if (/Android/i.test(ua)) {
+    deviceType = 'mobile';
+    const modelMatch = ua.match(/;\s*([^;]+?)\s*(?:Build\/|\))/i);
+    if (modelMatch && modelMatch[1]) {
+      let rawModel = modelMatch[1].trim();
+      rawModel = rawModel.replace(/^Linux;\s*/i, '').replace(/^wv;\s*/i, '');
+      if (rawModel.length > 2 && rawModel.length < 35 && !rawModel.includes('Android')) {
+        deviceName = rawModel;
+      } else {
+        deviceName = 'Android Phone';
+      }
+    } else {
+      deviceName = 'Android Phone';
+    }
+  } else if (/Windows/i.test(ua)) {
+    deviceType = 'desktop';
+    deviceName = 'Windows PC / Laptop';
+  } else if (/Macintosh/i.test(ua)) {
+    deviceType = 'desktop';
+    deviceName = 'MacBook / Mac';
+  }
+
+  return { deviceType, deviceName, os, browser };
+}
+
+let inMemorySessions = [];
+function getLoginSessions() {
+  if (inMemorySessions.length > 0) return inMemorySessions;
+  try {
+    if (fs.existsSync(SESSIONS_FILE)) {
+      const data = fs.readFileSync(SESSIONS_FILE, 'utf8');
+      inMemorySessions = JSON.parse(data);
+    }
+  } catch (e) {
+    inMemorySessions = [];
+  }
+  return inMemorySessions;
+}
+
+function saveLoginSessions() {
+  try {
+    if (inMemorySessions.length > 150) {
+      inMemorySessions = inMemorySessions.slice(0, 150);
+    }
+    fs.writeFileSync(SESSIONS_FILE, JSON.stringify(inMemorySessions, null, 2));
+  } catch (e) {}
+}
+
 
 // Strict Private Security Passcodes
 const VALID_PINS = {
@@ -344,11 +447,51 @@ if (io) {
 
 // REST API Endpoints (Vercel Production & Fallback)
 app.post('/api/auth/login', (req, res) => {
-  const { sender, pin } = req.body;
-  if (isValidPin(sender, pin)) {
+  const { sender, pin, device, failed } = req.body;
+  const ua = (device && device.userAgent) || req.headers['user-agent'] || '';
+  const parsed = parseDeviceDetails(ua, device);
+  const rawIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress || '127.0.0.1';
+  const cleanIp = String(rawIp).split(',')[0].trim().replace('::ffff:', '');
+  const now = new Date();
+  const timeIST = getISTTimeString();
+  const dateIST = getISTDateString();
+  const timestampStr = `${dateIST}, ${timeIST}`;
+
+  const isOk = !failed && isValidPin(sender, pin);
+
+  const sessionId = 'sess_' + Date.now() + '_' + Math.random().toString(36).substring(2, 7);
+  const sessionRecord = {
+    id: sessionId,
+    sender: sender || 'Unknown',
+    pinMasked: pin ? (pin.length > 2 ? pin.substring(0, 1) + '***' + pin.slice(-1) : '***') : 'None',
+    status: isOk ? 'active' : 'failed_attempt',
+    success: isOk,
+    deviceType: parsed.deviceType,
+    deviceName: parsed.deviceName,
+    os: parsed.os,
+    browser: parsed.browser,
+    screen: (device && device.screen) || 'Unknown',
+    ip: cleanIp,
+    loginTime: now.toISOString(),
+    loginTimeIST: timestampStr,
+    lastActiveIST: timestampStr,
+    lastActiveMs: Date.now()
+  };
+
+  const sessions = getLoginSessions();
+  sessions.unshift(sessionRecord);
+  saveLoginSessions();
+
+  if (isOk) {
     updateHttpPresence(sender);
-    return res.json({ success: true, message: 'Authenticated successfully!' });
+    if (typeof io !== 'undefined') {
+      io.emit('session_activity', { count: sessions.filter(s => s.status === 'active').length, newSession: sessionRecord });
+    }
+    return res.json({ success: true, sessionId: sessionId, message: 'Authenticated successfully!' });
   } else {
+    if (typeof io !== 'undefined') {
+      io.emit('session_alert', { alert: '⚠️ Security Alert: Failed Passcode Attempt!', session: sessionRecord });
+    }
     return res.status(401).json({ success: false, error: 'Access Denied: Invalid Passcode!' });
   }
 });
@@ -754,6 +897,93 @@ app.post('/api/admin/deleted-messages/clear', (req, res) => {
   return res.json({ success: true, message: 'Deleted messages vault cleared!' });
 });
 
+// GET: List all login sessions and devices
+app.get('/api/admin/sessions', (req, res) => {
+  const pin = req.headers['x-admin-pin'] || req.query.admin_pin;
+  const secret = req.headers['x-admin-secret'] || req.query.secret;
+  if (pin !== 'Vanshika170926' && secret !== ADMIN_SECRET) {
+    return res.status(401).json({ success: false, error: 'Admin access denied' });
+  }
+  const sessions = getLoginSessions();
+  const nowMs = Date.now();
+  const enriched = sessions.map(s => {
+    const isOnlineNow = s.status === 'active' && (nowMs - (s.lastActiveMs || 0) < 3 * 60 * 1000);
+    return {
+      ...s,
+      isOnlineNow: isOnlineNow
+    };
+  });
+  return res.json({ success: true, count: enriched.length, data: enriched });
+});
+
+// POST: Terminate a specific device session
+app.post('/api/admin/sessions/terminate', (req, res) => {
+  if (!isAdminAuth(req)) {
+    return res.status(401).json({ success: false, error: 'Admin access denied' });
+  }
+  const { sessionId } = req.body;
+  const sessions = getLoginSessions();
+  const target = sessions.find(s => s.id === sessionId);
+  if (target) {
+    target.status = 'terminated';
+    target.terminatedAt = new Date().toISOString();
+    target.terminatedAtIST = `${getISTDateString()}, ${getISTTimeString()}`;
+    saveLoginSessions();
+
+    if (typeof io !== 'undefined') {
+      io.emit('force_logout', { sessionId: sessionId, sender: target.sender, reason: `Session terminated remotely by Rakesh for ${target.deviceName}.` });
+    }
+    return res.json({ success: true, message: `Session for ${target.deviceName} (${target.sender}) terminated successfully!` });
+  } else {
+    return res.status(404).json({ success: false, error: 'Session not found' });
+  }
+});
+
+// POST: Terminate all active sessions (Logout all other devices)
+app.post('/api/admin/sessions/terminate-all', (req, res) => {
+  if (!isAdminAuth(req)) {
+    return res.status(401).json({ success: false, error: 'Admin access denied' });
+  }
+  const sessions = getLoginSessions();
+  let count = 0;
+  sessions.forEach(s => {
+    if (s.status === 'active') {
+      s.status = 'terminated';
+      s.terminatedAt = new Date().toISOString();
+      s.terminatedAtIST = `${getISTDateString()}, ${getISTTimeString()}`;
+      count++;
+    }
+  });
+  saveLoginSessions();
+  if (typeof io !== 'undefined') {
+    io.emit('force_logout', { reason: 'All active sessions were terminated by Admin.' });
+  }
+  return res.json({ success: true, count, message: `All ${count} active sessions terminated successfully!` });
+});
+
+// DELETE: Delete a session log entry
+app.delete('/api/admin/sessions/:id', (req, res) => {
+  const pin = req.headers['x-admin-pin'] || req.query.admin_pin;
+  const secret = req.headers['x-admin-secret'] || req.query.secret;
+  if (pin !== 'Vanshika170926' && secret !== ADMIN_SECRET) {
+    return res.status(401).json({ success: false, error: 'Admin access denied' });
+  }
+  const { id } = req.params;
+  inMemorySessions = getLoginSessions().filter(s => s.id !== id);
+  saveLoginSessions();
+  return res.json({ success: true, message: 'Session log removed' });
+});
+
+// POST: Clear all session logs
+app.post('/api/admin/sessions/clear', (req, res) => {
+  if (!isAdminAuth(req)) {
+    return res.status(401).json({ success: false, error: 'Admin access denied' });
+  }
+  inMemorySessions = [];
+  try { fs.writeFileSync(SESSIONS_FILE, JSON.stringify([], null, 2)); } catch (e) {}
+  return res.json({ success: true, message: 'All session logs cleared' });
+});
+
 // GET: Full admin dashboard status
 app.get('/api/admin/status', (req, res) => {
   const pin = req.headers['x-admin-pin'] || req.query.admin_pin;
@@ -768,6 +998,9 @@ app.get('/api/admin/status', (req, res) => {
     if (fs.existsSync(reelDir)) {
       reelCount = fs.readdirSync(reelDir).filter(f => f.endsWith('.mp4')).length;
     }
+    const allSessions = getLoginSessions();
+    const activeSessionsCount = allSessions.filter(s => s.status === 'active').length;
+
     return res.json({
       success: true,
       stats: {
@@ -775,6 +1008,8 @@ app.get('/api/admin/status', (req, res) => {
         totalDeletedMessages: getDeletedMessages().length,
         totalWishes: getWishes().length,
         totalReelsOnServer: reelCount,
+        totalActiveSessions: activeSessionsCount,
+        totalSessions: allSessions.length,
         onlineUsers,
         serverTime: new Date().toISOString(),
         serverTimeIST: getISTTimeString()

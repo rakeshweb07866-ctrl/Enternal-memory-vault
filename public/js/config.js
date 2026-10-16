@@ -133,6 +133,13 @@ async function confirmNameLogin() {
     authenticated = true;
   }
 
+  const clientDevice = {
+    userAgent: navigator.userAgent || '',
+    platform: navigator.platform || '',
+    screen: `${window.screen.width || 0}x${window.screen.height || 0}`,
+    language: navigator.language || ''
+  };
+
   if (!authenticated) {
     if (errEl) {
       errEl.innerText = '❌ Incorrect Security Passcode! Please try again.';
@@ -142,6 +149,14 @@ async function confirmNameLogin() {
       pinInput.value = '';
       pinInput.focus();
     }
+    // Log security alert to backend
+    try {
+      fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sender: name, pin: pin, device: clientDevice, failed: true })
+      }).catch(() => {});
+    } catch (e) {}
     return;
   }
 
@@ -165,7 +180,11 @@ async function confirmNameLogin() {
     fetch('/api/auth/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ sender: name, pin: pin })
+      body: JSON.stringify({ sender: name, pin: pin, device: clientDevice, failed: false })
+    }).then(r => r.json()).then(data => {
+      if (data && data.sessionId) {
+        sessionStorage.setItem('chat_session_id', data.sessionId);
+      }
     }).catch(() => {});
   } catch (e) {}
 

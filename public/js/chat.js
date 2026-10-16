@@ -1449,6 +1449,19 @@ function initSocketConnection() {
       clearChatUI();
     });
 
+    socket.on('force_logout', (data) => {
+      sessionStorage.clear();
+      localStorage.removeItem('chat_user_pin');
+      currentChatSender = null;
+      currentChatPin = null;
+      if (typeof openNameLoginModal === 'function') openNameLoginModal();
+      const errEl = document.getElementById('login-error-msg');
+      if (errEl) {
+        errEl.innerText = (data && data.reason) || '🔒 This device was remotely logged out by Admin.';
+        errEl.classList.remove('hidden');
+      }
+    });
+
     socket.on('user_typing', (data) => {
       const bar = document.getElementById('typing-indicator-bar');
       if (bar) {
