@@ -60,10 +60,14 @@ function openNameLoginModal() {
   if (pinInput) {
     pinInput.value = '';
     pinInput.type = 'password';
+    setTimeout(() => pinInput.focus(), 100);
   }
   if (eyeIcon) eyeIcon.innerText = '👁️';
   if (errEl) errEl.classList.add('hidden');
-  if (modal) modal.classList.remove('hidden');
+  if (modal) {
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+  }
 }
 
 function togglePasscodeVisibility() {
@@ -100,77 +104,83 @@ async function confirmNameLogin() {
   const pinInput = document.getElementById('login-pin-input');
   const errEl = document.getElementById('login-error-msg');
 
-  const name = nameInput ? nameInput.value.trim() : 'Vanshika 👸';
+  let name = nameInput ? nameInput.value.trim() : 'Vanshika 👸';
   const pin = pinInput ? pinInput.value.trim() : '';
 
   if (!pin) {
     if (errEl) {
-      errEl.innerText = '⚠️ Security PIN required!';
+      errEl.innerText = '⚠️ Please enter your secret passcode!';
       errEl.classList.remove('hidden');
+    }
+    if (pinInput) pinInput.focus();
+    return;
+  }
+
+  // 1. Instant 0ms Passcode Verification with Auto-Identity Detection
+  let authenticated = false;
+  if (pin === '1212') {
+    name = 'Rakesh 🤵';
+    authenticated = true;
+  } else if (pin === '1709') {
+    name = 'Vanshika 👸';
+    authenticated = true;
+  } else if (pin === 'Vanshika170926') {
+    name = 'Rakesh 🤵';
+    authenticated = true;
+  } else if (name.includes('Vanshika') && pin === '1709') {
+    authenticated = true;
+  } else if (name.includes('Rakesh') && (pin === '1212' || pin === 'Vanshika170926')) {
+    authenticated = true;
+  }
+
+  if (!authenticated) {
+    if (errEl) {
+      errEl.innerText = '❌ Incorrect Security Passcode! Please try again.';
+      errEl.classList.remove('hidden');
+    }
+    if (pinInput) {
+      pinInput.value = '';
+      pinInput.focus();
     }
     return;
   }
 
+  // 2. Instant 0ms UI Unlock - Modal disappears immediately
+  currentChatSender = name;
+  currentChatPin = pin;
+  sessionStorage.setItem('chat_user_name', name);
+  sessionStorage.setItem('chat_user_pin', pin);
+  localStorage.setItem('chat_user_name', name);
+
+  const modal = document.getElementById('name-login-modal');
+  if (modal) {
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+  }
+  if (errEl) errEl.classList.add('hidden');
+  updateUserBadge();
+
+  // 3. Background non-blocking network sync (zero lag)
   try {
-    const res = await fetch('/api/auth/login', {
+    fetch('/api/auth/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ sender: name, pin: pin })
-    });
-    const data = await res.json();
-    if (data.success) {
-      currentChatSender = name;
-      currentChatPin = pin;
-      sessionStorage.setItem('chat_user_name', name);
-      sessionStorage.setItem('chat_user_pin', pin);
-      localStorage.setItem('chat_user_name', name);
-      localStorage.setItem('chat_user_pin', pin);
+    }).catch(() => {});
+  } catch (e) {}
 
-      document.getElementById('name-login-modal').classList.add('hidden');
-      if (errEl) errEl.classList.add('hidden');
-      updateUserBadge();
+  if (socket && socket.connected) {
+    socket.emit('user_join', { sender: currentChatSender, pin: currentChatPin });
+  } else if (typeof initSocketConnection === 'function') {
+    initSocketConnection();
+  }
+  if (typeof fetchLiveChatMessages === 'function') {
+    fetchLiveChatMessages();
+  }
 
-      if (isFirebaseActive && typeof initFirebaseCloud === 'function') {
-        initFirebaseCloud();
-      }
-      if (socket && socket.connected) {
-        socket.emit('user_join', { sender: currentChatSender, pin: currentChatPin });
-      } else if (typeof initSocketConnection === 'function') {
-        initSocketConnection();
-      }
-      if (typeof fetchLiveChatMessages === 'function') {
-        fetchLiveChatMessages();
-      }
-
-      if (typeof isAnniversaryActive === 'function' && isAnniversaryActive()) {
-        setTimeout(playGrandCinematicAnniversaryAnimation, 400);
-      }
-    } else {
-      if (errEl) {
-        errEl.innerText = '❌ Incorrect Security Passcode! Please try again.';
-        errEl.classList.remove('hidden');
-      }
-    }
-  } catch (e) {
-    currentChatSender = name;
-    currentChatPin = pin;
-    sessionStorage.setItem('chat_user_name', name);
-    sessionStorage.setItem('chat_user_pin', pin);
-    localStorage.setItem('chat_user_name', name);
-    localStorage.setItem('chat_user_pin', pin);
-    document.getElementById('name-login-modal').classList.add('hidden');
-    updateUserBadge();
-    if (socket && socket.connected) {
-      socket.emit('user_join', { sender: currentChatSender, pin: currentChatPin });
-    } else if (typeof initSocketConnection === 'function') {
-      initSocketConnection();
-    }
-    if (typeof fetchLiveChatMessages === 'function') {
-      fetchLiveChatMessages();
-    }
-    if (typeof isAnniversaryActive === 'function' && isAnniversaryActive()) {
-      setTimeout(playGrandCinematicAnniversaryAnimation, 400);
-    }
+  // 4. If Anniversary is active, trigger grand cinematic celebration
+  if (typeof isAnniversaryActive === 'function' && isAnniversaryActive()) {
+    setTimeout(playGrandCinematicAnniversaryAnimation, 350);
   }
 }
 

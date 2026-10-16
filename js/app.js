@@ -31,27 +31,14 @@ document.addEventListener('DOMContentLoaded', () => {
   startSmartPolling();
   fetchLiveChatMessages();
 
-  // 5. User Login / Session Gate & Anniversary Launch
-  const localName = localStorage.getItem('chat_user_name');
-  const localPin = localStorage.getItem('chat_user_pin');
-  if (localName && localPin && (!sessionStorage.getItem('chat_user_name') || !sessionStorage.getItem('chat_user_pin'))) {
-    sessionStorage.setItem('chat_user_name', localName);
-    sessionStorage.setItem('chat_user_pin', localPin);
-    currentChatSender = localName;
-    currentChatPin = localPin;
-  }
+  // 5. Strict User Security Login Gate (Enforced on Every Visit)
+  localStorage.removeItem('chat_user_pin');
+  sessionStorage.removeItem('chat_user_pin');
+  currentChatSender = null;
+  currentChatPin = null;
 
-  const isUserLoggedIn = sessionStorage.getItem('chat_user_name') && sessionStorage.getItem('chat_user_pin');
-  if (isUserLoggedIn) {
-    updateUserBadge();
-  }
+  openNameLoginModal();
 
-  if (typeof isAnniversaryActive === 'function' && isAnniversaryActive()) {
-    // Show the grand romantic celebration whenever the website is opened on 17th Oct
-    setTimeout(playGrandCinematicAnniversaryAnimation, 800);
-  } else if (!isUserLoggedIn) {
-    setTimeout(openNameLoginModal, 800);
-  }
 
   // 6. Chat Input Keypress Listeners
   const chatInput = document.getElementById('live-chat-input');

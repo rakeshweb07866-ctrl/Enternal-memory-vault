@@ -49,8 +49,8 @@ const DELETED_MESSAGES_FILE = path.join(DATA_DIR, 'deleted_messages.json');
 // Strict Private Security Passcodes
 const VALID_PINS = {
   'vanshika': ['1709'],
-  'rakesh': ['1212'],
-  'soulmate': ['1212']
+  'rakesh': ['1212', 'Vanshika170926'],
+  'soulmate': ['1212', 'Vanshika170926']
 };
 
 function isValidPin(sender, pin) {
