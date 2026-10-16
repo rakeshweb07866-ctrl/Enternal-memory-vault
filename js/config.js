@@ -116,29 +116,39 @@ async function confirmNameLogin() {
     return;
   }
 
-  // 1. Instant 0ms Passcode Verification with Auto-Identity Detection
-  let authenticated = false;
-  if (pin === '1212') {
-    name = 'Rakesh 🤵';
-    authenticated = true;
-  } else if (pin === '1709') {
-    name = 'Vanshika 👸';
-    authenticated = true;
-  } else if (pin === 'Vanshika170926') {
-    name = 'Rakesh 🤵';
-    authenticated = true;
-  } else if (name.includes('Vanshika') && pin === '1709') {
-    authenticated = true;
-  } else if (name.includes('Rakesh') && (pin === '1212' || pin === 'Vanshika170926')) {
-    authenticated = true;
-  }
-
   const clientDevice = {
     userAgent: navigator.userAgent || '',
     platform: navigator.platform || '',
     screen: `${window.screen.width || 0}x${window.screen.height || 0}`,
     language: navigator.language || ''
   };
+
+  // 1. Dynamic Server Passcode Verification with Auto-Identity Detection
+  let authenticated = false;
+  let authSessionId = null;
+
+  try {
+    const res = await fetch('/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ sender: name, pin: pin, device: clientDevice, failed: false })
+    });
+    const data = await res.json();
+    if (res.ok && data && data.success) {
+      authenticated = true;
+      if (data.sender) name = data.sender;
+      if (data.sessionId) authSessionId = data.sessionId;
+    }
+  } catch (err) {
+    // Offline fallback if server is temporarily unreachable
+    if (pin === '1212' || pin === 'Vanshika170926') {
+      name = 'Rakesh 🤵';
+      authenticated = true;
+    } else if (pin === '1709') {
+      name = 'Vanshika 👸';
+      authenticated = true;
+    }
+  }
 
   if (!authenticated) {
     if (errEl) {
@@ -149,23 +159,18 @@ async function confirmNameLogin() {
       pinInput.value = '';
       pinInput.focus();
     }
-    // Log security alert to backend
-    try {
-      fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ sender: name, pin: pin, device: clientDevice, failed: true })
-      }).catch(() => {});
-    } catch (e) {}
     return;
   }
 
-  // 2. Instant 0ms UI Unlock - Modal disappears immediately
+  // 2. Instant UI Unlock - Modal disappears immediately
   currentChatSender = name;
   currentChatPin = pin;
   sessionStorage.setItem('chat_user_name', name);
   sessionStorage.setItem('chat_user_pin', pin);
   localStorage.setItem('chat_user_name', name);
+  if (authSessionId) {
+    sessionStorage.setItem('chat_session_id', authSessionId);
+  }
 
   const modal = document.getElementById('name-login-modal');
   if (modal) {
@@ -174,19 +179,6 @@ async function confirmNameLogin() {
   }
   if (errEl) errEl.classList.add('hidden');
   updateUserBadge();
-
-  // 3. Background non-blocking network sync (zero lag)
-  try {
-    fetch('/api/auth/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ sender: name, pin: pin, device: clientDevice, failed: false })
-    }).then(r => r.json()).then(data => {
-      if (data && data.sessionId) {
-        sessionStorage.setItem('chat_session_id', data.sessionId);
-      }
-    }).catch(() => {});
-  } catch (e) {}
 
   if (socket && socket.connected) {
     socket.emit('user_join', { sender: currentChatSender, pin: currentChatPin });

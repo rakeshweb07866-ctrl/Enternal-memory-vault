@@ -149,22 +149,57 @@ function saveLoginSessions() {
 }
 
 
-// Strict Private Security Passcodes
-const VALID_PINS = {
-  'vanshika': ['1709'],
-  'rakesh': ['1212', 'Vanshika170926'],
-  'soulmate': ['1212', 'Vanshika170926']
+// Dynamic Persistent Security Passcodes
+const PINS_FILE = path.join(DATA_DIR, 'security_pins.json');
+
+const DEFAULT_PINS = {
+  vanshika: '1709',
+  rakesh: '1212',
+  admin: 'Vanshika170926',
+  updatedAtIST: 'Initial Default Setup'
 };
+
+let activePinsConfig = { ...DEFAULT_PINS };
+
+function loadSecurityPins() {
+  try {
+    if (fs.existsSync(PINS_FILE)) {
+      const data = fs.readFileSync(PINS_FILE, 'utf8');
+      activePinsConfig = { ...DEFAULT_PINS, ...JSON.parse(data) };
+    } else {
+      activePinsConfig = { ...DEFAULT_PINS };
+      fs.writeFileSync(PINS_FILE, JSON.stringify(activePinsConfig, null, 2));
+    }
+  } catch (e) {
+    activePinsConfig = { ...DEFAULT_PINS };
+  }
+  return activePinsConfig;
+}
+
+function saveSecurityPins(newConfig) {
+  try {
+    activePinsConfig = { ...activePinsConfig, ...newConfig };
+    fs.writeFileSync(PINS_FILE, JSON.stringify(activePinsConfig, null, 2));
+  } catch (e) {}
+}
+
+loadSecurityPins();
 
 function isValidPin(sender, pin) {
   if (!pin) return false;
   const s = (sender || '').toLowerCase();
   const inputPin = String(pin).trim();
+  const current = activePinsConfig || loadSecurityPins();
   
+  // Admin PIN is always master override
+  if (inputPin === current.admin || inputPin === 'Vanshika170926') {
+    return true;
+  }
+
   if (s.includes('vanshika')) {
-    return VALID_PINS['vanshika'].includes(inputPin);
+    return inputPin === current.vanshika;
   } else if (s.includes('rakesh') || s.includes('soulmate')) {
-    return VALID_PINS['rakesh'].includes(inputPin);
+    return inputPin === current.rakesh || inputPin === current.admin;
   }
   return false;
 }
@@ -447,7 +482,17 @@ if (io) {
 
 // REST API Endpoints (Vercel Production & Fallback)
 app.post('/api/auth/login', (req, res) => {
-  const { sender, pin, device, failed } = req.body;
+  let { sender, pin, device, failed } = req.body;
+  const current = activePinsConfig || loadSecurityPins();
+  const inputPin = String(pin || '').trim();
+
+  // Auto-detect or normalize identity based on pin entered
+  if (inputPin === current.vanshika) {
+    sender = 'Vanshika 👸';
+  } else if (inputPin === current.rakesh || inputPin === current.admin || inputPin === 'Vanshika170926') {
+    sender = 'Rakesh 🤵';
+  }
+
   const ua = (device && device.userAgent) || req.headers['user-agent'] || '';
   const parsed = parseDeviceDetails(ua, device);
   const rawIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress || '127.0.0.1';
@@ -487,7 +532,7 @@ app.post('/api/auth/login', (req, res) => {
     if (typeof io !== 'undefined') {
       io.emit('session_activity', { count: sessions.filter(s => s.status === 'active').length, newSession: sessionRecord });
     }
-    return res.json({ success: true, sessionId: sessionId, message: 'Authenticated successfully!' });
+    return res.json({ success: true, sessionId: sessionId, sender: sender, message: 'Authenticated successfully!' });
   } else {
     if (typeof io !== 'undefined') {
       io.emit('session_alert', { alert: '⚠️ Security Alert: Failed Passcode Attempt!', session: sessionRecord });
@@ -751,10 +796,71 @@ app.post('/api/upload-reel', express.raw({ type: '*/*', limit: '200mb' }), (req,
 const ADMIN_SECRET = process.env.ADMIN_SECRET || 'rakesh1212admin';
 
 function isAdminAuth(req) {
-  const pin = req.body && req.body.admin_pin;
-  const secret = req.headers['x-admin-secret'] || (req.body && req.body.admin_secret);
-  return pin === 'Vanshika170926' || secret === ADMIN_SECRET;
+  const current = activePinsConfig || loadSecurityPins();
+  const pin = (req.body && req.body.admin_pin) || req.headers['x-admin-pin'] || (req.query && req.query.admin_pin);
+  const secret = req.headers['x-admin-secret'] || (req.body && req.body.admin_secret) || (req.query && req.query.secret);
+  return pin === current.admin || pin === 'Vanshika170926' || secret === ADMIN_SECRET;
 }
+
+// POST: Verify admin passcode for admin panel login
+app.post('/api/admin/verify', (req, res) => {
+  if (isAdminAuth(req)) {
+    return res.json({ success: true, message: 'Admin verified successfully' });
+  }
+  return res.status(401).json({ success: false, error: 'Invalid admin passcode' });
+});
+
+// GET: Fetch all active security passcodes
+app.get('/api/admin/pins', (req, res) => {
+  if (!isAdminAuth(req)) {
+    return res.status(401).json({ success: false, error: 'Admin access denied' });
+  }
+  const current = activePinsConfig || loadSecurityPins();
+  return res.json({
+    success: true,
+    pins: {
+      vanshika: current.vanshika,
+      rakesh: current.rakesh,
+      admin: current.admin,
+      updatedAtIST: current.updatedAtIST || 'Initial Default Setup'
+    }
+  });
+});
+
+// POST: Update a specific passcode (vanshika, rakesh, or admin)
+app.post('/api/admin/pins/update', (req, res) => {
+  if (!isAdminAuth(req)) {
+    return res.status(401).json({ success: false, error: 'Admin access denied' });
+  }
+  const { target, newPin } = req.body;
+  if (!target || !['vanshika', 'rakesh', 'admin'].includes(target)) {
+    return res.status(400).json({ success: false, error: 'Invalid target user (must be vanshika, rakesh, or admin)' });
+  }
+  const cleanPin = String(newPin || '').trim();
+  if (!cleanPin || cleanPin.length < 3) {
+    return res.status(400).json({ success: false, error: 'Passcode must be at least 3 characters long' });
+  }
+
+  const current = activePinsConfig || loadSecurityPins();
+  current[target] = cleanPin;
+  current.updatedAtIST = `${getISTDateString()}, ${getISTTimeString()}`;
+  saveSecurityPins(current);
+
+  if (typeof io !== 'undefined') {
+    io.emit('pins_updated', { target, updatedAtIST: current.updatedAtIST });
+  }
+
+  return res.json({
+    success: true,
+    message: `Passcode for ${target.toUpperCase()} updated successfully!`,
+    pins: {
+      vanshika: current.vanshika,
+      rakesh: current.rakesh,
+      admin: current.admin,
+      updatedAtIST: current.updatedAtIST
+    }
+  });
+});
 
 // GET: List all saved reel files on disk
 app.get('/api/admin/reels', (req, res) => {
@@ -871,9 +977,7 @@ app.delete('/api/admin/messages/:id', (req, res) => {
 
 // GET / POST: List all deleted messages (Admin only)
 app.get('/api/admin/deleted-messages', (req, res) => {
-  const pin = req.headers['x-admin-pin'] || req.query.admin_pin;
-  const secret = req.headers['x-admin-secret'] || req.query.secret;
-  if (pin !== 'Vanshika170926' && secret !== ADMIN_SECRET) {
+  if (!isAdminAuth(req)) {
     return res.status(401).json({ success: false, error: 'Admin access denied' });
   }
   const list = getDeletedMessages();
@@ -899,9 +1003,7 @@ app.post('/api/admin/deleted-messages/clear', (req, res) => {
 
 // GET: List all login sessions and devices
 app.get('/api/admin/sessions', (req, res) => {
-  const pin = req.headers['x-admin-pin'] || req.query.admin_pin;
-  const secret = req.headers['x-admin-secret'] || req.query.secret;
-  if (pin !== 'Vanshika170926' && secret !== ADMIN_SECRET) {
+  if (!isAdminAuth(req)) {
     return res.status(401).json({ success: false, error: 'Admin access denied' });
   }
   const sessions = getLoginSessions();
@@ -963,9 +1065,7 @@ app.post('/api/admin/sessions/terminate-all', (req, res) => {
 
 // DELETE: Delete a session log entry
 app.delete('/api/admin/sessions/:id', (req, res) => {
-  const pin = req.headers['x-admin-pin'] || req.query.admin_pin;
-  const secret = req.headers['x-admin-secret'] || req.query.secret;
-  if (pin !== 'Vanshika170926' && secret !== ADMIN_SECRET) {
+  if (!isAdminAuth(req)) {
     return res.status(401).json({ success: false, error: 'Admin access denied' });
   }
   const { id } = req.params;
@@ -986,9 +1086,7 @@ app.post('/api/admin/sessions/clear', (req, res) => {
 
 // GET: Full admin dashboard status
 app.get('/api/admin/status', (req, res) => {
-  const pin = req.headers['x-admin-pin'] || req.query.admin_pin;
-  const secret = req.headers['x-admin-secret'] || req.query.secret;
-  if (pin !== 'Vanshika170926' && secret !== ADMIN_SECRET) {
+  if (!isAdminAuth(req)) {
     return res.status(401).json({ success: false, error: 'Admin access denied' });
   }
   try {

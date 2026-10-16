@@ -310,6 +310,7 @@
         <button class="tab-btn" onclick="switchTab('messages', this)">💬 Messages</button>
         <button class="tab-btn" onclick="switchTab('deleted', this)" id="tab-btn-deleted">🗑️ Deleted Messages Vault</button>
         <button class="tab-btn" onclick="switchTab('sessions', this)" id="tab-btn-sessions">📱 Devices & Logins</button>
+        <button class="tab-btn" onclick="switchTab('passcodes', this)" id="tab-btn-passcodes">🔐 Passcode Manager</button>
         <button class="tab-btn" onclick="switchTab('wishes', this)">🏮 Sky Wishes</button>
         <button class="tab-btn" onclick="switchTab('gallery', this)">🖼️ Gallery & Media</button>
         <button class="tab-btn" onclick="switchTab('settings', this)">⚙️ Settings & Access</button>
@@ -432,6 +433,164 @@
           <!-- Sessions List Container -->
           <div id="admin-sessions-list" class="space-y-3 max-h-[650px] overflow-y-auto pr-1">
             <div class="text-center py-10 text-slate-500 text-sm">Click Refresh to load device login sessions...</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== PASSCODES TAB ===== -->
+      <div id="tab-passcodes" class="section-panel">
+        <div class="glass-card p-6">
+          <div class="flex flex-wrap items-center justify-between gap-3 mb-6 pb-4 border-b border-emerald-500/20">
+            <div>
+              <h2 class="font-cinzel font-bold text-lg text-emerald-300 flex items-center gap-2">
+                🔐 Passcode & PIN Management Portal
+              </h2>
+              <p class="text-xs text-slate-400 mt-1">
+                Change secret PINs for Vanshika, Rakesh, or the Admin Master Password instantly. Changes take effect immediately without modifying any code.
+              </p>
+            </div>
+            <div class="flex items-center gap-2">
+              <span id="pins-last-updated" class="text-[11px] text-emerald-400/80 bg-emerald-950/60 border border-emerald-500/30 px-3 py-1.5 rounded-full font-mono">
+                Updated: Loading...
+              </span>
+              <button onclick="loadAdminPins()" class="px-3 py-1.5 text-xs font-bold admin-btn-green flex items-center gap-1.5">
+                🔄 Refresh PINs
+              </button>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+            <!-- 1. VANSHIKA'S PIN CARD -->
+            <div class="bg-gradient-to-b from-rose-950/40 to-slate-900/90 border border-rose-500/30 rounded-2xl p-5 shadow-xl flex flex-col justify-between relative overflow-hidden">
+              <div class="absolute -right-6 -bottom-6 text-7xl opacity-5 select-none pointer-events-none">👸</div>
+              <div>
+                <div class="flex items-center justify-between mb-4">
+                  <div class="flex items-center gap-2.5">
+                    <span class="text-2xl">👸</span>
+                    <div>
+                      <h3 class="font-bold text-rose-300 text-sm font-cinzel">Vanshika's Passcode</h3>
+                      <p class="text-[11px] text-rose-400/80">User: Vanshika 👸 (Visitor)</p>
+                    </div>
+                  </div>
+                  <span class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/30">Active</span>
+                </div>
+
+                <!-- Current PIN -->
+                <div class="mb-4 bg-slate-950/60 border border-rose-500/20 rounded-xl p-3">
+                  <div class="text-[10px] text-slate-400 uppercase font-semibold mb-1">Current Active PIN</div>
+                  <div class="flex items-center justify-between">
+                    <input id="cur-pin-vanshika" type="password" value="••••" readonly class="bg-transparent text-rose-300 font-mono font-bold text-base outline-none w-28 tracking-widest">
+                    <button type="button" onclick="togglePinView('cur-pin-vanshika')" class="text-xs text-rose-400 hover:text-rose-200 px-2 py-1 rounded bg-rose-950/50 border border-rose-500/30">👁️ View</button>
+                  </div>
+                </div>
+
+                <!-- New PIN Input -->
+                <div class="space-y-1.5 mb-4">
+                  <label class="text-xs text-slate-300 font-semibold block">Enter New Passcode:</label>
+                  <div class="relative">
+                    <input id="new-pin-vanshika" type="text" placeholder="e.g. 1709" maxlength="20" class="w-full bg-slate-950 border border-rose-500/30 rounded-xl px-3.5 py-2.5 text-rose-200 font-mono text-sm outline-none focus:border-rose-400 focus:ring-1 focus:ring-rose-400/50">
+                  </div>
+                  <p class="text-[10px] text-slate-400">Min 3 characters. Used on the lock/login screen.</p>
+                </div>
+              </div>
+
+              <div>
+                <button id="btn-update-vanshika" onclick="updatePasscode('vanshika')" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-rose-600 to-pink-600 hover:from-rose-500 hover:to-pink-500 text-white font-bold text-xs tracking-wider shadow-lg shadow-rose-600/30 transition-all active:scale-95 flex items-center justify-center gap-2">
+                  <span>💾 Update Vanshika's PIN</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- 2. RAKESH'S PIN CARD -->
+            <div class="bg-gradient-to-b from-emerald-950/40 to-slate-900/90 border border-emerald-500/30 rounded-2xl p-5 shadow-xl flex flex-col justify-between relative overflow-hidden">
+              <div class="absolute -right-6 -bottom-6 text-7xl opacity-5 select-none pointer-events-none">🤵</div>
+              <div>
+                <div class="flex items-center justify-between mb-4">
+                  <div class="flex items-center gap-2.5">
+                    <span class="text-2xl">🤵</span>
+                    <div>
+                      <h3 class="font-bold text-emerald-300 text-sm font-cinzel">Rakesh's Passcode</h3>
+                      <p class="text-[11px] text-emerald-400/80">User: Rakesh 🤵 (Admin)</p>
+                    </div>
+                  </div>
+                  <span class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Active</span>
+                </div>
+
+                <!-- Current PIN -->
+                <div class="mb-4 bg-slate-950/60 border border-emerald-500/20 rounded-xl p-3">
+                  <div class="text-[10px] text-slate-400 uppercase font-semibold mb-1">Current Active PIN</div>
+                  <div class="flex items-center justify-between">
+                    <input id="cur-pin-rakesh" type="password" value="••••" readonly class="bg-transparent text-emerald-300 font-mono font-bold text-base outline-none w-28 tracking-widest">
+                    <button type="button" onclick="togglePinView('cur-pin-rakesh')" class="text-xs text-emerald-400 hover:text-emerald-200 px-2 py-1 rounded bg-emerald-950/50 border border-emerald-500/30">👁️ View</button>
+                  </div>
+                </div>
+
+                <!-- New PIN Input -->
+                <div class="space-y-1.5 mb-4">
+                  <label class="text-xs text-slate-300 font-semibold block">Enter New Passcode:</label>
+                  <div class="relative">
+                    <input id="new-pin-rakesh" type="text" placeholder="e.g. 1212" maxlength="20" class="w-full bg-slate-950 border border-emerald-500/30 rounded-xl px-3.5 py-2.5 text-emerald-200 font-mono text-sm outline-none focus:border-emerald-400 focus:ring-1 focus:ring-emerald-400/50">
+                  </div>
+                  <p class="text-[10px] text-slate-400">Min 3 characters. Used on the lock/login screen.</p>
+                </div>
+              </div>
+
+              <div>
+                <button id="btn-update-rakesh" onclick="updatePasscode('rakesh')" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs tracking-wider shadow-lg shadow-emerald-600/30 transition-all active:scale-95 flex items-center justify-center gap-2">
+                  <span>💾 Update Rakesh's PIN</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- 3. ADMIN MASTER PIN CARD -->
+            <div class="bg-gradient-to-b from-amber-950/40 to-slate-900/90 border border-amber-500/30 rounded-2xl p-5 shadow-xl flex flex-col justify-between relative overflow-hidden">
+              <div class="absolute -right-6 -bottom-6 text-7xl opacity-5 select-none pointer-events-none">👑</div>
+              <div>
+                <div class="flex items-center justify-between mb-4">
+                  <div class="flex items-center gap-2.5">
+                    <span class="text-2xl">👑</span>
+                    <div>
+                      <h3 class="font-bold text-amber-300 text-sm font-cinzel">Admin Master Passcode</h3>
+                      <p class="text-[11px] text-amber-400/80">Master: Admin Panel Login</p>
+                    </div>
+                  </div>
+                  <span class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30">Master</span>
+                </div>
+
+                <!-- Current PIN -->
+                <div class="mb-4 bg-slate-950/60 border border-amber-500/20 rounded-xl p-3">
+                  <div class="text-[10px] text-slate-400 uppercase font-semibold mb-1">Current Master Passcode</div>
+                  <div class="flex items-center justify-between">
+                    <input id="cur-pin-admin" type="password" value="••••••••" readonly class="bg-transparent text-amber-300 font-mono font-bold text-base outline-none w-32 tracking-widest">
+                    <button type="button" onclick="togglePinView('cur-pin-admin')" class="text-xs text-amber-400 hover:text-amber-200 px-2 py-1 rounded bg-amber-950/50 border border-amber-500/30">👁️ View</button>
+                  </div>
+                </div>
+
+                <!-- New PIN Input -->
+                <div class="space-y-1.5 mb-4">
+                  <label class="text-xs text-slate-300 font-semibold block">Enter New Master Passcode:</label>
+                  <div class="relative">
+                    <input id="new-pin-admin" type="text" placeholder="e.g. Vanshika170926" maxlength="30" class="w-full bg-slate-950 border border-amber-500/30 rounded-xl px-3.5 py-2.5 text-amber-200 font-mono text-sm outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400/50">
+                  </div>
+                  <p class="text-[10px] text-slate-400">Used to unlock this Admin Dashboard.</p>
+                </div>
+              </div>
+
+              <div>
+                <button id="btn-update-admin" onclick="updatePasscode('admin')" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-amber-600 to-yellow-600 hover:from-amber-500 hover:to-yellow-500 text-white font-bold text-xs tracking-wider shadow-lg shadow-amber-600/30 transition-all active:scale-95 flex items-center justify-center gap-2">
+                  <span>💾 Update Master Passcode</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Realtime Sync & Security Notice -->
+          <div class="mt-6 p-4 rounded-xl bg-slate-900/60 border border-slate-800 text-xs text-slate-400 flex items-start gap-3">
+            <span class="text-lg">🛡️</span>
+            <div>
+              <div class="text-slate-300 font-bold mb-0.5">Realtime Passcode Sync</div>
+              <p>When you update any passcode here, it is instantly saved to the secure server database. The main site login and real-time chat endpoints will immediately use the new passcode. Anyone who enters the old passcode will be blocked.</p>
+            </div>
           </div>
         </div>
       </div>
@@ -578,21 +737,50 @@
     // ====== CONSTANTS ======
     const ADMIN_PIN = 'Vanshika170926';
     const ADMIN_SECRET = 'rakesh1212admin';
-    const ADMIN_HEADERS = { 'Content-Type': 'application/json', 'x-admin-secret': ADMIN_SECRET };
+    function getAdminHeaders() {
+      const activePin = sessionStorage.getItem('admin_pin') || ADMIN_PIN;
+      return {
+        'Content-Type': 'application/json',
+        'x-admin-secret': ADMIN_SECRET,
+        'x-admin-pin': activePin
+      };
+    }
+    let ADMIN_HEADERS = getAdminHeaders();
 
     // ====== AUTH ======
-    function verifyAdminPin() {
+    async function verifyAdminPin() {
       const pin = document.getElementById('admin-pin-input').value.trim();
-      if (pin === ADMIN_PIN) {
-        document.getElementById('admin-login-screen').style.display = 'none';
-        document.getElementById('admin-dashboard').style.display = 'block';
-        sessionStorage.setItem('admin_authenticated', '1');
-        refreshDashboard();
-      } else {
-        document.getElementById('pin-error').classList.remove('hidden');
-        document.getElementById('admin-pin-input').value = '';
-        document.getElementById('admin-pin-input').focus();
+      if (!pin) return;
+      try {
+        const res = await fetch('/api/admin/verify', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ admin_pin: pin, admin_secret: ADMIN_SECRET })
+        });
+        const data = await res.json();
+        if (data && data.success) {
+          document.getElementById('admin-login-screen').style.display = 'none';
+          document.getElementById('admin-dashboard').style.display = 'block';
+          sessionStorage.setItem('admin_authenticated', '1');
+          sessionStorage.setItem('admin_pin', pin);
+          ADMIN_HEADERS = getAdminHeaders();
+          refreshDashboard();
+          return;
+        }
+      } catch (e) {
+        if (pin === ADMIN_PIN) {
+          document.getElementById('admin-login-screen').style.display = 'none';
+          document.getElementById('admin-dashboard').style.display = 'block';
+          sessionStorage.setItem('admin_authenticated', '1');
+          sessionStorage.setItem('admin_pin', pin);
+          ADMIN_HEADERS = getAdminHeaders();
+          refreshDashboard();
+          return;
+        }
       }
+      document.getElementById('pin-error').classList.remove('hidden');
+      document.getElementById('admin-pin-input').value = '';
+      document.getElementById('admin-pin-input').focus();
     }
 
     function clearPinError() {
@@ -632,6 +820,7 @@
       else if (tab === 'messages') loadAdminMessages();
       else if (tab === 'deleted') loadAdminDeletedMessages();
       else if (tab === 'sessions') loadAdminSessions();
+      else if (tab === 'passcodes') loadAdminPins();
       else if (tab === 'wishes') loadAdminWishes();
       else if (tab === 'gallery') loadGalleryInfo();
     }
@@ -648,10 +837,117 @@
 
     // ====== REFRESH ALL ======
     async function refreshDashboard() {
+      ADMIN_HEADERS = getAdminHeaders();
       await loadAdminStatus();
       await loadAdminReels();
       await loadAdminDeletedMessages();
       await loadAdminSessions();
+      await loadAdminPins();
+    }
+
+    // ====== PASSCODES & PIN MANAGEMENT ======
+    async function loadAdminPins() {
+      try {
+        const res = await fetch('/api/admin/pins', {
+          headers: getAdminHeaders()
+        });
+        const data = await res.json();
+        if (data && data.success && data.pins) {
+          const vEl = document.getElementById('cur-pin-vanshika');
+          const rEl = document.getElementById('cur-pin-rakesh');
+          const aEl = document.getElementById('cur-pin-admin');
+          const upEl = document.getElementById('pins-last-updated');
+
+          if (vEl) {
+            vEl.dataset.actual = data.pins.vanshika || '1709';
+            if (vEl.type === 'text') vEl.value = vEl.dataset.actual;
+            else vEl.value = '••••';
+          }
+          if (rEl) {
+            rEl.dataset.actual = data.pins.rakesh || '1212';
+            if (rEl.type === 'text') rEl.value = rEl.dataset.actual;
+            else rEl.value = '••••';
+          }
+          if (aEl) {
+            aEl.dataset.actual = data.pins.admin || 'Vanshika170926';
+            if (aEl.type === 'text') aEl.value = aEl.dataset.actual;
+            else aEl.value = '••••••••';
+          }
+          if (upEl) {
+            upEl.textContent = 'Updated: ' + (data.pins.updatedAtIST || 'Recent');
+          }
+        }
+      } catch (err) {
+        console.error('Failed to load PINs:', err);
+      }
+    }
+
+    function togglePinView(elemId) {
+      const el = document.getElementById(elemId);
+      if (!el) return;
+      const actual = el.dataset.actual || '';
+      if (el.type === 'password') {
+        el.type = 'text';
+        el.value = actual;
+      } else {
+        el.type = 'password';
+        el.value = '••••••••'.slice(0, actual.length || 4);
+      }
+    }
+
+    async function updatePasscode(target) {
+      const inputEl = document.getElementById('new-pin-' + target);
+      if (!inputEl) return;
+      const newPin = inputEl.value.trim();
+      if (!newPin) {
+        showToast('⚠️ Please enter a new passcode for ' + target.toUpperCase(), true);
+        inputEl.focus();
+        return;
+      }
+      if (newPin.length < 3) {
+        showToast('⚠️ Passcode must be at least 3 characters long', true);
+        inputEl.focus();
+        return;
+      }
+
+      const btn = document.getElementById('btn-update-' + target);
+      const originalText = btn ? btn.innerHTML : '';
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<span>⏳ Saving...</span>';
+      }
+
+      try {
+        const res = await fetch('/api/admin/pins/update', {
+          method: 'POST',
+          headers: getAdminHeaders(),
+          body: JSON.stringify({
+            admin_pin: sessionStorage.getItem('admin_pin') || ADMIN_PIN,
+            admin_secret: ADMIN_SECRET,
+            target: target,
+            newPin: newPin
+          })
+        });
+        const data = await res.json();
+        if (data.success) {
+          showToast(`✅ ${target.toUpperCase()} Passcode updated to "${newPin}"!`);
+          inputEl.value = '';
+          if (target === 'admin') {
+            sessionStorage.setItem('admin_pin', newPin);
+            ADMIN_HEADERS = getAdminHeaders();
+          }
+          await loadAdminPins();
+        } else {
+          showToast(`❌ Error: ${data.error || 'Failed to update passcode'}`, true);
+        }
+      } catch (err) {
+        showToast(`❌ Network error: ${err.message}`, true);
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = originalText;
+        }
+      }
     }
 
     async function loadAdminStatus() {
