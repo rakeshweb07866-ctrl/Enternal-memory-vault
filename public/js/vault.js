@@ -101,15 +101,13 @@ function loadSavedGalleryData() {
 }
 
 // 3. 1-Month Anniversary Celebration Engine
-// Strictly locked for production: Automatically unlocks on 17th October 2026!
+// Strictly locked for production: 17th October Celebration Completed!
 const IS_ANNIVERSARY_PREVIEW_TEST = false;
 
 function isAnniversaryActive() {
   if (IS_ANNIVERSARY_PREVIEW_TEST) return true;
   if (typeof window !== 'undefined' && (window.location.search.includes('anniv=1') || sessionStorage.getItem('anniv_preview_force') === '1')) return true;
-  const now = new Date();
-  const annivDate = new Date('2026-10-17T00:00:00');
-  return now >= annivDate;
+  return false;
 }
 
 function updateAnniversaryTimer() {
@@ -129,47 +127,27 @@ function updateAnniversaryTimer() {
     const minsEl = document.getElementById('anniv-mins');
     const secsEl = document.getElementById('anniv-secs');
 
-    if (daysEl) daysEl.innerText = isAnniversaryActive() ? Math.max(days, 30) : days;
+    if (daysEl) daysEl.innerText = days;
     if (hoursEl) hoursEl.innerText = String(hours).padStart(2, '0');
     if (minsEl) minsEl.innerText = String(mins).padStart(2, '0');
     if (secsEl) secsEl.innerText = String(secs).padStart(2, '0');
 
-    if (isAnniversaryActive()) {
-      const badge = document.querySelector('#anniversary-section .inline-flex span');
-      if (badge) badge.innerHTML = '🎉 HAPPY 1ST MONTH ANNIVERSARY VANSHIKA! 🎉';
-      
-      const giftTag = document.getElementById('gift-lock-tag');
-      if (giftTag) giftTag.innerHTML = '🎁 UNLOCKED TODAY: YOUR 1-MONTH SURPRISE GIFTS!';
+    const badge = document.querySelector('#anniversary-section .inline-flex span');
+    if (badge) badge.innerHTML = '✨ 1st Month Milestone Completed ✨';
+    
+    const giftTag = document.getElementById('gift-lock-tag');
+    if (giftTag) giftTag.innerHTML = '🎁 1ST MONTH COMPLETED ❤️';
 
-      const banner = document.getElementById('princess-royal-banner');
-      if (banner) {
-        banner.classList.remove('hidden');
-        banner.classList.add('flex');
-      }
+    const banner = document.getElementById('princess-royal-banner');
+    if (banner) {
+      banner.classList.add('hidden');
+      banner.classList.remove('flex');
+    }
 
-      const floatingBadge = document.getElementById('oct17-floating-badge');
-      if (floatingBadge) {
-        floatingBadge.classList.remove('hidden');
-        floatingBadge.classList.add('block');
-      }
-    } else {
-      const badge = document.querySelector('#anniversary-section .inline-flex span');
-      if (badge) badge.innerHTML = '✨ 1st Month Anniversary Special ✨';
-      
-      const giftTag = document.getElementById('gift-lock-tag');
-      if (giftTag) giftTag.innerHTML = '🔒 LOCKED UNTIL 17TH OCTOBER';
-
-      const banner = document.getElementById('princess-royal-banner');
-      if (banner) {
-        banner.classList.add('hidden');
-        banner.classList.remove('flex');
-      }
-
-      const floatingBadge = document.getElementById('oct17-floating-badge');
-      if (floatingBadge) {
-        floatingBadge.classList.add('hidden');
-        floatingBadge.classList.remove('block');
-      }
+    const floatingBadge = document.getElementById('oct17-floating-badge');
+    if (floatingBadge) {
+      floatingBadge.classList.add('hidden');
+      floatingBadge.classList.remove('block');
     }
   }
 }
@@ -483,25 +461,6 @@ function stopAnnivPhotoAutoCycle() {
 }
 
 function openAnniversarySurpriseModal() {
-  if (!isAnniversaryActive()) {
-    const anniversaryDate = new Date('2026-10-17T00:00:00');
-    const now = new Date();
-    const diffMs = anniversaryDate - now;
-    const remainingDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
-    
-    const msgEl = document.getElementById('locked-toast-message');
-    if (msgEl) {
-      msgEl.innerHTML = 'Shh! Dearest Vanshika, this 1st Month Anniversary surprise is <strong class="text-rose-400">LOCKED 🔒</strong> until <strong class="text-amber-300">17th October 2026</strong>!<br/><br/><span class="text-amber-300 font-bold">' + remainingDays + ' Days remaining</span> until your special gift unlocks! ❤️✨';
-    }
-    
-    const lockedModal = document.getElementById('locked-toast-modal');
-    if (lockedModal) {
-      lockedModal.classList.remove('hidden');
-      lockedModal.classList.add('flex');
-    }
-    return;
-  }
-
   const modal = document.getElementById('anniv-modal');
   if (modal) {
     modal.classList.remove('hidden');

@@ -189,10 +189,7 @@ async function confirmNameLogin() {
     fetchLiveChatMessages();
   }
 
-  // 4. If Anniversary is active, trigger grand cinematic celebration
-  if (typeof isAnniversaryActive === 'function' && isAnniversaryActive()) {
-    setTimeout(playGrandCinematicAnniversaryAnimation, 350);
-  }
+  // 4. (17th October Celebration Completed - auto popup disabled)
 }
 
 function updateUserBadge() {
