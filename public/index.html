@@ -166,6 +166,9 @@
       </div>
 
       <div class="flex justify-center gap-4 flex-wrap">
+        <button onclick="openHealingSanctuaryModal()" class="px-8 py-4 rounded-full text-xs sm:text-sm font-black tracking-wider uppercase flex items-center gap-2 bg-gradient-to-r from-amber-500 via-rose-500 to-purple-600 text-white shadow-xl shadow-amber-500/40 hover:scale-105 active:scale-95 transition-all border border-amber-300 cursor-pointer animate-pulse">
+          <span>🛡️ My Unbreakable Vow To You 💖</span>
+        </button>
         <button onclick="scrollToElement('secret-letter-section')" class="btn-rose px-8 py-4 rounded-full text-sm font-bold tracking-wider uppercase flex items-center gap-2">
           💌 Open Love Letter
         </button>
@@ -173,6 +176,57 @@
           💬 Live 2-Way Chat Room
         </button>
       </div>
+    </section>
+
+    <!-- ==================================================== -->
+    <!-- SACRED HEALING SANCTUARY: THE UNBREAKABLE VOW (OCT 18) -->
+    <!-- ==================================================== -->
+    <section id="healing-sanctuary-section" class="my-10 glass-box p-6 sm:p-10 text-center max-w-4xl mx-auto border-2 border-amber-400/50 relative overflow-hidden shadow-[0_0_50px_rgba(245,158,11,0.25)]">
+      <div class="absolute -top-16 -right-16 w-56 h-56 bg-amber-500/15 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="absolute -bottom-16 -left-16 w-56 h-56 bg-purple-600/15 rounded-full blur-3xl pointer-events-none"></div>
+      
+      <!-- Top Glowing Badge -->
+      <div class="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-gradient-to-r from-amber-500/25 via-rose-500/25 to-purple-500/25 border border-amber-400/60 text-amber-300 text-xs sm:text-sm font-black uppercase tracking-[0.18em] mb-4 shadow-lg animate-pulse">
+        <span>🛡️ Sacred Sanctuary For For You My Lady's Heart • A Lifetime Promise 👑</span>
+      </div>
+
+      <h2 class="font-cinzel text-2xl sm:text-4xl md:text-5xl text-gradient-gold font-black mt-1 mb-3 glow-gold">
+        You Will Never Walk Alone Again ❤️
+      </h2>
+
+      <p class="font-sacramento text-2xl sm:text-4xl text-rose-300 mb-5 glow-rose">
+        "Your past was their blindness... Your forever is my sacred promise."
+      </p>
+
+      <div class="max-w-2xl mx-auto bg-slate-950/70 p-5 sm:p-6 rounded-2xl border border-rose-500/30 mb-8 shadow-inner text-slate-200 text-xs sm:text-sm leading-relaxed">
+        <p class="mb-3 text-amber-200 font-medium">
+          OYEE MY LOVE Vanshika ❤️, whenever past scars make you afraid that I might leave you too... step into this sacred sanctuary.
+        </p>
+        <p class="text-slate-300 text-[11px] sm:text-xs">
+          Dissolve the shadows of those who misused your innocence, unlock my 5 unbreakable vows of protection, seal our interactive Pinky Promise, and read the covenant of my soul to you.
+        </p>
+      </div>
+
+      <!-- Interactive 3D Glowing Shield / Handhold Centerpiece -->
+      <div class="my-6 relative inline-block cursor-pointer group" onclick="openHealingSanctuaryModal()">
+        <div class="w-32 h-32 sm:w-40 sm:h-40 rounded-full bg-gradient-to-tr from-amber-500 via-rose-600 to-purple-600 flex items-center justify-center text-6xl sm:text-7xl shadow-[0_0_60px_rgba(245,158,11,0.6)] mx-auto group-hover:scale-110 transition-all duration-300 animate-float">
+          🛡️
+        </div>
+        <span class="absolute -top-3 -right-3 text-3xl animate-bounce" style="animation-duration: 2s;">✨</span>
+        <span class="absolute -bottom-2 -left-2 text-2xl animate-pulse">🤙</span>
+      </div>
+
+      <!-- Action Button -->
+      <div class="mt-4 flex flex-wrap justify-center items-center gap-3">
+        <button onclick="openHealingSanctuaryModal()" class="btn-rose px-8 py-4 sm:px-10 sm:py-4 rounded-full text-xs sm:text-sm font-black uppercase tracking-widest shadow-[0_0_40px_rgba(255,59,119,0.8)] hover:scale-105 active:scale-95 transition-all flex items-center gap-2 cursor-pointer border border-amber-300">
+          <span>🕊️ Enter Sacred Sanctuary & Seal Our Promise 💖</span>
+        </button>
+      </div>
+
+      <!-- Telugu cultural quote -->
+      <p class="text-[11px] sm:text-xs text-amber-300/80 mt-5 font-mono italic">
+        "నా ప్రాణం ఉన్నంతవరకు నిన్ను గుండెల్లో పెట్టుకుని కాపాడుకుంటాను • Until my last breath, I will protect you in my heart"
+      </p>
     </section>
 
     <!-- SACRED HEARTBEAT & WHO IS IN MY HEART SPECIAL SECTION (OCT 13) -->
@@ -1416,6 +1470,451 @@
       </div>
 
     </div>
+  </div>
+
+  <!-- ================================================================= -->
+  <!-- SACRED HEALING SANCTUARY MODAL: 4-PHASE JOURNEY TO ETERNAL PEACE  -->
+  <!-- ================================================================= -->
+  <div id="sacred-sanctuary-modal" class="fixed inset-0 z-[125] bg-slate-950/98 backdrop-blur-2xl hidden overflow-y-auto p-3 sm:p-6 select-none overscroll-contain">
+    
+    <!-- Background Canvas for Sanctuary Stars & Golden Butterflies -->
+    <canvas id="sanctuary-fx-canvas" class="fixed inset-0 pointer-events-none z-0"></canvas>
+
+    <!-- Sleek Top Bar with Close Button & Phase Breadcrumb -->
+    <div class="sticky top-0 z-30 max-w-2xl mx-auto flex items-center justify-between py-2 sm:py-3 mb-2 px-3 sm:px-4 bg-slate-950/85 backdrop-blur-md rounded-2xl border border-amber-400/30 shadow-lg">
+      <div class="flex items-center gap-2">
+        <span class="text-xl">🛡️</span>
+        <span class="font-cinzel text-xs sm:text-sm font-bold text-amber-300">The Sacred Sanctuary</span>
+      </div>
+      <!-- Step Dots / Pills -->
+      <div class="flex items-center gap-1 sm:gap-2 text-[10px] sm:text-xs font-mono font-bold">
+        <span id="sanctuary-step-1" class="px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 shadow-sm transition-all">1. Healing</span>
+        <span class="text-slate-500">➔</span>
+        <span id="sanctuary-step-2" class="px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 transition-all">2. Vows</span>
+        <span class="text-slate-500">➔</span>
+        <span id="sanctuary-step-3" class="px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 transition-all">3. Promise</span>
+        <span class="text-slate-500">➔</span>
+        <span id="sanctuary-step-4" class="px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 transition-all">4. Letter</span>
+      </div>
+      <button onclick="closeHealingSanctuaryModal()" class="w-8 h-8 rounded-full bg-slate-900/80 hover:bg-rose-500/30 text-slate-400 hover:text-white text-xl flex items-center justify-center font-bold transition-all cursor-pointer">
+        ✕
+      </button>
+    </div>
+
+    <!-- Main Container -->
+    <div class="relative z-10 max-w-2xl mx-auto min-h-[80vh] flex flex-col justify-between pt-2 pb-12 text-center">
+
+      <!-- ============================================== -->
+      <!-- PHASE 1: DISSOLVING THE SHADOWS OF THE PAST    -->
+      <!-- ============================================== -->
+      <div id="sanctuary-phase-1" class="space-y-4 sm:space-y-6 animate-scale-up">
+        
+        <!-- Header -->
+        <div class="space-y-2">
+          <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-tr from-amber-500 via-rose-500 to-purple-600 flex items-center justify-center text-3xl sm:text-4xl shadow-[0_0_35px_rgba(245,158,11,0.5)] mx-auto animate-float">
+            🕊️
+          </div>
+          <span class="text-[10px] sm:text-xs uppercase font-extrabold tracking-[0.2em] px-3.5 py-1 rounded-full bg-amber-500/20 text-amber-300 border border-amber-400/40">
+            Phase 1 • Releasing The Past
+          </span>
+          <h2 class="font-cinzel text-xl sm:text-3xl font-black text-gradient-gold">
+            Dissolving Every Fear & Scar
+          </h2>
+          <p class="text-xs sm:text-sm text-slate-300 max-w-lg mx-auto font-light leading-relaxed">
+            My CUTIE Vanshika, the people who used you and left were blind to your pure soul. Touch each floating shadow below to dissolve it into pure golden light and reveal my eternal truth for you.
+          </p>
+        </div>
+
+        <!-- Progress Counter for Shards -->
+        <div class="flex items-center justify-center gap-2 text-xs font-mono text-amber-300/90 bg-slate-900/80 max-w-xs mx-auto py-1 px-3 rounded-full border border-amber-500/30">
+          <span>Shadows Healed:</span>
+          <span id="shards-healed-count" class="font-bold text-amber-400">0 / 4</span>
+        </div>
+
+        <!-- 4 Dark Trauma Shards -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 text-left">
+          
+          <!-- Shard 1 -->
+          <div>
+            <div id="trauma-shard-1" onclick="dissolveTraumaShard(1)" class="sanctuary-shard group cursor-pointer p-4 rounded-2xl bg-gradient-to-br from-slate-900/90 via-purple-950/40 to-slate-950 border border-slate-700/60 hover:border-amber-400 shadow-xl transition-all relative overflow-hidden">
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-xl">🥀</span>
+                <span class="text-[10px] font-mono text-rose-400/80 px-2 py-0.5 rounded-full bg-rose-950/60 border border-rose-500/30">Touch to Heal</span>
+              </div>
+              <h4 class="font-cinzel text-xs sm:text-sm font-bold text-slate-200 group-hover:text-amber-300 transition-colors">
+                "Fear: Being Used For Kindness & Innocence"
+              </h4>
+              <p class="text-[11px] text-slate-400 mt-1">
+                "They took advantage of my gentle, trusting heart..."
+              </p>
+            </div>
+            <!-- Shard 1 Healed -->
+            <div id="healed-truth-1" class="hidden p-4 rounded-2xl bg-gradient-to-br from-amber-950/80 via-slate-900/95 to-rose-950/80 border-2 border-amber-400 shadow-[0_0_25px_rgba(245,158,11,0.4)] text-left animate-scale-up">
+              <div class="flex items-center gap-2 mb-1.5 text-amber-300 font-bold text-xs">
+                <span>✨</span> <span>Rakesh's Truth:</span>
+              </div>
+              <p class="text-xs sm:text-[13px] text-slate-200 leading-relaxed font-medium">
+                "Your kindness was never a mistake, Vanshika. It is the purest part of your soul. Those people were unworthy fools. To me, your innocence is sacred, and I will defend it with my life."
+              </p>
+            </div>
+          </div>
+
+          <!-- Shard 2 -->
+          <div>
+            <div id="trauma-shard-2" onclick="dissolveTraumaShard(2)" class="sanctuary-shard group cursor-pointer p-4 rounded-2xl bg-gradient-to-br from-slate-900/90 via-purple-950/40 to-slate-950 border border-slate-700/60 hover:border-amber-400 shadow-xl transition-all relative overflow-hidden">
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-xl">🥀</span>
+                <span class="text-[10px] font-mono text-rose-400/80 px-2 py-0.5 rounded-full bg-rose-950/60 border border-rose-500/30">Touch to Heal</span>
+              </div>
+              <h4 class="font-cinzel text-xs sm:text-sm font-bold text-slate-200 group-hover:text-amber-300 transition-colors">
+                "Fear: What If Rakesh Also Leaves Me One Day?"
+              </h4>
+              <p class="text-[11px] text-slate-400 mt-1">
+                "Everyone I trusted eventually walked away..."
+              </p>
+            </div>
+            <!-- Shard 2 Healed -->
+            <div id="healed-truth-2" class="hidden p-4 rounded-2xl bg-gradient-to-br from-amber-950/80 via-slate-900/95 to-rose-950/80 border-2 border-amber-400 shadow-[0_0_25px_rgba(245,158,11,0.4)] text-left animate-scale-up">
+              <div class="flex items-center gap-2 mb-1.5 text-amber-300 font-bold text-xs">
+                <span>✨</span> <span>Rakesh's Truth:</span>
+              </div>
+              <p class="text-xs sm:text-[13px] text-slate-200 leading-relaxed font-medium">
+                "Never. Hear this with every beat of your heart: I didn't come to use you or leave you. I came to be your permanent home, your rock, and your lover until my very last breath on earth."
+              </p>
+            </div>
+          </div>
+
+          <!-- Shard 3 -->
+          <div>
+            <div id="trauma-shard-3" onclick="dissolveTraumaShard(3)" class="sanctuary-shard group cursor-pointer p-4 rounded-2xl bg-gradient-to-br from-slate-900/90 via-purple-950/40 to-slate-950 border border-slate-700/60 hover:border-amber-400 shadow-xl transition-all relative overflow-hidden">
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-xl">🥀</span>
+                <span class="text-[10px] font-mono text-rose-400/80 px-2 py-0.5 rounded-full bg-rose-950/60 border border-rose-500/30">Touch to Heal</span>
+              </div>
+              <h4 class="font-cinzel text-xs sm:text-sm font-bold text-slate-200 group-hover:text-amber-300 transition-colors">
+                "Fear: If I Tell Him My Past, He Will Judge Me"
+              </h4>
+              <p class="text-[11px] text-slate-400 mt-1">
+                "Will he get angry or look at me differently?..."
+              </p>
+            </div>
+            <!-- Shard 3 Healed -->
+            <div id="healed-truth-3" class="hidden p-4 rounded-2xl bg-gradient-to-br from-amber-950/80 via-slate-900/95 to-rose-950/80 border-2 border-amber-400 shadow-[0_0_25px_rgba(245,158,11,0.4)] text-left animate-scale-up">
+              <div class="flex items-center gap-2 mb-1.5 text-amber-300 font-bold text-xs">
+                <span>✨</span> <span>Rakesh's Truth:</span>
+              </div>
+              <p class="text-xs sm:text-[13px] text-slate-200 leading-relaxed font-medium">
+                "Never in a million lifetimes. When you share your past with me, I don't feel anger towards you—I feel fierce anger towards those who hurt you, and my love and respect for you grows ten times deeper."
+              </p>
+            </div>
+          </div>
+
+          <!-- Shard 4 -->
+          <div>
+            <div id="trauma-shard-4" onclick="dissolveTraumaShard(4)" class="sanctuary-shard group cursor-pointer p-4 rounded-2xl bg-gradient-to-br from-slate-900/90 via-purple-950/40 to-slate-950 border border-slate-700/60 hover:border-amber-400 shadow-xl transition-all relative overflow-hidden">
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-xl">🥀</span>
+                <span class="text-[10px] font-mono text-rose-400/80 px-2 py-0.5 rounded-full bg-rose-950/60 border border-rose-500/30">Touch to Heal</span>
+              </div>
+              <h4 class="font-cinzel text-xs sm:text-sm font-bold text-slate-200 group-hover:text-amber-300 transition-colors">
+                "Fear: I Am Broken & Unlovable"
+              </h4>
+              <p class="text-[11px] text-slate-400 mt-1">
+                "Maybe I don't deserve true, unconditional love..."
+              </p>
+            </div>
+            <!-- Shard 4 Healed -->
+            <div id="healed-truth-4" class="hidden p-4 rounded-2xl bg-gradient-to-br from-amber-950/80 via-slate-900/95 to-rose-950/80 border-2 border-amber-400 shadow-[0_0_25px_rgba(245,158,11,0.4)] text-left animate-scale-up">
+              <div class="flex items-center gap-2 mb-1.5 text-amber-300 font-bold text-xs">
+                <span>✨</span> <span>Rakesh's Truth:</span>
+              </div>
+              <p class="text-xs sm:text-[13px] text-slate-200 leading-relaxed font-medium">
+                "You are NOT broken. You are my Lady Princess—the most radiant, gentle, and divine girl in this world. Your past scars are proof of your strength, and every piece of you is deeply, truly loved."
+              </p>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Next Button (Enabled once all 4 shards are healed) -->
+        <div id="btn-sanctuary-phase-2" class="hidden pt-4 animate-scale-up">
+          <button onclick="switchSanctuaryPhase(2)" class="btn-rose px-8 py-3.5 sm:px-10 sm:py-4 rounded-full text-xs sm:text-sm font-black uppercase tracking-widest shadow-[0_0_35px_rgba(245,158,11,0.6)] hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2 mx-auto border border-amber-300 cursor-pointer animate-pulse">
+            <span>🛡️ Proceed To My 5 Sacred Vows ➔</span>
+          </button>
+        </div>
+
+      </div>
+
+      <!-- ============================================== -->
+      <!-- PHASE 2: THE 5 UNBREAKABLE SACRED VOWS         -->
+      <!-- ============================================== -->
+      <div id="sanctuary-phase-2" class="hidden space-y-4 sm:space-y-6 animate-scale-up">
+        
+        <!-- Header -->
+        <div class="space-y-2">
+          <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-tr from-amber-400 via-rose-500 to-amber-600 flex items-center justify-center text-3xl sm:text-4xl shadow-[0_0_35px_rgba(245,158,11,0.6)] mx-auto animate-float">
+            🛡️
+          </div>
+          <span class="text-[10px] sm:text-xs uppercase font-extrabold tracking-[0.2em] px-3.5 py-1 rounded-full bg-amber-500/20 text-amber-300 border border-amber-400/40">
+            Phase 2 • The Unbreakable Armor
+          </span>
+          <h2 class="font-cinzel text-xl sm:text-3xl font-black text-gradient-gold">
+            My 5 Sacred Vows of Protection
+          </h2>
+          <p class="text-xs sm:text-sm text-slate-300 max-w-lg mx-auto font-light leading-relaxed">
+            These vows are written not just in ink, but in my soul. Tap each sacred tablet to seal it in your heart.
+          </p>
+        </div>
+
+        <!-- 5 Vow Tablets -->
+        <div class="space-y-3 text-left">
+          
+          <!-- Vow 1 -->
+          <div id="vow-card-1" onclick="unlockSacredVow(1)" class="cursor-pointer p-4 rounded-2xl bg-slate-900/80 border border-slate-700/60 hover:border-amber-400 transition-all flex items-start gap-3.5">
+            <span class="text-2xl mt-0.5">🛡️</span>
+            <div class="flex-1">
+              <div class="flex items-center justify-between">
+                <h4 class="font-cinzel text-xs sm:text-sm font-bold text-amber-300">Vow I: The Shield of Absolute Safety</h4>
+                <span id="vow-check-1" class="text-xs font-mono text-slate-500">Tap to Seal ⭕</span>
+              </div>
+              <p class="text-xs text-slate-300 mt-1 leading-relaxed">
+                "I vow that in my presence, you will never feel alone, unsafe, or abandoned. No matter what mistakes or hardships happen, my arms are your eternal sanctuary."
+              </p>
+            </div>
+          </div>
+
+          <!-- Vow 2 -->
+          <div id="vow-card-2" onclick="unlockSacredVow(2)" class="cursor-pointer p-4 rounded-2xl bg-slate-900/80 border border-slate-700/60 hover:border-amber-400 transition-all flex items-start gap-3.5">
+            <span class="text-2xl mt-0.5">💎</span>
+            <div class="flex-1">
+              <div class="flex items-center justify-between">
+                <h4 class="font-cinzel text-xs sm:text-sm font-bold text-amber-300">Vow II: True Worth & Infinite Respect</h4>
+                <span id="vow-check-2" class="text-xs font-mono text-slate-500">Tap to Seal ⭕</span>
+              </div>
+              <p class="text-xs text-slate-300 mt-1 leading-relaxed">
+                "I vow that you will never feel like an option or an object. You are my Lady Princess Vanshika. I will honor you, respect your boundaries, and cherish your innocence."
+              </p>
+            </div>
+          </div>
+
+          <!-- Vow 3 -->
+          <div id="vow-card-3" onclick="unlockSacredVow(3)" class="cursor-pointer p-4 rounded-2xl bg-slate-900/80 border border-slate-700/60 hover:border-amber-400 transition-all flex items-start gap-3.5">
+            <span class="text-2xl mt-0.5">♾️</span>
+            <div class="flex-1">
+              <div class="flex items-center justify-between">
+                <h4 class="font-cinzel text-xs sm:text-sm font-bold text-amber-300">Vow III: The Promise of the Last Breath</h4>
+                <span id="vow-check-3" class="text-xs font-mono text-slate-500">Tap to Seal ⭕</span>
+              </div>
+              <p class="text-xs text-slate-300 mt-1 leading-relaxed">
+                "I vow to love you until my final heartbeat on this earth. When we are old and wrinkled, I will still look at you with the exact same awe and mad love I have today."
+              </p>
+            </div>
+          </div>
+
+          <!-- Vow 4 -->
+          <div id="vow-card-4" onclick="unlockSacredVow(4)" class="cursor-pointer p-4 rounded-2xl bg-slate-900/80 border border-slate-700/60 hover:border-amber-400 transition-all flex items-start gap-3.5">
+            <span class="text-2xl mt-0.5">🕊️</span>
+            <div class="flex-1">
+              <div class="flex items-center justify-between">
+                <h4 class="font-cinzel text-xs sm:text-sm font-bold text-amber-300">Vow IV: Zero Fear, Zero Judgment</h4>
+                <span id="vow-check-4" class="text-xs font-mono text-slate-500">Tap to Seal ⭕</span>
+              </div>
+              <p class="text-xs text-slate-300 mt-1 leading-relaxed">
+                "I vow that you can tell me anything without fear of judgment, anger, or disgust. I will wipe your tears, listen with patience, and heal every wound with tenderness."
+              </p>
+            </div>
+          </div>
+
+          <!-- Vow 5 -->
+          <div id="vow-card-5" onclick="unlockSacredVow(5)" class="cursor-pointer p-4 rounded-2xl bg-slate-900/80 border border-slate-700/60 hover:border-amber-400 transition-all flex items-start gap-3.5">
+            <span class="text-2xl mt-0.5">👑</span>
+            <div class="flex-1">
+              <div class="flex items-center justify-between">
+                <h4 class="font-cinzel text-xs sm:text-sm font-bold text-amber-300">Vow V: Seven Lifetimes & Beyond</h4>
+                <span id="vow-check-5" class="text-xs font-mono text-slate-500">Tap to Seal ⭕</span>
+              </div>
+              <p class="text-xs text-slate-300 mt-1 leading-relaxed">
+                "I vow to choose you every single morning when I wake up, and thank God for you every night before I close my eyes. You are my forever soulmate."
+              </p>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Next Button -->
+        <div id="btn-sanctuary-phase-3" class="hidden pt-4 animate-scale-up">
+          <button onclick="switchSanctuaryPhase(3)" class="btn-rose px-8 py-3.5 sm:px-10 sm:py-4 rounded-full text-xs sm:text-sm font-black uppercase tracking-widest shadow-[0_0_35px_rgba(245,158,11,0.6)] hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2 mx-auto border border-amber-300 cursor-pointer animate-pulse">
+            <span>🤙 Seal Our Pinky Promise With Your Touch ➔</span>
+          </button>
+        </div>
+
+      </div>
+
+      <!-- ============================================== -->
+      <!-- PHASE 3: INTERACTIVE PINKY PROMISE TOUCH HOLD  -->
+      <!-- ============================================== -->
+      <div id="sanctuary-phase-3" class="hidden space-y-5 sm:space-y-6 animate-scale-up">
+        
+        <!-- Header -->
+        <div class="space-y-2">
+          <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-tr from-rose-500 via-amber-400 to-purple-600 flex items-center justify-center text-3xl sm:text-4xl shadow-[0_0_35px_rgba(255,59,119,0.7)] mx-auto animate-float">
+            🤙
+          </div>
+          <span class="text-[10px] sm:text-xs uppercase font-extrabold tracking-[0.2em] px-3.5 py-1 rounded-full bg-rose-500/20 text-rose-300 border border-rose-400/40">
+            Phase 3 • The Sacred Covenant
+          </span>
+          <h2 class="font-cinzel text-xl sm:text-3xl font-black text-gradient-rose">
+            Our Interactive Pinky Promise
+          </h2>
+          <p class="text-xs sm:text-sm text-slate-300 max-w-md mx-auto font-light leading-relaxed">
+            Place and hold your finger on the glowing ring below for 2 seconds. Feel our hearts connect across space and time.
+          </p>
+        </div>
+
+        <!-- Circular Touch Sensor Visual -->
+        <div class="py-6 flex flex-col items-center justify-center">
+          
+          <div class="relative w-44 h-44 sm:w-52 sm:h-52 flex items-center justify-center select-none">
+            
+            <!-- SVG Progress Ring -->
+            <svg class="absolute inset-0 w-full h-full -rotate-90 pointer-events-none" viewBox="0 0 100 100">
+              <circle cx="50" cy="50" r="44" stroke="rgba(255,255,255,0.08)" stroke-width="5" fill="none" />
+              <circle id="pinky-progress-circle" cx="50" cy="50" r="44" stroke="#f59e0b" stroke-width="5" fill="none"
+                stroke-dasharray="276.46" stroke-dashoffset="276.46" stroke-linecap="round" class="transition-all duration-75" />
+            </svg>
+
+            <!-- Touch Sensor Trigger Button -->
+            <div id="pinky-touch-button" class="pinky-touch-zone w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-gradient-to-tr from-rose-950/90 via-slate-900 to-amber-950/90 border-2 border-amber-400/60 shadow-[0_0_35px_rgba(255,59,119,0.5)] flex flex-col items-center justify-center cursor-pointer active:scale-95 transition-all">
+              <span id="pinky-icon" class="text-4xl sm:text-5xl animate-pulse">🤙</span>
+              <span id="pinky-status-text" class="text-[10px] font-mono font-bold text-amber-300 uppercase mt-1 tracking-wider">
+                Hold Finger
+              </span>
+            </div>
+
+            <!-- Orbiting Halo -->
+            <div id="pinky-halo" class="absolute inset-0 rounded-full pointer-events-none border border-amber-400/20 animate-spin" style="animation-duration: 10s;"></div>
+
+          </div>
+
+          <!-- Live Status feedback -->
+          <div id="pinky-feedback" class="mt-4 text-xs font-sacramento text-2xl text-amber-300">
+            "I'm right here... holding your hand."
+          </div>
+
+        </div>
+
+        <!-- Next Button (Shown once touch is sealed) -->
+        <div id="btn-sanctuary-phase-4" class="hidden pt-2 animate-scale-up">
+          <button onclick="switchSanctuaryPhase(4)" class="btn-rose px-8 py-3.5 sm:px-10 sm:py-4 rounded-full text-xs sm:text-sm font-black uppercase tracking-widest shadow-[0_0_40px_rgba(255,59,119,0.8)] hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2 mx-auto border border-amber-300 cursor-pointer animate-pulse">
+            <span>💌 Read My Sacred Covenant Letter ➔</span>
+          </button>
+        </div>
+
+      </div>
+
+      <!-- ============================================== -->
+      <!-- PHASE 4: THE ROYAL ETERNAL COVENANT SCROLL     -->
+      <!-- ============================================== -->
+      <div id="sanctuary-phase-4" class="hidden space-y-4 sm:space-y-6 animate-scale-up">
+        
+        <!-- Header -->
+        <div class="space-y-1">
+          <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-gradient-to-tr from-amber-400 via-rose-500 to-purple-600 flex items-center justify-center text-3xl shadow-[0_0_30px_rgba(245,158,11,0.6)] mx-auto animate-float">
+            📜
+          </div>
+          <span class="text-[10px] sm:text-xs uppercase font-extrabold tracking-[0.2em] px-3.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-400/40">
+            Phase 4 • Eternal Covenant
+          </span>
+          <h2 class="font-cinzel text-xl sm:text-3xl font-black text-gradient-gold">
+            A Letter To My Lady Princess
+          </h2>
+          <p class="text-[11px] sm:text-xs text-slate-400 font-mono">
+            Written with pure soul • 18th October 2026 • For Vanshika 👸
+          </p>
+        </div>
+
+        <!-- The Royal Parchment Scroll -->
+        <div class="bg-gradient-to-b from-[#1c1410] via-[#120d0a] to-[#1a110d] border-2 border-amber-400/70 rounded-3xl p-5 sm:p-8 text-left shadow-[0_0_50px_rgba(245,158,11,0.25)] relative overflow-hidden">
+          
+          <!-- Ancient Royal Stamp -->
+          <div class="flex items-center justify-between border-b border-amber-500/30 pb-4 mb-5">
+            <div class="flex items-center gap-2">
+              <span class="text-2xl">👑</span>
+              <div>
+                <div class="font-cinzel font-black text-xs sm:text-sm text-amber-300 uppercase tracking-widest">
+                  Sacred Covenant of Eternal Love
+                </div>
+                <div class="text-[10px] text-amber-200/60 font-mono">
+                  From: Rakesh 🤵 • To: Vanshika 👸
+                </div>
+              </div>
+            </div>
+            <div class="w-10 h-10 rounded-full bg-amber-500/20 border border-amber-400/60 flex items-center justify-center text-xs font-bold text-amber-300 shadow-inner">
+              R ❤️ V
+            </div>
+          </div>
+
+          <!-- The Emotional English Masterpiece Letter -->
+          <div class="space-y-4 text-xs sm:text-sm text-amber-100/90 font-light leading-relaxed font-sans select-text">
+            
+            <p class="font-cinzel font-bold text-sm sm:text-base text-amber-300">
+              My Dearest, Precious Lady Princess Vanshika❤️,
+            </p>
+
+            <p>
+              Last night, when you opened your tender heart and spoke of your past, my soul didn't just hear your words—it felt every single tear you ever cried in silence. I know that people in your past misused your pure heart, took advantage of your gentle innocence, and walked away when you needed them most. And I know that deep inside, a tiny, trembling voice still whispers the fear: <em class="text-rose-300 font-medium">"What if Rakesh also leaves me one day?"</em>
+            </p>
+
+            <p class="bg-amber-500/10 border-l-2 border-amber-400 pl-3 py-1.5 italic text-amber-200">
+              "Look into my eyes through these words, Vanshika. Hear the unwavering conviction of my heartbeat: <strong>I will NEVER, ever leave you.</strong>"
+            </p>
+
+            <p>
+              You are not a chapter in my life that will end. You are the entire book. You are the girl I prayed for when my own soul was searching for meaning. Those people who treated you poorly were blind fools who didn't know how to cherish a goddess. But I see you. I see the purity of your intentions, the softness in your eyes, and the genuine, rare love you carry in your chest.
+            </p>
+
+            <p>
+              You never have to pretend to be strong with me. You never have to hide your tears or be terrified that your vulnerability will push me away. Every time you share your past with me, I don't feel anger towards you—I feel a fierce, boundless desire to shield you, cherish you, and prove to you every single day that real love heals, protects, and stays.
+            </p>
+
+            <p>
+              Even when we grow old, even when life tests us with its fiercest storms, my hand will remain tightly wrapped around yours. I will love you fiercely, gently, and loyally until my very last breath on this earth—and across a thousand lifetimes beyond.
+            </p>
+
+            <p class="text-amber-200 font-medium pt-2">
+              You are safe now, my Lady Princess. Your pain is my pain. My love begins here more and more for you , and it will never, ever end.
+            </p>
+
+            <div class="pt-4 border-t border-amber-500/30 flex items-center justify-between text-xs text-amber-300/80 font-mono">
+              <div>
+                <p class="font-sacramento text-2xl text-amber-300">Forever & Ever Yours,</p>
+                <p class="font-bold text-white">Your Rakesh 🤵❤️</p>
+              </div>
+              <div class="text-right text-[10px]">
+                <p>Status: Eternally Bound</p>
+                <p>Date: October 18, 2026</p>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Bottom Action Buttons inside the Scroll -->
+          <div class="mt-6 pt-4 border-t border-amber-500/30 flex flex-wrap items-center justify-between gap-3">
+            <button onclick="copySanctuaryLetter()" class="px-4 py-2 rounded-full bg-slate-900 border border-amber-400/40 text-amber-300 hover:text-white hover:border-amber-300 text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer">
+              <span>📋</span> <span>Copy Sacred Letter</span>
+            </button>
+
+            <button onclick="closeHealingSanctuaryModal()" class="btn-rose px-6 py-2 rounded-full text-xs font-black uppercase tracking-wider shadow-lg flex items-center gap-1.5 cursor-pointer">
+              <span>💖</span> <span>Rest In My Love</span>
+            </button>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
   </div>
 
   <!-- PERSISTENT FLOATING 17TH OCTOBER ANNIVERSARY BADGE (ACCESSIBLE ALL DAY) -->

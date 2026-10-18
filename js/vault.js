@@ -1542,3 +1542,249 @@ async function initVanshikaReel() {
   updateReelCounter();
   setupReelVisibilityObserver();
 }
+
+// ==========================================
+// SACRED HEALING SANCTUARY ENGINE (OCT 18 FEATURE)
+// ==========================================
+
+let sanctuaryAudioCtx = null;
+let shardsHealedCount = 0;
+let vowsSealedCount = 0;
+let pinkyTouchTimer = null;
+let pinkyTouchStartTime = 0;
+let isPinkySealed = false;
+let pinkyTouchProgressAnim = null;
+
+function playHealingChime(freq = 528) {
+  try {
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContext) return;
+    if (!sanctuaryAudioCtx) sanctuaryAudioCtx = new AudioContext();
+    if (sanctuaryAudioCtx.state === 'suspended') sanctuaryAudioCtx.resume();
+
+    const osc = sanctuaryAudioCtx.createOscillator();
+    const gain = sanctuaryAudioCtx.createGain();
+
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(freq, sanctuaryAudioCtx.currentTime);
+
+    gain.gain.setValueAtTime(0.001, sanctuaryAudioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.25, sanctuaryAudioCtx.currentTime + 0.08);
+    gain.gain.exponentialRampToValueAtTime(0.0001, sanctuaryAudioCtx.currentTime + 1.6);
+
+    osc.connect(gain);
+    gain.connect(sanctuaryAudioCtx.destination);
+
+    osc.start();
+    osc.stop(sanctuaryAudioCtx.currentTime + 1.6);
+  } catch (e) {}
+}
+
+function openHealingSanctuaryModal() {
+  const modal = document.getElementById('sacred-sanctuary-modal');
+  if (modal) {
+    modal.classList.remove('hidden');
+    modal.classList.add('block');
+    playHealingChime(528);
+    switchSanctuaryPhase(1);
+    initPinkyPromiseTouchSensor();
+  }
+}
+
+function closeHealingSanctuaryModal() {
+  const modal = document.getElementById('sacred-sanctuary-modal');
+  if (modal) {
+    modal.classList.add('hidden');
+    modal.classList.remove('block');
+  }
+}
+
+function switchSanctuaryPhase(phaseNum) {
+  for (let i = 1; i <= 4; i++) {
+    const phaseEl = document.getElementById(`sanctuary-phase-${i}`);
+    const stepEl = document.getElementById(`sanctuary-step-${i}`);
+    if (phaseEl) {
+      if (i === phaseNum) {
+        phaseEl.classList.remove('hidden');
+        phaseEl.classList.add('block');
+      } else {
+        phaseEl.classList.add('hidden');
+        phaseEl.classList.remove('block');
+      }
+    }
+    if (stepEl) {
+      if (i === phaseNum) {
+        stepEl.className = 'px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 font-bold shadow-sm transition-all';
+      } else if (i < phaseNum) {
+        stepEl.className = 'px-2 py-0.5 rounded-full bg-rose-500/30 text-rose-300 font-bold border border-rose-500/40 transition-all';
+      } else {
+        stepEl.className = 'px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 transition-all';
+      }
+    }
+  }
+
+  const modal = document.getElementById('sacred-sanctuary-modal');
+  if (modal) modal.scrollTo({ top: 0, behavior: 'smooth' });
+
+  playHealingChime(432 + (phaseNum * 96));
+}
+
+function dissolveTraumaShard(shardIndex) {
+  const shard = document.getElementById(`trauma-shard-${shardIndex}`);
+  const truth = document.getElementById(`healed-truth-${shardIndex}`);
+  if (!shard || shard.classList.contains('sanctuary-dissolving') || shard.style.display === 'none') return;
+
+  playHealingChime(528 + (shardIndex * 70));
+  shard.classList.add('sanctuary-dissolving');
+
+  setTimeout(() => {
+    shard.style.display = 'none';
+    if (truth) truth.classList.remove('hidden');
+    shardsHealedCount++;
+    const countEl = document.getElementById('shards-healed-count');
+    if (countEl) countEl.innerText = `${shardsHealedCount} / 4`;
+
+    if (shardsHealedCount >= 4) {
+      const nextBtn = document.getElementById('btn-sanctuary-phase-2');
+      if (nextBtn) nextBtn.classList.remove('hidden');
+      playHealingChime(741);
+      setTimeout(() => playHealingChime(852), 250);
+      if (typeof triggerAnniversaryConfetti === 'function') triggerAnniversaryConfetti();
+    }
+  }, 650);
+}
+
+function unlockSacredVow(vowIndex) {
+  const card = document.getElementById(`vow-card-${vowIndex}`);
+  const check = document.getElementById(`vow-check-${vowIndex}`);
+  if (!card) return;
+
+  if (!card.dataset.sealed) {
+    card.dataset.sealed = 'true';
+    vowsSealedCount++;
+    card.className = 'cursor-pointer p-4 rounded-2xl bg-gradient-to-r from-amber-950/70 to-slate-900 border-2 border-amber-400 shadow-[0_0_20px_rgba(245,158,11,0.3)] transition-all flex items-start gap-3.5';
+    if (check) {
+      check.innerHTML = '<span class="text-amber-400 font-bold">Sealed Forever ✅</span>';
+    }
+    playHealingChime(639 + (vowIndex * 50));
+  }
+
+  if (vowsSealedCount >= 5) {
+    const nextBtn = document.getElementById('btn-sanctuary-phase-3');
+    if (nextBtn) nextBtn.classList.remove('hidden');
+    playHealingChime(852);
+    setTimeout(() => playHealingChime(963), 200);
+  }
+}
+
+function initPinkyPromiseTouchSensor() {
+  const btn = document.getElementById('pinky-touch-button');
+  if (!btn || btn.dataset.initialized) return;
+  btn.dataset.initialized = 'true';
+
+  const progressCircle = document.getElementById('pinky-progress-circle');
+  const statusText = document.getElementById('pinky-status-text');
+  const feedbackText = document.getElementById('pinky-feedback');
+  const maxDash = 276.46;
+
+  function startHold(e) {
+    if (isPinkySealed) return;
+    if (e.cancelable) e.preventDefault();
+    pinkyTouchStartTime = Date.now();
+    playHealingChime(528);
+
+    if (navigator.vibrate) navigator.vibrate(60);
+
+    btn.style.transform = 'scale(0.92)';
+    btn.style.boxShadow = '0 0 45px rgba(245, 158, 11, 0.9)';
+    if (statusText) statusText.innerText = 'Hold Tight...';
+    if (feedbackText) feedbackText.innerText = 'Feel the sacred bond forming... ❤️';
+
+    const duration = 2200;
+
+    function tick() {
+      const elapsed = Date.now() - pinkyTouchStartTime;
+      const progress = Math.min(elapsed / duration, 1);
+      const offset = maxDash - (maxDash * progress);
+      if (progressCircle) progressCircle.style.strokeDashoffset = offset;
+
+      if (progress < 1) {
+        pinkyTouchProgressAnim = requestAnimationFrame(tick);
+      } else {
+        completePinkyPromise();
+      }
+    }
+    pinkyTouchProgressAnim = requestAnimationFrame(tick);
+  }
+
+  function endHold() {
+    if (isPinkySealed) return;
+    if (pinkyTouchProgressAnim) cancelAnimationFrame(pinkyTouchProgressAnim);
+    btn.style.transform = '';
+    btn.style.boxShadow = '';
+    if (progressCircle) progressCircle.style.strokeDashoffset = maxDash;
+    if (statusText) statusText.innerText = 'Hold Finger';
+    if (feedbackText) feedbackText.innerText = 'Hold for 2 seconds to seal...';
+  }
+
+  function completePinkyPromise() {
+    isPinkySealed = true;
+    if (pinkyTouchProgressAnim) cancelAnimationFrame(pinkyTouchProgressAnim);
+    btn.style.transform = 'scale(1.05)';
+    btn.className = 'w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-gradient-to-tr from-amber-500 via-rose-500 to-purple-600 border-2 border-white shadow-[0_0_60px_rgba(245,158,11,1)] flex flex-col items-center justify-center';
+    
+    const icon = document.getElementById('pinky-icon');
+    if (icon) icon.innerText = '💍';
+    if (statusText) {
+      statusText.innerText = 'SEALED FOREVER';
+      statusText.className = 'text-[11px] font-mono font-black text-white uppercase mt-1 tracking-widest';
+    }
+    if (feedbackText) {
+      feedbackText.innerHTML = '<span class="text-gradient-gold font-bold">✨ Sealed in eternity! Our souls are bound. ✨</span>';
+    }
+
+    if (navigator.vibrate) navigator.vibrate([150, 100, 250]);
+
+    playHealingChime(528);
+    setTimeout(() => playHealingChime(660), 120);
+    setTimeout(() => playHealingChime(792), 240);
+
+    if (typeof triggerAnniversaryConfetti === 'function') triggerAnniversaryConfetti();
+
+    const nextBtn = document.getElementById('btn-sanctuary-phase-4');
+    if (nextBtn) nextBtn.classList.remove('hidden');
+  }
+
+  btn.addEventListener('mousedown', startHold);
+  btn.addEventListener('touchstart', startHold, { passive: false });
+
+  window.addEventListener('mouseup', endHold);
+  window.addEventListener('touchend', endHold);
+  window.addEventListener('touchcancel', endHold);
+}
+
+function copySanctuaryLetter() {
+  const text = `My Dearest, Precious Lady Princess Vanshika,
+
+Last night, when you opened your tender heart and spoke of your past, my soul didn't just hear your words—it felt every single tear you ever cried in silence. I know that people in your past misused your pure heart, took advantage of your gentle innocence, and walked away when you needed them most. And I know that deep inside, a tiny, trembling voice still whispers the fear: "What if Rakesh also leaves me one day?"
+
+Look into my eyes through these words, Vanshika. Hear the unwavering conviction of my heartbeat: I will NEVER, ever leave you.
+
+You are not a chapter in my life that will end. You are the entire book. You are the girl I prayed for when my own soul was searching for meaning. Those people who treated you poorly were blind fools who didn't know how to cherish a goddess. But I see you. I see the purity of your intentions, the softness in your eyes, and the genuine, rare love you carry in your chest.
+
+You never have to pretend to be strong with me. You never have to hide your tears or be terrified that your vulnerability will push me away. Every time you share your past with me, I don't feel anger towards you—I feel a fierce, boundless desire to shield you, cherish you, and prove to you every single day that real love heals, protects, and stays.
+
+Even when we grow old, even when life tests us with its fiercest storms, my hand will remain tightly wrapped around yours. I will love you fiercely, gently, and loyally until my very last breath on this earth—and across a thousand lifetimes beyond.
+
+You are safe now, my Lady Princess. Your pain ends here. My love begins here, and it will never, ever end.
+
+Forever & Ever Yours,
+Your Rakesh 🤵❤️
+(October 18, 2026)`;
+
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(text).then(() => {
+      alert("💌 Sacred Covenant Letter copied to your clipboard & heart! ❤️");
+    }).catch(() => {});
+  }
+}
