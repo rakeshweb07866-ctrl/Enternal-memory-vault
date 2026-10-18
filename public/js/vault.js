@@ -1580,6 +1580,79 @@ function playHealingChime(freq = 528) {
   } catch (e) {}
 }
 
+let wasMainMusicPlayingBeforeSanctuary = false;
+
+function playSanctuaryMusic() {
+  const sanctuaryAudio = document.getElementById('sanctuary-music-player');
+  const mainAudio = document.getElementById('bg-music-player');
+
+  if (mainAudio && !mainAudio.paused) {
+    wasMainMusicPlayingBeforeSanctuary = true;
+    try { mainAudio.pause(); } catch (e) {}
+  }
+
+  if (sanctuaryAudio) {
+    sanctuaryAudio.volume = 0.75;
+    const playPromise = sanctuaryAudio.play();
+    if (playPromise !== undefined) {
+      playPromise.then(() => {
+        updateSanctuaryMusicUI(true);
+      }).catch(err => {
+        console.log('Sanctuary audio play promise note:', err);
+        updateSanctuaryMusicUI(false);
+      });
+    }
+  }
+}
+
+function pauseSanctuaryMusic() {
+  const sanctuaryAudio = document.getElementById('sanctuary-music-player');
+  if (sanctuaryAudio) {
+    try { sanctuaryAudio.pause(); } catch (e) {}
+    updateSanctuaryMusicUI(false);
+  }
+
+  if (wasMainMusicPlayingBeforeSanctuary) {
+    const mainAudio = document.getElementById('bg-music-player');
+    if (mainAudio) {
+      try { mainAudio.play(); } catch (e) {}
+    }
+    wasMainMusicPlayingBeforeSanctuary = false;
+  }
+}
+
+function toggleSanctuaryMusic() {
+  const sanctuaryAudio = document.getElementById('sanctuary-music-player');
+  if (!sanctuaryAudio) return;
+  if (sanctuaryAudio.paused) {
+    sanctuaryAudio.play().then(() => {
+      updateSanctuaryMusicUI(true);
+    }).catch(() => {});
+  } else {
+    sanctuaryAudio.pause();
+    updateSanctuaryMusicUI(false);
+  }
+}
+
+function updateSanctuaryMusicUI(isPlaying) {
+  const btn = document.getElementById('sanctuary-music-btn');
+  const icon = document.getElementById('sanctuary-music-icon');
+  const text = document.getElementById('sanctuary-music-text');
+  if (btn && icon && text) {
+    if (isPlaying) {
+      btn.className = 'flex items-center gap-1.5 px-2 sm:px-2.5 py-1 rounded-full bg-rose-500/20 border border-rose-400/40 text-rose-300 text-[10px] sm:text-[11px] font-semibold hover:bg-rose-500/30 transition-all cursor-pointer shadow-sm';
+      icon.textContent = '🎵';
+      text.textContent = 'Song Playing';
+      icon.classList.add('animate-bounce');
+    } else {
+      btn.className = 'flex items-center gap-1.5 px-2 sm:px-2.5 py-1 rounded-full bg-slate-900 border border-slate-700 text-slate-400 text-[10px] sm:text-[11px] font-semibold hover:text-slate-200 transition-all cursor-pointer';
+      icon.textContent = '🔇';
+      text.textContent = 'Song Muted';
+      icon.classList.remove('animate-bounce');
+    }
+  }
+}
+
 function openHealingSanctuaryModal() {
   const modal = document.getElementById('sacred-sanctuary-modal');
   if (modal) {
@@ -1588,6 +1661,7 @@ function openHealingSanctuaryModal() {
     playHealingChime(528);
     switchSanctuaryPhase(1);
     initPinkyPromiseTouchSensor();
+    playSanctuaryMusic();
   }
 }
 
@@ -1596,6 +1670,7 @@ function closeHealingSanctuaryModal() {
   if (modal) {
     modal.classList.add('hidden');
     modal.classList.remove('block');
+    pauseSanctuaryMusic();
   }
 }
 

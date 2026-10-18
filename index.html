@@ -1480,7 +1480,14 @@
     <!-- Background Canvas for Sanctuary Stars & Golden Butterflies -->
     <canvas id="sanctuary-fx-canvas" class="fixed inset-0 pointer-events-none z-0"></canvas>
 
-    <!-- Sleek Top Bar with Close Button & Phase Breadcrumb -->
+    <!-- Dedicated Audio Player for Sacred Sanctuary -->
+    <audio id="sanctuary-music-player" loop preload="auto">
+      <source src="music/sanctuary-song.mp3" type="audio/mpeg">
+      <source src="music/tum-jo-aaye.mp3" type="audio/mpeg">
+      <source src="music/love-song.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- Sleek Top Bar with Close Button, Music Toggle & Phase Breadcrumb -->
     <div class="sticky top-0 z-30 max-w-2xl mx-auto flex items-center justify-between py-2 sm:py-3 mb-2 px-3 sm:px-4 bg-slate-950/85 backdrop-blur-md rounded-2xl border border-amber-400/30 shadow-lg">
       <div class="flex items-center gap-2">
         <span class="text-xl">🛡️</span>
@@ -1496,9 +1503,15 @@
         <span class="text-slate-500">➔</span>
         <span id="sanctuary-step-4" class="px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 transition-all">4. Letter</span>
       </div>
-      <button onclick="closeHealingSanctuaryModal()" class="w-8 h-8 rounded-full bg-slate-900/80 hover:bg-rose-500/30 text-slate-400 hover:text-white text-xl flex items-center justify-center font-bold transition-all cursor-pointer">
-        ✕
-      </button>
+      <div class="flex items-center gap-1.5 sm:gap-2">
+        <button id="sanctuary-music-btn" onclick="toggleSanctuaryMusic()" class="flex items-center gap-1.5 px-2 sm:px-2.5 py-1 rounded-full bg-rose-500/20 border border-rose-400/40 text-rose-300 text-[10px] sm:text-[11px] font-semibold hover:bg-rose-500/30 transition-all cursor-pointer shadow-sm" title="Play / Pause Sanctuary Music">
+          <span id="sanctuary-music-icon" class="animate-bounce">🎵</span>
+          <span id="sanctuary-music-text" class="hidden xs:inline">Song Playing</span>
+        </button>
+        <button onclick="closeHealingSanctuaryModal()" class="w-8 h-8 rounded-full bg-slate-900/80 hover:bg-rose-500/30 text-slate-400 hover:text-white text-xl flex items-center justify-center font-bold transition-all cursor-pointer">
+          ✕
+        </button>
+      </div>
     </div>
 
     <!-- Main Container -->

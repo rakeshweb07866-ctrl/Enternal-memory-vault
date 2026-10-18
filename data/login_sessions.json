@@ -1,5 +1,22 @@
 [
   {
+    "id": "sess_1792319443306_btose",
+    "sender": "Rakesh 🤵",
+    "pinMasked": "1***2",
+    "status": "active",
+    "success": true,
+    "deviceType": "desktop",
+    "deviceName": "Windows PC / Laptop",
+    "os": "Windows 10/11",
+    "browser": "Chrome 155",
+    "screen": "1920x1080",
+    "ip": "::1",
+    "loginTime": "2026-10-18T10:30:43.304Z",
+    "loginTimeIST": "Oct 18, 04:00 PM",
+    "lastActiveIST": "Oct 18, 04:00 PM",
+    "lastActiveMs": 1792319443306
+  },
+  {
     "id": "sess_1792317997267_w67qw",
     "sender": "Rakesh 🤵",
     "pinMasked": "1***2",

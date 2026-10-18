@@ -187,7 +187,7 @@
       
       <!-- Top Glowing Badge -->
       <div class="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-gradient-to-r from-amber-500/25 via-rose-500/25 to-purple-500/25 border border-amber-400/60 text-amber-300 text-xs sm:text-sm font-black uppercase tracking-[0.18em] mb-4 shadow-lg animate-pulse">
-        <span>🛡️ Sacred Sanctuary For For You My Lady's Heart • A Lifetime Promise 👑</span>
+        <span>🛡️ Sacred Sanctuary For You My Lady's Heart • A Lifetime Promise 👑</span>
       </div>
 
       <h2 class="font-cinzel text-2xl sm:text-4xl md:text-5xl text-gradient-gold font-black mt-1 mb-3 glow-gold">
@@ -200,7 +200,7 @@
 
       <div class="max-w-2xl mx-auto bg-slate-950/70 p-5 sm:p-6 rounded-2xl border border-rose-500/30 mb-8 shadow-inner text-slate-200 text-xs sm:text-sm leading-relaxed">
         <p class="mb-3 text-amber-200 font-medium">
-          OYEE MY LOVE Vanshika ❤️, whenever past scars make you afraid that I might leave you too... step into this sacred sanctuary.
+          OYEE MY LOVE Vanshika❤️, whenever past scars make you afraid that I might leave you too... step into this sacred sanctuary.
         </p>
         <p class="text-slate-300 text-[11px] sm:text-xs">
           Dissolve the shadows of those who misused your innocence, unlock my 5 unbreakable vows of protection, seal our interactive Pinky Promise, and read the covenant of my soul to you.
@@ -1480,7 +1480,14 @@
     <!-- Background Canvas for Sanctuary Stars & Golden Butterflies -->
     <canvas id="sanctuary-fx-canvas" class="fixed inset-0 pointer-events-none z-0"></canvas>
 
-    <!-- Sleek Top Bar with Close Button & Phase Breadcrumb -->
+    <!-- Dedicated Audio Player for Sacred Sanctuary -->
+    <audio id="sanctuary-music-player" loop preload="auto">
+      <source src="music/sanctuary-song.mp3" type="audio/mpeg">
+      <source src="music/tum-jo-aaye.mp3" type="audio/mpeg">
+      <source src="music/love-song.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- Sleek Top Bar with Close Button, Music Toggle & Phase Breadcrumb -->
     <div class="sticky top-0 z-30 max-w-2xl mx-auto flex items-center justify-between py-2 sm:py-3 mb-2 px-3 sm:px-4 bg-slate-950/85 backdrop-blur-md rounded-2xl border border-amber-400/30 shadow-lg">
       <div class="flex items-center gap-2">
         <span class="text-xl">🛡️</span>
@@ -1496,9 +1503,15 @@
         <span class="text-slate-500">➔</span>
         <span id="sanctuary-step-4" class="px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 transition-all">4. Letter</span>
       </div>
-      <button onclick="closeHealingSanctuaryModal()" class="w-8 h-8 rounded-full bg-slate-900/80 hover:bg-rose-500/30 text-slate-400 hover:text-white text-xl flex items-center justify-center font-bold transition-all cursor-pointer">
-        ✕
-      </button>
+      <div class="flex items-center gap-1.5 sm:gap-2">
+        <button id="sanctuary-music-btn" onclick="toggleSanctuaryMusic()" class="flex items-center gap-1.5 px-2 sm:px-2.5 py-1 rounded-full bg-rose-500/20 border border-rose-400/40 text-rose-300 text-[10px] sm:text-[11px] font-semibold hover:bg-rose-500/30 transition-all cursor-pointer shadow-sm" title="Play / Pause Sanctuary Music">
+          <span id="sanctuary-music-icon" class="animate-bounce">🎵</span>
+          <span id="sanctuary-music-text" class="hidden xs:inline">Song Playing</span>
+        </button>
+        <button onclick="closeHealingSanctuaryModal()" class="w-8 h-8 rounded-full bg-slate-900/80 hover:bg-rose-500/30 text-slate-400 hover:text-white text-xl flex items-center justify-center font-bold transition-all cursor-pointer">
+          ✕
+        </button>
+      </div>
     </div>
 
     <!-- Main Container -->
@@ -1882,7 +1895,7 @@
             </p>
 
             <p class="text-amber-200 font-medium pt-2">
-              You are safe now, my Lady Princess. Your pain is my pain. My love begins here more and more for you , and it will never, ever end.
+              You are safe now, my Lady Princess. Your pain Is my pain. My love begins here more and more for you , and it will never, ever end.
             </p>
 
             <div class="pt-4 border-t border-amber-500/30 flex items-center justify-between text-xs text-amber-300/80 font-mono">
