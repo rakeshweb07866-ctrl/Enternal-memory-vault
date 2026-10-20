@@ -26,7 +26,7 @@ let fbApp = null;
 let fbDb = null;
 let isFirebaseActive = false;
 let currentChatSender = sessionStorage.getItem('chat_user_name') || localStorage.getItem('chat_user_name') || '';
-let currentChatPin = sessionStorage.getItem('chat_user_pin') || localStorage.getItem('chat_user_pin') || '';
+let currentChatPin = sessionStorage.getItem('chat_user_pin') || '';
 let previousMsgCount = 0;
 let isPlayingMusic = false;
 let typingTimeout = null;
@@ -57,14 +57,25 @@ function openNameLoginModal() {
   const errEl = document.getElementById('login-error-msg');
   const eyeIcon = document.getElementById('eye-icon');
 
+  // Pre-select previous user identity if available
+  const savedUser = localStorage.getItem('chat_user_name');
+  if (savedUser) {
+    selectIdentity(savedUser);
+  }
+
+  // Remove any fast-gate hide style
+  const fastGateStyle = document.getElementById('auth-fast-gate');
+  if (fastGateStyle) fastGateStyle.remove();
+
   if (pinInput) {
     pinInput.value = '';
     pinInput.type = 'password';
-    setTimeout(() => pinInput.focus(), 100);
+    setTimeout(() => pinInput.focus(), 150);
   }
   if (eyeIcon) eyeIcon.innerText = '👁️';
   if (errEl) errEl.classList.add('hidden');
   if (modal) {
+    modal.style.display = '';
     modal.classList.remove('hidden');
     modal.classList.add('flex');
   }
@@ -99,10 +110,95 @@ function selectIdentity(name) {
   }
 }
 
+// Dynamic Passcode Memory & Instant 0ms Unlock Engine
+let cachedSecurityPins = {
+  vanshika: '1709',
+  rakesh: '1212',
+  admin: 'Vanshika170926'
+};
+
+try {
+  const localStored = localStorage.getItem('cached_security_pins');
+  if (localStored) {
+    cachedSecurityPins = { ...cachedSecurityPins, ...JSON.parse(localStored) };
+  }
+} catch (e) {}
+
+function isKnownSecurityPin(p) {
+  const pin = String(p || '').trim();
+  return (
+    pin === '1709' ||
+    pin === '1212' ||
+    pin === 'Vanshika170926' ||
+    pin === cachedSecurityPins.vanshika ||
+    pin === cachedSecurityPins.rakesh ||
+    pin === cachedSecurityPins.admin
+  );
+}
+
+function getIdentityFromPin(p) {
+  const pin = String(p || '').trim();
+  if (pin === '1709' || pin === cachedSecurityPins.vanshika) {
+    return 'Vanshika 👸';
+  }
+  if (
+    pin === '1212' ||
+    pin === 'Vanshika170926' ||
+    pin === cachedSecurityPins.rakesh ||
+    pin === cachedSecurityPins.admin
+  ) {
+    return 'Rakesh 🤵';
+  }
+  return null;
+}
+
+function applySuccessfulLogin(name, pin, authSessionId) {
+  currentChatSender = name;
+  currentChatPin = pin;
+  sessionStorage.setItem('chat_user_name', name);
+  sessionStorage.setItem('chat_user_pin', pin);
+  localStorage.setItem('chat_user_name', name);
+  localStorage.removeItem('chat_user_pin');
+
+  if (authSessionId) {
+    sessionStorage.setItem('chat_session_id', authSessionId);
+  }
+
+  // Ensure zero-flicker style exists to keep modal suppressed during this active session
+  let fastGateStyle = document.getElementById('auth-fast-gate');
+  if (!fastGateStyle) {
+    fastGateStyle = document.createElement('style');
+    fastGateStyle.id = 'auth-fast-gate';
+    fastGateStyle.innerHTML = '#name-login-modal { display: none !important; }';
+    document.head.appendChild(fastGateStyle);
+  }
+
+  const modal = document.getElementById('name-login-modal');
+  if (modal) {
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+    modal.style.display = 'none';
+  }
+  const errEl = document.getElementById('login-error-msg');
+  if (errEl) errEl.classList.add('hidden');
+
+  updateUserBadge();
+
+  if (socket && socket.connected) {
+    socket.emit('user_join', { sender: currentChatSender, pin: currentChatPin });
+  } else if (typeof initSocketConnection === 'function') {
+    initSocketConnection();
+  }
+  if (typeof fetchLiveChatMessages === 'function') {
+    fetchLiveChatMessages();
+  }
+}
+
 async function confirmNameLogin() {
   const nameInput = document.getElementById('login-name-input');
   const pinInput = document.getElementById('login-pin-input');
   const errEl = document.getElementById('login-error-msg');
+  const submitBtn = document.getElementById('login-submit-btn');
 
   let name = nameInput ? nameInput.value.trim() : 'Vanshika 👸';
   const pin = pinInput ? pinInput.value.trim() : '';
@@ -123,30 +219,77 @@ async function confirmNameLogin() {
     language: navigator.language || ''
   };
 
-  // 1. Dynamic Server Passcode Verification with Auto-Identity Detection
+  // 1. FAST PATH (0ms Instant Unlock): If PIN matches known passcodes, unlock IMMEDIATELY without waiting!
+  if (isKnownSecurityPin(pin)) {
+    const autoIdent = getIdentityFromPin(pin);
+    if (autoIdent) name = autoIdent;
+
+    // Instant UI unlock - 0ms response!
+    applySuccessfulLogin(name, pin);
+
+    // Asynchronous background device & session telemetry logging (non-blocking)
+    fetch('/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ sender: name, pin: pin, device: clientDevice, failed: false })
+    }).then(res => res.json()).then(data => {
+      if (data && data.sessionId) {
+        sessionStorage.setItem('chat_session_id', data.sessionId);
+      }
+    }).catch(err => {
+      console.log('Background auth audit log note:', err);
+    });
+
+    return;
+  }
+
+  // 2. SERVER FALLBACK PATH: If PIN is newly changed or unknown locally, verify with server
+  if (submitBtn) {
+    submitBtn.disabled = true;
+    submitBtn.innerText = 'Verifying Passcode... ✨';
+  }
+
   let authenticated = false;
   let authSessionId = null;
 
   try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 3500);
+
     const res = await fetch('/api/auth/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ sender: name, pin: pin, device: clientDevice, failed: false })
+      body: JSON.stringify({ sender: name, pin: pin, device: clientDevice, failed: false }),
+      signal: controller.signal
     });
+    clearTimeout(timeoutId);
+
     const data = await res.json();
     if (res.ok && data && data.success) {
       authenticated = true;
       if (data.sender) name = data.sender;
       if (data.sessionId) authSessionId = data.sessionId;
+
+      // Cache newly confirmed pin locally for future 0ms instant logins
+      if (name.includes('Vanshika')) cachedSecurityPins.vanshika = pin;
+      else cachedSecurityPins.rakesh = pin;
+      try {
+        localStorage.setItem('cached_security_pins', JSON.stringify(cachedSecurityPins));
+      } catch (e) {}
     }
   } catch (err) {
-    // Offline fallback if server is temporarily unreachable
+    // Offline fallback for known defaults
     if (pin === '1212' || pin === 'Vanshika170926') {
       name = 'Rakesh 🤵';
       authenticated = true;
     } else if (pin === '1709') {
       name = 'Vanshika 👸';
       authenticated = true;
+    }
+  } finally {
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.innerText = 'Enter Our World 💖';
     }
   }
 
@@ -162,34 +305,7 @@ async function confirmNameLogin() {
     return;
   }
 
-  // 2. Instant UI Unlock - Modal disappears immediately
-  currentChatSender = name;
-  currentChatPin = pin;
-  sessionStorage.setItem('chat_user_name', name);
-  sessionStorage.setItem('chat_user_pin', pin);
-  localStorage.setItem('chat_user_name', name);
-  if (authSessionId) {
-    sessionStorage.setItem('chat_session_id', authSessionId);
-  }
-
-  const modal = document.getElementById('name-login-modal');
-  if (modal) {
-    modal.classList.add('hidden');
-    modal.classList.remove('flex');
-  }
-  if (errEl) errEl.classList.add('hidden');
-  updateUserBadge();
-
-  if (socket && socket.connected) {
-    socket.emit('user_join', { sender: currentChatSender, pin: currentChatPin });
-  } else if (typeof initSocketConnection === 'function') {
-    initSocketConnection();
-  }
-  if (typeof fetchLiveChatMessages === 'function') {
-    fetchLiveChatMessages();
-  }
-
-  // 4. (17th October Celebration Completed - auto popup disabled)
+  applySuccessfulLogin(name, pin, authSessionId);
 }
 
 function updateUserBadge() {

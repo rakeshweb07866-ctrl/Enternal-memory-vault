@@ -31,13 +31,37 @@ document.addEventListener('DOMContentLoaded', () => {
   startSmartPolling();
   fetchLiveChatMessages();
 
-  // 5. Strict User Security Login Gate (Enforced on Every Visit)
-  localStorage.removeItem('chat_user_pin');
-  sessionStorage.removeItem('chat_user_pin');
-  currentChatSender = null;
-  currentChatPin = null;
+  // 5. Strict User Security Login Gate:
+  // Check if active authenticated session exists (survives page refresh in current tab)
+  const sessionSender = sessionStorage.getItem('chat_user_name');
+  const sessionPin = sessionStorage.getItem('chat_user_pin');
 
-  openNameLoginModal();
+  if (sessionSender && sessionPin) {
+    // User is already logged in for this active tab session (survives page refresh)
+    currentChatSender = sessionSender;
+    currentChatPin = sessionPin;
+    updateUserBadge();
+    const modal = document.getElementById('name-login-modal');
+    if (modal) {
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+      modal.style.display = 'none';
+    }
+  } else {
+    // New visit / closed tab reopened -> enforce strict security login
+    currentChatSender = null;
+    currentChatPin = null;
+    openNameLoginModal();
+  
+  
+  
+  }
+
+
+
+
+
+
 
 
   // 6. Chat Input Keypress Listeners

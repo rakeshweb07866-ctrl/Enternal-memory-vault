@@ -26,6 +26,19 @@
   <!-- Interactive Background Canvas for Heart Rain -->
   <canvas id="canvas-container"></canvas>
 
+  <!-- Fast Zero-Flicker Session Check: Prevents login modal popup on page refresh if session is active -->
+  <script>
+    (function() {
+      try {
+        var sPin = sessionStorage.getItem('chat_user_pin');
+        var sName = sessionStorage.getItem('chat_user_name');
+        if (sPin && sName) {
+          document.write('<style id="auth-fast-gate">#name-login-modal { display: none !important; }</style>');
+        }
+      } catch(e) {}
+    })();
+  </script>
+
   <!-- POPUP NAME LOGIN MODAL (Default Security Gate - Always Visible Until Authenticated) -->
   <div id="name-login-modal" class="fixed inset-0 z-[200] flex items-center justify-center bg-slate-950/98 backdrop-blur-xl p-4 select-none">
     <div class="glass-box p-8 max-w-md w-full border-rose-500/40 text-center relative animate-float shadow-2xl">
@@ -59,7 +72,7 @@
 
       <div id="login-error-msg" class="text-xs text-rose-400 font-bold mb-3 hidden bg-rose-950/60 p-2.5 rounded-xl border border-rose-500/40"></div>
 
-      <button type="button" onclick="confirmNameLogin()" class="btn-rose w-full py-3.5 rounded-full text-xs font-bold uppercase tracking-wider shadow-lg shadow-rose-500/40">
+      <button type="button" id="login-submit-btn" onclick="confirmNameLogin()" class="btn-rose w-full py-3.5 rounded-full text-xs font-bold uppercase tracking-wider shadow-lg shadow-rose-500/40 cursor-pointer">
         Enter Our World 💖
       </button>
     </div>
