@@ -1249,6 +1249,7 @@ function closeChatMediaModal() {
 
 // Presence & Typing
 function updatePresenceUI(presence) {
+  updateChatAppHeaderUI();
   if (!presence) return;
   latestPresenceState = presence;
   const dot = document.getElementById('presence-dot');
@@ -1501,3 +1502,111 @@ function startSmartPolling() {
     }
   }, 2500);
 }
+
+
+// ==========================================
+// INSTAGRAM / WHATSAPP DEDICATED FULLSCREEN CHAT CONTROLLER
+// ==========================================
+
+function openLiveChatRoom() {
+  // If user is not logged in, prompt login first
+  if (!currentChatSender || !currentChatPin) {
+    if (typeof openNameLoginModal === 'function') {
+      openNameLoginModal();
+    }
+    return;
+  }
+
+  const chatRoom = document.getElementById('live-chat-room');
+  if (!chatRoom) return;
+
+  chatRoom.classList.add('chat-fullscreen-mode');
+  document.body.classList.add('chat-fullscreen-active');
+  updateChatAppHeaderUI();
+
+  // Push browser history state so Android/iOS back gesture exits fullscreen chat
+  try {
+    if (window.location.hash !== '#live-chat') {
+      history.pushState({ chatFullscreen: true }, '', '#live-chat');
+    }
+  } catch (e) {}
+
+  setTimeout(() => {
+    scrollChatToBottom(false);
+    const chatInput = document.getElementById('live-chat-input');
+    if (chatInput && window.innerWidth > 768) {
+      chatInput.focus();
+    }
+  }, 120);
+}
+
+function closeLiveChatRoom() {
+  const chatRoom = document.getElementById('live-chat-room');
+  if (!chatRoom) return;
+
+  chatRoom.classList.remove('chat-fullscreen-mode');
+  document.body.classList.remove('chat-fullscreen-active');
+
+  try {
+    if (window.location.hash === '#live-chat') {
+      history.back();
+    }
+  } catch (e) {}
+
+  // Smooth scroll back to embedded chat area on page
+  chatRoom.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function updateChatAppHeaderUI() {
+  const isMeV = (currentChatSender || '').toLowerCase().includes('vanshika');
+  const partnerName = isMeV ? 'Rakesh 🤵' : 'Vanshika 👸';
+  const partnerAvatar = isMeV ? '🤵' : '👸';
+  const myName = isMeV ? 'Vanshika 👸' : 'Rakesh 🤵';
+
+  const avatarEl = document.getElementById('chat-partner-avatar');
+  const nameEl = document.getElementById('chat-partner-name');
+  const myNameEl = document.getElementById('chat-current-user-name');
+  const dotEl = document.getElementById('chat-partner-status-dot');
+  const statusEl = document.getElementById('chat-partner-status-text');
+
+  if (avatarEl) avatarEl.textContent = partnerAvatar;
+  if (nameEl) nameEl.textContent = partnerName;
+  if (myNameEl) myNameEl.textContent = myName;
+
+  const partnerRole = isMeV ? 'rakesh' : 'vanshika';
+  const pData = (typeof latestPresenceState !== 'undefined' && latestPresenceState) ? latestPresenceState[partnerRole] : null;
+
+  if (dotEl && statusEl) {
+    if (pData && pData.isOnline) {
+      dotEl.className = 'absolute bottom-0 right-0 w-3 h-3 rounded-full bg-emerald-400 border-2 border-slate-950 animate-pulse';
+      statusEl.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block animate-ping"></span> Active now';
+      statusEl.className = 'text-[11px] text-emerald-400 font-medium truncate flex items-center gap-1.5';
+    } else {
+      dotEl.className = 'absolute bottom-0 right-0 w-3 h-3 rounded-full bg-slate-500 border-2 border-slate-950';
+      const seen = (pData && pData.lastSeen) ? 'Active ' + pData.lastSeen : 'Offline';
+      statusEl.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-slate-500 inline-block"></span> ' + seen;
+      statusEl.className = 'text-[11px] text-slate-400 font-medium truncate flex items-center gap-1.5';
+    }
+  }
+}
+
+// Mobile Hardware / Browser Back Button gesture support
+window.addEventListener('popstate', (e) => {
+  const chatRoom = document.getElementById('live-chat-room');
+  if (chatRoom && chatRoom.classList.contains('chat-fullscreen-mode')) {
+    chatRoom.classList.remove('chat-fullscreen-mode');
+    document.body.classList.remove('chat-fullscreen-active');
+  }
+});
+
+// Auto-scroll on virtual keyboard focus on mobile devices
+document.addEventListener('DOMContentLoaded', () => {
+  const inputEl = document.getElementById('live-chat-input');
+  if (inputEl) {
+    inputEl.addEventListener('focus', () => {
+      setTimeout(() => {
+        scrollChatToBottom(true);
+      }, 300);
+    });
+  }
+});

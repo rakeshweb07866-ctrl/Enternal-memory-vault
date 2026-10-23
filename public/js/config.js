@@ -311,6 +311,9 @@ async function confirmNameLogin() {
 function updateUserBadge() {
   const badge = document.getElementById('current-user-badge');
   if (badge) badge.innerText = currentChatSender || 'Not Set';
+  if (typeof updateChatAppHeaderUI === 'function') {
+    updateChatAppHeaderUI();
+  }
 }
 
 // ==========================================

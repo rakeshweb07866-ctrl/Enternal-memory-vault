@@ -1,5 +1,22 @@
 [
   {
+    "id": "sess_1792745964936_k4m90",
+    "sender": "Rakesh 🤵",
+    "pinMasked": "1***2",
+    "status": "active",
+    "success": true,
+    "deviceType": "mobile",
+    "deviceName": "Android Phone",
+    "os": "Android 10",
+    "browser": "Chrome 154",
+    "screen": "360x800",
+    "ip": "10.154.244.231",
+    "loginTime": "2026-10-23T08:59:24.935Z",
+    "loginTimeIST": "Oct 23, 02:29 PM",
+    "lastActiveIST": "Oct 23, 02:29 PM",
+    "lastActiveMs": 1792745964936
+  },
+  {
     "id": "sess_1792487006830_evvqq",
     "sender": "Rakesh 🤵",
     "pinMasked": "1***2",

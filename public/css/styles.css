@@ -698,3 +698,85 @@
       -webkit-touch-callout: none;
       user-select: none;
     }
+
+    /* ==========================================
+       INSTAGRAM / WHATSAPP DEDICATED FULLSCREEN CHAT MODE
+       ========================================== */
+    body.chat-fullscreen-active {
+      overflow: hidden !important;
+      height: 100vh !important;
+      height: 100dvh !important;
+      position: fixed !important;
+      width: 100% !important;
+      touch-action: none;
+    }
+
+    #live-chat-room.chat-fullscreen-mode {
+      position: fixed !important;
+      inset: 0 !important;
+      width: 100vw !important;
+      height: 100vh !important;
+      height: 100dvh !important;
+      max-width: 100vw !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      border: none !important;
+      border-radius: 0 !important;
+      z-index: 135 !important;
+      background: #08030d !important;
+      display: flex !important;
+      flex-direction: column !important;
+      overflow: hidden !important;
+      box-shadow: none !important;
+      animation: chatAppFadeIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @keyframes chatAppFadeIn {
+      from {
+        opacity: 0;
+        transform: scale(0.97) translateY(15px);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+    }
+
+    /* Switch between normal card header and app header */
+    #chat-fullscreen-app-header {
+      display: none;
+    }
+
+    #live-chat-room.chat-fullscreen-mode #chat-normal-card-header {
+      display: none !important;
+    }
+
+    #live-chat-room.chat-fullscreen-mode #chat-fullscreen-app-header {
+      display: flex !important;
+    }
+
+    /* Feed expansion in fullscreen mode */
+    #live-chat-room.chat-fullscreen-mode .chat-feed-wrapper {
+      flex: 1 1 0% !important;
+      height: 100% !important;
+      min-height: 0 !important;
+      display: flex !important;
+      flex-direction: column !important;
+    }
+
+    #live-chat-room.chat-fullscreen-mode #chat-feed-box {
+      height: 100% !important;
+      max-height: none !important;
+      border-radius: 0 !important;
+      border-left: none !important;
+      border-right: none !important;
+      padding: 0.75rem 0.85rem !important;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
+    }
+
+    #live-chat-room.chat-fullscreen-mode .chat-app-bottom-dock {
+      padding-bottom: max(0.6rem, env(safe-area-inset-bottom)) !important;
+      background: rgba(8, 3, 13, 0.98) !important;
+      border-top: 1px solid rgba(244, 63, 94, 0.25) !important;
+    }

@@ -128,5 +128,18 @@
     "formattedDate": "Oct 14",
     "status": "sent",
     "replyTo": null
+  },
+  {
+    "id": "msg_1792745992233_529912",
+    "sender": "Rakesh 🤵",
+    "message": "❤️ ❤️",
+    "mediaType": null,
+    "mediaUrl": null,
+    "fileName": null,
+    "timestamp": "2026-10-23T08:59:52.233Z",
+    "formattedTime": "02:29 PM",
+    "formattedDate": "Oct 23",
+    "status": "sent",
+    "replyTo": null
   }
 ]
