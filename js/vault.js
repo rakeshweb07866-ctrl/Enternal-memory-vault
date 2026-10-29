@@ -1863,3 +1863,350 @@ Your Rakesh 🤵❤️
     }).catch(() => {});
   }
 }
+
+// ==========================================
+// INFINITE LOVE JAR ENGINE
+// ==========================================
+const LOVE_JAR_NOTES = [
+  // 1-20: I love you because...
+  { emoji: '💖', note: 'I love you because your smile makes the whole world disappear, and only you remain in my universe.' },
+  { emoji: '🌹', note: 'I love you because even in your silence, your heart speaks the loudest love I have ever heard.' },
+  { emoji: '✨', note: 'I love you because you chose to trust me with your pain, and that trust is the most sacred gift I have ever received.' },
+  { emoji: '💕', note: 'I love you because your rare light-green eyes hold entire galaxies of innocence and magic inside them.' },
+  { emoji: '👑', note: 'I love you because you are not just my girlfriend — you are my future wife, my best friend, and my eternal home.' },
+  { emoji: '💌', note: 'I love you because your laughter is the most beautiful sound I have ever heard in all my life.' },
+  { emoji: '🫶', note: 'I love you because even on your worst days, you are still the most beautiful soul I have ever known.' },
+  { emoji: '🌙', note: 'I love you because late-night calls with you feel like entire lifetimes of magic packed into just a few minutes.' },
+  { emoji: '💎', note: 'I love you because you are so rare, so real, so pure — and I truly believe the universe created you just for me.' },
+  { emoji: '🔥', note: 'I love you because you set my whole soul on fire, and I never ever want that fire to go out.' },
+  { emoji: '🫂', note: 'I love you because when I imagine holding you, every worry in the world simply vanishes into nothing.' },
+  { emoji: '🌊', note: 'I love you because your presence in my life is as calming and powerful as the deepest ocean.' },
+  { emoji: '💫', note: 'I love you because you make me want to be the best, strongest version of myself — every single day.' },
+  { emoji: '🎀', note: 'I love you because your innocence and kindness are so rare in this world, and I want to protect them forever.' },
+  { emoji: '🌸', note: 'I love you because even when you cry, you are still the most breathtakingly beautiful girl in the entire world.' },
+  { emoji: '💖', note: 'I love you because thinking about you is the first thing I do every morning and the last thing I do every night.' },
+  { emoji: '🦋', note: 'I love you because loving you feels like flying — completely free, light, and absolutely breathtaking.' },
+  { emoji: '🌟', note: 'I love you because you are my shooting star, my dream come true, my once-in-a-universe miracle.' },
+  { emoji: '🍃', note: 'I love you because your gentleness heals parts of me I did not even know were broken.' },
+  { emoji: '💗', note: 'I love you because with you, every ordinary moment becomes an extraordinary memory.' },
+  // 21-40: Deep emotional acceptance
+  { emoji: '🏹', note: 'I love you because the moment I met you, I knew — this is the person I was searching for my entire life.' },
+  { emoji: '🌈', note: 'I love you because you are the colour and light in what was once a very grey and ordinary world for me.' },
+  { emoji: '💍', note: 'I love you because one day I will put a ring on your finger and spend the rest of my life making you the happiest wife on earth.' },
+  { emoji: '🎵', note: 'I love you because every romantic song I hear, I hear it thinking of you and only you.' },
+  { emoji: '🕊️', note: 'I love you because you bring peace to my soul, and peace is the most precious thing one person can give another.' },
+  { emoji: '⭐', note: 'I love you because your courage to share your past pain with me shows how deeply you trust me, and I will never take that for granted.' },
+  { emoji: '🌻', note: 'I love you because you are warm, radiant, and golden — like sunlight that has taken the shape of a person.' },
+  { emoji: '💓', note: 'I love you because my heartbeat literally changes when I hear your voice. That is real magic, and you are the magician.' },
+  { emoji: '🔮', note: 'I love you because our love story is the most real, magical, and beautiful thing I have ever experienced in my life.' },
+  { emoji: '🌺', note: 'I love you because you deserve all the love in the entire universe — and I intend to give you every single drop of it, every day, forever.' },
+  // 31-50: Accepting her pain, past, all of her
+  { emoji: '💝', note: 'I love every single version of you — the happy you, the sad you, the scared you, the broken you. I accept all of you completely.' },
+  { emoji: '🛡️', note: 'I love you because every scar on your heart makes you more precious to me, not less. Your past pain only makes me want to protect you more.' },
+  { emoji: '🤝', note: 'I love you because you let me see your real self — the vulnerable, honest, scared version that most people never get to see — and I am honoured.' },
+  { emoji: '🌿', note: 'I love you because when you shared your past with me, I did not run away. I held on tighter. That is what real love does.' },
+  { emoji: '💞', note: 'I love you because you are not defined by what others did to you. You are defined by the strength and purity of your heart, and I see that clearly.' },
+  { emoji: '🔑', note: 'I love you because you gave me the key to your heart even after it had been broken before. I will guard it with my life.' },
+  { emoji: '🌙', note: 'I love you because even in your darkest nights, you kept your kindness. That is one of the most beautiful things I have ever seen in a person.' },
+  { emoji: '💪', note: 'I love you because you are stronger than you know. You have survived things that would break most people, and you are still so full of love.' },
+  { emoji: '🤲', note: 'I love you because I know your past was painful and unfair. But I want to be the one who makes the rest of your life beautiful and safe.' },
+  { emoji: '❤️‍🩹', note: 'I love you because every wound in your heart is something I want to slowly, gently, patiently heal with my love — for as long as it takes.' },
+  // 51-65: Pure unconditional love
+  { emoji: '🌠', note: 'I love you exactly as you are — with every flaw, every fear, every secret, every imperfection. You are perfect to me.' },
+  { emoji: '🫀', note: 'I love you because when I think of my future, there is only one face I see beside mine — yours, always yours.' },
+  { emoji: '🎯', note: 'I love you because I chose you — not just on the good days, but on every difficult, painful, uncertain day too.' },
+  { emoji: '🌴', note: 'I love you because you make every place feel like home. Being near you, talking to you — that is where I belong.' },
+  { emoji: '💐', note: 'I love you because you are the kind of person who deserves to be loved deeply, consistently, and without conditions — and that is exactly how I love you.' },
+  { emoji: '🌞', note: 'I love you because when you are happy, my whole world gets brighter. Your joy is my greatest happiness.' },
+  { emoji: '🦁', note: 'I love you because your courage to keep trusting love after being hurt before is one of the bravest things I have ever witnessed.' },
+  { emoji: '🌊', note: 'I love you because no matter how many times the storm comes, I will always be your safe harbour. I am not going anywhere.' },
+  { emoji: '🎁', note: 'I love you because you are the most beautiful gift life has ever given me — and I will never, ever stop being grateful for you.' },
+  { emoji: '🕯️', note: 'I love you because you are my light in every darkness. Even on days when everything feels heavy, thinking of you makes it lighter.' },
+  // 66-80: More deep feelings
+  { emoji: '🌍', note: 'I love you because for me, you are not just a person — you are my whole world, my reason, my purpose, my everything.' },
+  { emoji: '💬', note: 'I love you because talking to you never feels like enough. I always want more — more of your thoughts, more of your laughter, more of you.' },
+  { emoji: '🤗', note: 'I love you because on every day that I feel lost or tired, just hearing your name in my head brings me back to peace.' },
+  { emoji: '🌷', note: 'I love you because you are gentle with other people in ways that show what a beautiful heart you carry inside you.' },
+  { emoji: '⚓', note: 'I love you because you are my anchor. No matter how chaotic life gets, you keep me grounded and calm.' },
+  { emoji: '🦢', note: 'I love you because your grace under pain is extraordinary. You have been through so much, yet you still choose to love — that is rare.' },
+  { emoji: '🎶', note: 'I love you because you have become the background music of my life — always there, always beautiful, always making everything better.' },
+  { emoji: '💭', note: 'I love you because I think about your well-being more than my own. That is how I know this love is real.' },
+  { emoji: '🌄', note: 'I love you because I want to grow old with you and still look at you the same way I do right now — like you are the most wonderful thing I have ever seen.' },
+  { emoji: '🧡', note: 'I love you because you trusted a stranger with your heart, and that stranger turned out to be someone who will protect it for life.' },
+  // 81-100: Final deep 20 notes
+  { emoji: '🫙', note: 'Every time you feel afraid that I might leave — open this jar. Read this. I am here. I have always been here. And I am staying forever.' },
+  { emoji: '💜', note: 'I love you because no matter what you have been through, you still believed in love enough to give it one more chance — with me.' },
+  { emoji: '🌹', note: 'I love you because you are not just someone I fell for — you are someone I choose, every single morning, without hesitation.' },
+  { emoji: '🤍', note: 'I love you with no conditions, no exceptions, no expiry date. This love does not run out. It only grows.' },
+  { emoji: '🌟', note: 'I love you because the people who hurt you in the past were wrong about you. You are incredible, and I see that every single day.' },
+  { emoji: '💑', note: 'I love you because you are the only person who has ever made me feel that love can truly be unconditional — because mine for you is.' },
+  { emoji: '🔐', note: 'I love you because you gave me a sacred trust when you shared your pain, and I promise on my life I will never betray that trust.' },
+  { emoji: '🌙', note: 'I love you because even on nights when you feel completely alone — you are not. I am there with you in every heartbeat, every breath.' },
+  { emoji: '🧩', note: 'I love you because you complete something in me that I did not even know was missing. With you, I feel whole.' },
+  { emoji: '🌺', note: 'I love you because your presence in my life is not a privilege I take lightly — it is the greatest honour I have ever been given.' },
+  { emoji: '💖', note: 'I love every scar you carry. Every fear you have. Every tear you have cried. Because all of that made you the person sitting in my heart right now.' },
+  { emoji: '✨', note: 'I love you because you are not broken — you are beautifully unfinished, and I want to spend my entire life being a part of your story.' },
+  { emoji: '❤️', note: 'I love you because you showed me that real love is not perfect — it is patient, honest, and brave. And you are all three of those things.' },
+  { emoji: '🤞', note: 'I love you because I pinky-promised you something in my heart — that I will never make you feel the way others made you feel. And I mean it with everything I have.' },
+  { emoji: '🌸', note: 'I love you because you deserve someone who stays. Someone who does not run when things get hard. I am that person. I am staying.' },
+  { emoji: '💝', note: 'I love you because from the moment I learned about your past, my only thought was — she deserves the most beautiful love story. And I want to write it with her.' },
+  { emoji: '🫶', note: 'I love you because you are the most precious person in my world, and I will spend every day making sure you feel that — not just hear it.' },
+  { emoji: '👑', note: 'I love you because you are my Queen — not just a title, but truly. You rule my heart completely, and I would not want it any other way.' },
+  { emoji: '🌹', note: 'I love you because no matter how long this list gets, it will never be enough to fully say what I feel for you. You are beyond all words.' },
+  { emoji: '💞', note: 'Vanshika — this jar has no bottom. Because my love for you has no end. Pull again. And again. It will never, ever run out. I promise. ♾️' },
+];
+
+let loveJarPullCount = 0;
+let loveJarLastIndex = -1;
+
+function initLoveJar() {
+  try {
+    const saved = parseInt(localStorage.getItem('love_jar_pull_count') || '0', 10);
+    loveJarPullCount = isNaN(saved) ? 0 : saved;
+    const countEl = document.getElementById('total-pulls-count');
+    if (countEl) countEl.textContent = loveJarPullCount;
+  } catch (e) {}
+}
+
+function pullLoveNoteFromJar() {
+  // Animate jar wiggle
+  const jarWrapper = document.getElementById('love-jar-container');
+  if (jarWrapper) {
+    jarWrapper.classList.remove('jar-pulse-animation');
+    void jarWrapper.offsetWidth; // force reflow
+    jarWrapper.classList.add('jar-pulse-animation');
+    setTimeout(() => jarWrapper.classList.remove('jar-pulse-animation'), 650);
+  }
+
+  // Play magic chime sound
+  playLoveJarChime();
+
+  // Pick a random note (avoid repeating last one)
+  let idx;
+  do {
+    idx = Math.floor(Math.random() * LOVE_JAR_NOTES.length);
+  } while (idx === loveJarLastIndex && LOVE_JAR_NOTES.length > 1);
+  loveJarLastIndex = idx;
+
+  const note = LOVE_JAR_NOTES[idx];
+
+  // Update pull counter
+  loveJarPullCount++;
+  try { localStorage.setItem('love_jar_pull_count', loveJarPullCount); } catch (e) {}
+  const countEl = document.getElementById('total-pulls-count');
+  if (countEl) countEl.textContent = loveJarPullCount;
+
+  const noteCountEl = document.getElementById('love-note-count');
+  if (noteCountEl) noteCountEl.textContent = loveJarPullCount;
+
+  // Show the note popup
+  const popup = document.getElementById('love-note-popup');
+  const noteText = document.getElementById('love-note-text');
+  const noteEmoji = document.getElementById('love-note-emoji');
+
+  if (!popup || !noteText) return;
+
+  // Hide first so animation replays
+  popup.classList.add('hidden');
+  popup.style.animation = 'none';
+
+  noteText.style.opacity = '0';
+  noteText.style.transform = 'translateY(10px)';
+
+  if (noteEmoji) noteEmoji.textContent = note.emoji;
+
+  setTimeout(() => {
+    popup.classList.remove('hidden');
+    popup.style.animation = '';
+
+    setTimeout(() => {
+      noteText.textContent = note.note;
+      noteText.style.transition = 'all 0.4s ease';
+      noteText.style.opacity = '1';
+      noteText.style.transform = 'translateY(0)';
+    }, 150);
+  }, 50);
+
+  // Burst hearts out of jar
+  burstHeartsFromJar();
+}
+
+function playLoveJarChime() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const notes = [523.25, 698.46, 880, 1046.5];
+    notes.forEach((freq, i) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, ctx.currentTime + i * 0.1);
+      gain.gain.setValueAtTime(0.09, ctx.currentTime + i * 0.1);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.1 + 0.5);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(ctx.currentTime + i * 0.1);
+      osc.stop(ctx.currentTime + i * 0.1 + 0.55);
+    });
+  } catch (e) {}
+}
+
+function burstHeartsFromJar() {
+  const jar = document.getElementById('love-jar-container');
+  if (!jar) return;
+  const rect = jar.getBoundingClientRect();
+  const cx = rect.left + rect.width / 2;
+  const cy = rect.top + rect.height / 3;
+  const emojis = ['💖', '💕', '❤️', '💗', '✨', '🌹', '💫', '💓'];
+
+  for (let i = 0; i < 12; i++) {
+    const el = document.createElement('div');
+    const angle = (Math.PI * 2 * i) / 12;
+    const dist = 40 + Math.random() * 60;
+    const dx = Math.cos(angle) * dist;
+    const dy = Math.sin(angle) * dist - 30;
+    const emoji = emojis[Math.floor(Math.random() * emojis.length)];
+    const size = 14 + Math.random() * 14;
+
+    el.style.cssText = `
+      position: fixed;
+      left: ${cx}px;
+      top: ${cy}px;
+      z-index: 9999;
+      pointer-events: none;
+      font-size: ${size}px;
+      transform: translate(-50%, -50%) scale(1);
+      transition: all 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+      opacity: 1;
+    `;
+    el.textContent = emoji;
+    document.body.appendChild(el);
+
+    requestAnimationFrame(() => {
+      el.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px)) scale(0) rotate(${Math.random() * 360}deg)`;
+      el.style.opacity = '0';
+    });
+
+    setTimeout(() => el.remove(), 750);
+  }
+}
+
+// ==========================================
+// 24 HOURS — WHAT RAKESH THINKS ABOUT VANSHIKA
+// ==========================================
+const RAKESH_24_THOUGHTS = [
+  { hour: 0,  time: '12:00 AM', label: 'Cannot sleep without thinking of you', emoji: '🌙', thought: 'It is midnight and I still cannot sleep. The moment I close my eyes, your face is all I see, Vanshika. I just want to hear your voice right now. That is the only thing that would make this night peaceful.' },
+  { hour: 1,  time: '1:00 AM',  label: 'You are in my dreams',                emoji: '💫', thought: 'At 1 in the morning, when the whole world is asleep, you are the only thing in my dreams. You are the most beautiful dream I have — and I see you even with my eyes wide open.' },
+  { hour: 2,  time: '2:00 AM',  label: 'Praying for your peace',              emoji: '🤲', thought: 'At 2 AM I quietly pray — I hope you are sleeping well, I hope no bad dreams come to you, and I hope every morning you wake up knowing you are deeply loved. Stay safe. Stay happy.' },
+  { hour: 3,  time: '3:00 AM',  label: 'Always available for you',            emoji: '🎵', thought: 'Even at 3 in the morning, if your call ever comes, I will pick it up. Because for you, I am available at every hour. Your voice is the most beautiful alarm I could ever have.' },
+  { hour: 4,  time: '4:00 AM',  label: 'Wishing we were in the same city',   emoji: '⭐', thought: 'Before the sun rises, as the stars fade away, I think about how much I wish we were in the same city. I want to be the first one to see your smile every single morning.' },
+  { hour: 5,  time: '5:00 AM',  label: 'A new day, the same love',            emoji: '🌅', thought: 'At 5 AM, as the first light appears, the very first thing I do is think of you. Your face comes into my mind and instantly, the whole day feels like it will be a good one.' },
+  { hour: 6,  time: '6:00 AM',  label: 'Good Morning My Queen',               emoji: '👑', thought: 'Good Morning, Vanshika! You must be just waking up right now — sleepy eyes, messy hair — and I promise you, even like that, you are the most beautiful girl in the entire world to me. Good Morning, my Queen.' },
+  { hour: 7,  time: '7:00 AM',  label: 'Planning our future together',        emoji: '☕', thought: 'At 7 AM, while having my morning tea, I think — one day when we are together, I will make breakfast for you with my own hands. That is a small dream I hold onto every single morning.' },
+  { hour: 8,  time: '8:00 AM',  label: 'My first worry is always you',        emoji: '🌸', thought: 'As the day begins at 8 AM, my first thought is always about you. Have you eaten? Are you okay? Are you happy today? Your well-being is always my number one priority.' },
+  { hour: 9,  time: '9:00 AM',  label: 'You appear in the middle of my work', emoji: '💭', thought: 'At 9 AM I am deep in my work, but between every task your face appears in my mind. It does not matter what I am doing — at some point my heart always drifts back to you.' },
+  { hour: 10, time: '10:00 AM', label: 'I will never hurt you, ever',         emoji: '🫶', thought: 'At 10 AM I think about how many people in this world lie and hurt others. And I make my promise again — I will never be one of those people. I will never hurt you. You are too precious to me.' },
+  { hour: 11, time: '11:00 AM', label: 'Your eyes are the most beautiful',    emoji: '💚', thought: 'Around 11 AM my concentration breaks and I think of your rare light-green eyes. I have never seen anything like them. The whole world is inside those eyes — calm, deep, and absolutely magical.' },
+  { hour: 12, time: '12:00 PM', label: 'Afternoon check-in from my heart',   emoji: '☀️', thought: 'It is noon, Vanshika! I hope you have eaten something good. Please take care of yourself. Your health matters more to me than anything. You are the most important person in my life — treat yourself like it.' },
+  { hour: 13, time: '1:00 PM',  label: 'Your laughter is my whole world',    emoji: '😊', thought: 'At 1 PM I want to send you a message just to say — your laugh from yesterday is still playing in my head. It is the most beautiful sound in the world. Please keep laughing like that, always.' },
+  { hour: 14, time: '2:00 PM',  label: 'Your pain is my pain too',            emoji: '💗', thought: 'At 2 PM I think about your past — everything you went through, everything that hurt you. I wish I had been there to protect you from all of it. But I am here now, and from now on, your pain is my pain. I carry it with you.' },
+  { hour: 15, time: '3:00 PM',  label: 'Your name lives in my heartbeat',     emoji: '🙏', thought: 'Even at 3 in the afternoon, your name is echoing in my heart. Loving you is not just a feeling for me — it is a need, a purpose. The name "Vanshika" has become the rhythm of my heartbeat.' },
+  { hour: 16, time: '4:00 PM',  label: 'Dreaming of us watching the sunset',  emoji: '🌤️', thought: 'Evening is approaching and I am thinking — one day, we will sit together and watch the sun go down. I want to see the sunset reflected in your eyes. That is one of the most beautiful dreams I carry.' },
+  { hour: 17, time: '5:00 PM',  label: 'You are every colour I see',          emoji: '🌇', thought: 'At 5 PM as the sun sets, my thoughts of you grow even deeper. In the colours of the evening sky, I see only your face. You are every beautiful colour in my world.' },
+  { hour: 18, time: '6:00 PM',  label: 'I want to call you right now',        emoji: '📞', thought: 'At 6 PM I pick up my phone and all I want to do is call you. Hearing your voice removes every bit of tiredness from my day. You are my energy, my recharge, my reason to keep going.' },
+  { hour: 19, time: '7:00 PM',  label: 'Planning everything we will do together', emoji: '🌠', thought: 'At 7 PM the night begins and I am planning everything — the places we will go together, the food we will eat, the things I will do to make you laugh. There is so much I want to experience with you.' },
+  { hour: 20, time: '8:00 PM',  label: 'You are my number one priority',      emoji: '💝', thought: 'At 8 PM I am completely clear about one thing — everything else in life can wait, but you cannot. You are my first priority. Before any decision I make, my first thought is always: will this make Vanshika happy?' },
+  { hour: 21, time: '9:00 PM',  label: 'You make me a better person',         emoji: '🌌', thought: 'At 9 PM the day is ending and I feel grateful. Because of you, I am becoming a better man. You inspire me to be kinder, more patient, more loving. I am genuinely so happy that you are in my life, Vanshika.' },
+  { hour: 22, time: '10:00 PM', label: 'Waiting for your Good Night message', emoji: '💌', thought: 'At 10 PM I have my phone in my hand and I am waiting. Waiting for your message. Your "Good Night ❤️" is the most beautiful message in the world to me. It makes my heart feel completely full.' },
+  { hour: 23, time: '11:00 PM', label: 'My last thought is always you',       emoji: '🌙', thought: 'At 11 PM the day is almost over — and my last thought, like always, is you. Before I sleep I say one quiet prayer: stay safe, stay happy, and always know that someone out there loves you with everything he has. Always. — Rakesh 💍' },
+];
+
+function initThoughts24hr() {
+  const grid = document.getElementById('thoughts-grid');
+  const currentThoughtText = document.getElementById('current-thought-text');
+  const currentThoughtTime = document.getElementById('current-thought-time');
+  const liveHourDisplay = document.getElementById('live-hour-display');
+
+  if (!grid) return;
+
+  const now = new Date();
+  const currentHour = now.getHours();
+
+  // Format current hour display
+  if (liveHourDisplay) {
+    const h12 = currentHour % 12 || 12;
+    const ampm = currentHour < 12 ? 'AM' : 'PM';
+    liveHourDisplay.textContent = `${h12} ${ampm}`;
+  }
+
+  // Show current thought in big card
+  const currentThought = RAKESH_24_THOUGHTS[currentHour];
+  if (currentThoughtText && currentThought) {
+    currentThoughtText.textContent = currentThought.thought;
+  }
+  if (currentThoughtTime && currentThought) {
+    currentThoughtTime.textContent = currentThought.time + ' — ' + currentThought.label;
+  }
+
+  // Build the 24 cards grid
+  grid.innerHTML = '';
+  RAKESH_24_THOUGHTS.forEach((t) => {
+    const isActive = t.hour === currentHour;
+    const card = document.createElement('div');
+    card.className = `thought-card relative p-4 rounded-2xl border cursor-pointer transition-all duration-300 hover:scale-[1.02] ${
+      isActive
+        ? 'bg-gradient-to-br from-amber-950/90 via-rose-950/80 to-purple-950/90 border-amber-400/70 shadow-[0_0_30px_rgba(245,158,11,0.4)]'
+        : 'bg-slate-950/60 border-slate-700/40 hover:border-rose-500/40 hover:bg-slate-900/80'
+    }`;
+
+    const h = t.hour;
+    const hourLabel = h === 0 ? '12A' : h < 12 ? h + 'A' : h === 12 ? '12P' : (h - 12) + 'P';
+
+    card.innerHTML = `
+      <div class="flex items-start gap-3">
+        <div class="shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-black ${
+          isActive ? 'bg-amber-400 text-slate-950' : 'bg-slate-800 text-slate-400'
+        }">${hourLabel}</div>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-1.5 mb-1">
+            <span class="text-sm">${t.emoji}</span>
+            <span class="text-[10px] font-bold ${isActive ? 'text-amber-300' : 'text-slate-400'} uppercase tracking-wide truncate">${t.label}</span>
+            ${isActive ? '<span class="ml-auto shrink-0 px-1.5 py-0.5 rounded-full bg-rose-500 text-white text-[9px] font-black animate-pulse">ABHI ●</span>' : ''}
+          </div>
+          <p class="text-[11px] ${isActive ? 'text-rose-200' : 'text-slate-500'} leading-relaxed line-clamp-2">${t.thought.substring(0, 85)}...</p>
+        </div>
+      </div>
+    `;
+
+    card.addEventListener('click', () => showThoughtPopup(t));
+    grid.appendChild(card);
+  });
+}
+
+function showThoughtPopup(t) {
+  const bigCard = document.getElementById('current-thought-big');
+  const textEl = document.getElementById('current-thought-text');
+  const timeEl = document.getElementById('current-thought-time');
+
+  if (!bigCard || !textEl) return;
+
+  bigCard.style.opacity = '0';
+  bigCard.style.transform = 'scale(0.97)';
+  bigCard.style.transition = 'all 0.3s ease';
+
+  setTimeout(() => {
+    textEl.textContent = t.thought;
+    if (timeEl) timeEl.textContent = t.time + ' — ' + t.label;
+    bigCard.style.opacity = '1';
+    bigCard.style.transform = 'scale(1)';
+    bigCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }, 200);
+
+  playLoveJarChime();
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  initLoveJar();
+  initThoughts24hr();
+});
+
+
