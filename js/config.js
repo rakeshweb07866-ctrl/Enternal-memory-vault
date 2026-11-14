@@ -192,6 +192,12 @@ function applySuccessfulLogin(name, pin, authSessionId) {
   if (typeof fetchLiveChatMessages === 'function') {
     fetchLiveChatMessages();
   }
+  if (typeof updateNov17LauncherUI === 'function') {
+    updateNov17LauncherUI();
+  }
+  if (typeof maybeAutoLaunchNov17 === 'function') {
+    setTimeout(maybeAutoLaunchNov17, 700);
+  }
 }
 
 async function confirmNameLogin() {

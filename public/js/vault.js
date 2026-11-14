@@ -2170,7 +2170,7 @@ function initThoughts24hr() {
           <div class="flex items-center gap-1.5 mb-1">
             <span class="text-sm">${t.emoji}</span>
             <span class="text-[10px] font-bold ${isActive ? 'text-amber-300' : 'text-slate-400'} uppercase tracking-wide truncate">${t.label}</span>
-            ${isActive ? '<span class="ml-auto shrink-0 px-1.5 py-0.5 rounded-full bg-rose-500 text-white text-[9px] font-black animate-pulse">ABHI ●</span>' : ''}
+            ${isActive ? '<span class="ml-auto shrink-0 px-1.5 py-0.5 rounded-full bg-rose-500 text-white text-[9px] font-black animate-pulse">NOW ●</span>' : ''}
           </div>
           <p class="text-[11px] ${isActive ? 'text-rose-200' : 'text-slate-500'} leading-relaxed line-clamp-2">${t.thought.substring(0, 85)}...</p>
         </div>
@@ -2207,6 +2207,7 @@ function showThoughtPopup(t) {
 document.addEventListener('DOMContentLoaded', () => {
   initLoveJar();
   initThoughts24hr();
+  if (typeof initNov17Chapter2 === 'function') initNov17Chapter2();
 });
 
 

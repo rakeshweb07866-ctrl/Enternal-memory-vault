@@ -1,1 +1,58 @@
-[]
+[
+  {
+    "id": "del_1794645781450_mjoikw",
+    "messageId": "msg_1794639407593_bxkegk",
+    "deleteType": "for_everyone",
+    "deletedBy": "Rakesh 🤵",
+    "deletedAt": "2026-11-14T08:43:01.450Z",
+    "deletedAtFormatted": "02:13 PM (Nov 14)",
+    "originalSender": "Unknown",
+    "message": "💓 Vanshika just connected with Rakesh's heartbeat! \"My heart beats only for you, Rakesh ❤️\"",
+    "mediaType": null,
+    "mediaUrl": null,
+    "fileName": null,
+    "originalTimestamp": null
+  },
+  {
+    "id": "del_1794645781409_eola76",
+    "messageId": "msg_1794639407593_bxkegk",
+    "deleteType": "for_everyone",
+    "deletedBy": "Rakesh 🤵",
+    "deletedAt": "2026-11-14T08:43:01.409Z",
+    "deletedAtFormatted": "02:13 PM (Nov 14)",
+    "originalSender": "Rakesh 🤵",
+    "message": "💓 Vanshika just connected with Rakesh's heartbeat! \"My heart beats only for you, Rakesh ❤️\"",
+    "mediaType": null,
+    "mediaUrl": null,
+    "fileName": null,
+    "originalTimestamp": "2026-11-14T06:56:47.593Z"
+  },
+  {
+    "id": "del_1794374735203_93drii",
+    "messageId": "msg_1794374725236_wx047z",
+    "deleteType": "for_everyone",
+    "deletedBy": "Rakesh 🤵",
+    "deletedAt": "2026-11-11T05:25:35.203Z",
+    "deletedAtFormatted": "10:55 AM (Nov 11)",
+    "originalSender": "Unknown",
+    "message": "Happy 2nd Month Anniversary, Rakesh! ❤️✨ I just finished reading Chapter Two and my heart is so full right now 💍💕",
+    "mediaType": null,
+    "mediaUrl": null,
+    "fileName": null,
+    "originalTimestamp": null
+  },
+  {
+    "id": "del_1794374735200_lzj6i1",
+    "messageId": "msg_1794374725236_wx047z",
+    "deleteType": "for_everyone",
+    "deletedBy": "Rakesh 🤵",
+    "deletedAt": "2026-11-11T05:25:35.200Z",
+    "deletedAtFormatted": "10:55 AM (Nov 11)",
+    "originalSender": "Rakesh 🤵",
+    "message": "Happy 2nd Month Anniversary, Rakesh! ❤️✨ I just finished reading Chapter Two and my heart is so full right now 💍💕",
+    "mediaType": null,
+    "mediaUrl": null,
+    "fileName": null,
+    "originalTimestamp": "2026-11-11T05:25:25.236Z"
+  }
+]

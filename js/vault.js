@@ -2170,7 +2170,7 @@ function initThoughts24hr() {
           <div class="flex items-center gap-1.5 mb-1">
             <span class="text-sm">${t.emoji}</span>
             <span class="text-[10px] font-bold ${isActive ? 'text-amber-300' : 'text-slate-400'} uppercase tracking-wide truncate">${t.label}</span>
-            ${isActive ? '<span class="ml-auto shrink-0 px-1.5 py-0.5 rounded-full bg-rose-500 text-white text-[9px] font-black animate-pulse">ABHI ●</span>' : ''}
+            ${isActive ? '<span class="ml-auto shrink-0 px-1.5 py-0.5 rounded-full bg-rose-500 text-white text-[9px] font-black animate-pulse">NOW ●</span>' : ''}
           </div>
           <p class="text-[11px] ${isActive ? 'text-rose-200' : 'text-slate-500'} leading-relaxed line-clamp-2">${t.thought.substring(0, 85)}...</p>
         </div>
@@ -2207,6 +2207,285 @@ function showThoughtPopup(t) {
 document.addEventListener('DOMContentLoaded', () => {
   initLoveJar();
   initThoughts24hr();
+  if (typeof initNov17Chapter2 === 'function') initNov17Chapter2();
 });
+// ==========================================
+// 2ND MONTH ANNIVERSARY - NOV 17, 2026
+// Galaxy Stars x Deep Love Experience
+// ==========================================
+
+const NOV17_MEMORIES = [
+  { icon: '🌙', text: 'The first time I heard your voice and knew: this is her. This is the one.' },
+  { icon: '💫', text: 'The way you laugh quietly when something really catches you off guard. That laugh lives in my heart.' },
+  { icon: '🌊', text: 'You told me something from your past, scared I would judge you. I never did. I never will.' },
+  { icon: '🔥', text: 'The first time you called me at night just to talk. I stayed up till 3 AM and I would do it again every night.' },
+  { icon: '💚', text: 'Your rare green eyes. I have never seen anything like them. They are the most beautiful thing in this world to me.' },
+  { icon: '✨', text: '60 days. Every single one of them, you were the last thought before I slept and the first when I woke up.' },
+  { icon: '🫂', text: 'On days you felt low, you still showed up. That strength in you: I am in awe of it.' },
+  { icon: '🌹', text: 'The moment you trusted me with your pain, I made a silent promise: I will never let you feel alone again.' },
+  { icon: '💌', text: 'Every message you send me, even just "hi", makes my whole day feel different. Better. Complete.' },
+  { icon: '🎵', text: 'When you share a song with me, I listen to it on repeat because I want to feel what you felt when you heard it.' },
+  { icon: '🌸', text: 'You are soft and strong at the same time. That combination is rare and beautiful and I am so lucky to know you.' },
+  { icon: '🫶', text: 'I never have to pretend with you. That is the rarest gift a person can give someone: safety to be real.' },
+  { icon: '💎', text: 'Your heart is worth more than anything in this world. I am going to spend my whole life making sure you know that.' },
+  { icon: '🌌', text: 'Loving you has shown me what it means to actually care about someone, not just say it, but feel it in every cell.' },
+  { icon: '⭐', text: 'On the 17th of September, you said yes. That is the greatest yes anyone has ever given me.' },
+  { icon: '🕊️', text: 'I want to be the one person in your life who never makes you question whether you are enough. You are. You are everything.' },
+  { icon: '💝', text: 'Two months of choosing each other every single day. That is not small. That is everything.' },
+  { icon: '🌠', text: 'I think about our future and I feel calm. Because I know you are in it. That is enough.' },
+  { icon: '🫧', text: 'The silly things, the random voice notes, the late night jokes, those are my favourite memories.' },
+  { icon: '🎯', text: 'You make me want to be better. Not because you demand it, but because you deserve the best version of me.' },
+  { icon: '🌙', text: '60 nights of thinking about you before sleeping. I would choose 60,000 more.' },
+  { icon: '💫', text: 'You are not too much. You are not too little. You are exactly right, for me, exactly as you are.' },
+  { icon: '🔮', text: 'I do not know what the future holds, but I know who I want next to me inside it. Always you.' },
+  { icon: '🌺', text: 'You have been through things that would have broken most people. The fact that you are still here, still loving: that is extraordinary.' },
+  { icon: '🎀', text: 'Happy 2nd Month, Vanshika. Here is to every month after this, forever and always. Rakesh 💍' },
+];
+
+const NOV17_60_REASONS = [
+  'The way your name sounds when I say it.',
+  'Your green eyes that hold the whole universe.',
+  'Your laugh, especially the quiet one you do when something is really funny.',
+  'Your honesty, even when it was hard for you.',
+  'The strength you carry so quietly.',
+  'The fact that you still love people after they hurt you.',
+  'Your voice at night when everything is calm.',
+  'The way you trust me a little more each day.',
+  'Your heart: big, real, and genuine.',
+  'You are kind, even on your hard days.',
+  'The courage you have to be vulnerable.',
+  'The way you make ordinary moments feel important.',
+  'Your silence never feels awkward, it feels safe.',
+  'You make me want to be a better person, every single day.',
+  'You care deeply, even when you pretend not to.',
+  'The random things you say that make me smile for hours.',
+  'You have survived things most people cannot imagine.',
+  'Your sensitivity is not a weakness, it is your superpower.',
+  'You are real. Not performative. Not fake. Just real.',
+  'The fact that you chose me.',
+  'Your stubbornness, honestly I love it.',
+  'The little details you notice that most people miss.',
+  'You feel deeply, and that makes you one in a million.',
+  'You make even a normal conversation feel like magic.',
+  'Your past did not make you bitter, it made you wise.',
+  'You are soft but you are not weak. That is rare.',
+  'You care about people genuinely.',
+  'Your presence makes me feel calm.',
+  'You are worth fighting for, and I always will.',
+  'You make me feel like I am exactly where I am supposed to be.',
+  'Your tears are sacred to me. I will never take them lightly.',
+  'You have so much love to give, and I am here to receive all of it.',
+  'Your opinions matter. Your thoughts matter. You matter.',
+  'You are curious, that makes you interesting.',
+  'You try. Even when it is hard, you try.',
+  'You let me in, slowly, and that means everything.',
+  'The way you say my name.',
+  'You have your own world inside your head, and I want to explore it forever.',
+  'You are more beautiful than you believe.',
+  'Your warmth: people feel safe near you.',
+  'You are loyal. That is incredibly rare.',
+  'Your flaws make you human, and I love your humanity.',
+  'You are mine, and I am so proud of that.',
+  'You deserve every good thing the universe has.',
+  'You have my heart completely, there is no one else.',
+  'On hard days you still show up. I see that. I cherish that.',
+  'You are worth every prayer, every promise, every late night.',
+  'Knowing you has made my life better in every way.',
+  'You are my favourite person on this entire planet.',
+  'I want to know you for the rest of my life.',
+  'Two months with you felt like coming home.',
+  'I do not want to imagine a world where I never met you.',
+  'You are enough. Exactly as you are, right now.',
+  'I love you in a way that does not need a reason list, but I made one anyway, for you.',
+  'Because you said yes on September 17th.',
+  'Because every day since then has been worth living more fully.',
+  'Because you are Vanshika.',
+  'Because you are my Vanshika.',
+  'Because loving you is the best thing that has ever happened to me.',
+  'Happy 2 Months. Here is to forever. Rakesh 💍'
+];
+
+let nov17ScratchRevealed = false;
+
+function init2ndAnniversary() {
+  const today = new Date();
+  const isNov17 = today.getMonth() === 10 && today.getDate() === 17;
+  if (isNov17) { setTimeout(() => open2ndAnnivScreen(), 1800); }
+}
+
+function open2ndAnnivScreen() {
+  const el = document.getElementById('anniv2-galaxy-screen');
+  if (!el) return;
+  el.classList.remove('hidden');
+  el.scrollTop = 0;
+  document.body.style.overflow = 'hidden';
+  startGalaxyStars();
+  startShootingStars();
+  renderNov17Memories();
+  initScratchCard();
+}
+
+function close2ndAnnivScreen() {
+  const el = document.getElementById('anniv2-galaxy-screen');
+  if (!el) return;
+  el.classList.add('hidden');
+  document.body.style.overflow = '';
+}
+
+function startGalaxyStars() {
+  const canvas = document.getElementById('galaxy-stars-canvas');
+  if (!canvas) return;
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  const ctx = canvas.getContext('2d');
+  const stars = Array.from({ length: 200 }, () => ({
+    x: Math.random() * canvas.width, y: Math.random() * canvas.height,
+    r: Math.random() * 1.8 + 0.3, alpha: Math.random(),
+    speed: Math.random() * 0.008 + 0.002, dir: Math.random() > 0.5 ? 1 : -1,
+  }));
+  function drawStars() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    stars.forEach(s => {
+      s.alpha += s.speed * s.dir;
+      if (s.alpha >= 1 || s.alpha <= 0) s.dir *= -1;
+      ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(255,255,255,' + s.alpha + ')'; ctx.fill();
+    });
+    const sc = document.getElementById('anniv2-galaxy-screen');
+    if (sc && !sc.classList.contains('hidden')) requestAnimationFrame(drawStars);
+  }
+  drawStars();
+}
+
+function startShootingStars() {
+  function shoot() {
+    const sc = document.getElementById('anniv2-galaxy-screen');
+    if (!sc || sc.classList.contains('hidden')) return;
+    const el = document.createElement('div');
+    const sx = Math.random() * window.innerWidth * 0.8;
+    const sy = Math.random() * window.innerHeight * 0.35;
+    const w = 60 + Math.random() * 100;
+    el.style.cssText = 'position:fixed;left:' + sx + 'px;top:' + sy + 'px;width:' + w + 'px;height:1.5px;background:linear-gradient(90deg,rgba(200,200,255,0.9),transparent);border-radius:999px;z-index:5;pointer-events:none;transform:rotate(-28deg);animation:shootingStar 0.75s ease-out forwards;';
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 900);
+  }
+  shoot();
+  const id = setInterval(() => {
+    const sc = document.getElementById('anniv2-galaxy-screen');
+    if (!sc || sc.classList.contains('hidden')) { clearInterval(id); return; }
+    shoot();
+  }, 2000);
+}
+
+function renderNov17Memories() {
+  const grid = document.getElementById('nov17-memories-grid');
+  if (!grid) return;
+  grid.innerHTML = NOV17_MEMORIES.map((m, i) =>
+    '<div class="nov17-memory-card" style="animation-delay:' + (i * 0.07) + 's">' +
+    '<span style="font-size:1.6rem;display:block;margin-bottom:6px">' + m.icon + '</span>' +
+    '<p style="font-size:0.78rem;line-height:1.6;color:#e2e8f0">' + m.text + '</p></div>'
+  ).join('');
+}
+
+function initScratchCard() {
+  const canvas = document.getElementById('scratch-canvas');
+  if (!canvas) return;
+  nov17ScratchRevealed = false;
+  setTimeout(() => {
+    canvas.width = canvas.offsetWidth || 300; canvas.height = canvas.offsetHeight || 160;
+    const ctx = canvas.getContext('2d');
+    const grad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+    grad.addColorStop(0, '#4c1d95'); grad.addColorStop(0.5, '#9d174d'); grad.addColorStop(1, '#92400e');
+    ctx.fillStyle = grad; ctx.fillRect(0, 0, canvas.width, canvas.height);
+    for (let i = 0; i < 20; i++) {
+      ctx.fillStyle = 'rgba(255,255,255,' + (0.1 + Math.random() * 0.3) + ')';
+      ctx.beginPath(); ctx.arc(Math.random() * canvas.width, Math.random() * canvas.height, Math.random() * 2, 0, Math.PI * 2); ctx.fill();
+    }
+    ctx.font = 'bold 14px sans-serif'; ctx.fillStyle = 'rgba(255,255,255,0.9)'; ctx.textAlign = 'center';
+    ctx.fillText('✨ Scratch here with your finger ✨', canvas.width / 2, canvas.height / 2 - 12);
+    ctx.font = '12px sans-serif'; ctx.fillStyle = 'rgba(255,220,220,0.85)';
+    ctx.fillText('A secret message is hidden inside 💝', canvas.width / 2, canvas.height / 2 + 14);
+    ctx.globalCompositeOperation = 'destination-out';
+    let isDrawing = false;
+    function getPos(e) {
+      const rect = canvas.getBoundingClientRect();
+      const touch = e.touches ? e.touches[0] : e;
+      return { x: touch.clientX - rect.left, y: touch.clientY - rect.top };
+    }
+    function scratch(e) {
+      if (!isDrawing) return; e.preventDefault();
+      const pos = getPos(e);
+      ctx.beginPath(); ctx.arc(pos.x, pos.y, 24, 0, Math.PI * 2); ctx.fill();
+      checkScratchPercent(ctx, canvas);
+    }
+    canvas.addEventListener('mousedown', () => { isDrawing = true; });
+    canvas.addEventListener('mouseup', () => { isDrawing = false; });
+    canvas.addEventListener('mouseleave', () => { isDrawing = false; });
+    canvas.addEventListener('mousemove', scratch);
+    canvas.addEventListener('touchstart', e => { isDrawing = true; e.preventDefault(); }, { passive: false });
+    canvas.addEventListener('touchend', () => { isDrawing = false; });
+    canvas.addEventListener('touchmove', scratch, { passive: false });
+  }, 200);
+}
+
+function checkScratchPercent(ctx, canvas) {
+  if (nov17ScratchRevealed) return;
+  const data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+  let transparent = 0;
+  for (let i = 3; i < data.length; i += 4) { if (data[i] < 128) transparent++; }
+  if (transparent / (canvas.width * canvas.height) > 0.42) {
+    nov17ScratchRevealed = true;
+    canvas.style.transition = 'opacity 0.7s ease'; canvas.style.opacity = '0';
+    setTimeout(() => { canvas.style.display = 'none'; }, 750);
+    launchNov17Confetti();
+  }
+}
+
+function launchNov17Confetti() {
+  const colors = ['#f59e0b','#ec4899','#8b5cf6','#06b6d4','#10b981','#f43f5e','#ffffff'];
+  for (let i = 0; i < 100; i++) {
+    setTimeout(() => {
+      const el = document.createElement('div');
+      const color = colors[Math.floor(Math.random() * colors.length)];
+      const x = Math.random() * window.innerWidth;
+      const size = 5 + Math.random() * 7; const dur = 1.5 + Math.random() * 2;
+      el.style.cssText = 'position:fixed;left:' + x + 'px;top:-10px;width:' + size + 'px;height:' + size + 'px;background:' + color + ';border-radius:' + (Math.random() > 0.5 ? '50%' : '2px') + ';z-index:9999;pointer-events:none;animation:confettiFall ' + dur + 's linear forwards;';
+      document.body.appendChild(el); setTimeout(() => el.remove(), dur * 1000 + 100);
+    }, i * 22);
+  }
+}
+
+function open2ndAnnivGiftModal(type) {
+  const modal = document.getElementById('anniv2-gift-modal');
+  const title = document.getElementById('anniv2-gift-title');
+  const body = document.getElementById('anniv2-gift-body');
+  if (!modal || !title || !body) return;
+  if (type === 'letter') {
+    title.textContent = 'A Letter From My Heart — 2 Months 💌';
+    body.innerHTML =
+      '<p style="color:#67e8f9;font-weight:700;font-size:0.9rem;margin-bottom:0.75rem">My Dearest Vanshika,</p>' +
+      '<p style="margin-bottom:0.75rem">Two months. Sixty days. One thousand, four hundred and forty hours of thinking about you, missing you, smiling because of you.</p>' +
+      '<p style="margin-bottom:0.75rem">I want you to know something that I need you to really hear and believe: <strong style="color:#fcd34d">I am not with you because it is easy. I am with you because you are worth it.</strong> Every version of you: the strong one, the scared one, the laughing one, the quiet one — I love all of them, completely.</p>' +
+      '<p style="margin-bottom:0.75rem">Your past does not scare me. It tells me how strong you are. The fact that you still open your heart after everything you have been through — that is the bravest thing I have ever seen.</p>' +
+      '<p style="margin-bottom:0.75rem">I promise you this: I will never use your honesty against you. I will never make you regret trusting me. I will never be someone who hurts the person who chose to love me.</p>' +
+      '<p style="margin-bottom:0.75rem">You are my home, Vanshika. And I am building a life with you in my heart every single day.</p>' +
+      '<p style="color:#fda4af;font-weight:700;margin-top:1rem">Forever yours, every hour of every day,<br/><span style="color:#fcd34d">Rakesh 💍</span></p>';
+  } else {
+    title.textContent = '60 Reasons I Love You 🌌';
+    body.innerHTML = '<div style="max-height:19rem;overflow-y:auto;padding-right:4px">' +
+      NOV17_60_REASONS.map((r, i) =>
+        '<div style="display:flex;gap:8px;align-items:flex-start;font-size:0.76rem;color:#e2e8f0;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.06)">' +
+        '<span style="color:#67e8f9;font-weight:700;min-width:1.6rem;flex-shrink:0">' + (i + 1) + '.</span>' +
+        '<span>' + r + '</span></div>'
+      ).join('') + '</div>';
+  }
+  modal.classList.remove('hidden');
+}
+
+function close2ndAnnivGiftModal() {
+  const modal = document.getElementById('anniv2-gift-modal');
+  if (modal) modal.classList.add('hidden');
+}
+
 
 

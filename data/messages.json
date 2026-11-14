@@ -141,5 +141,18 @@
     "formattedDate": "Oct 23",
     "status": "sent",
     "replyTo": null
+  },
+  {
+    "id": "msg_1794645938742_jmhaxs",
+    "sender": "Rakesh 🤵",
+    "message": "❤️ ❤️ ❤️ ❤️ ❤️",
+    "mediaType": null,
+    "mediaUrl": null,
+    "fileName": null,
+    "timestamp": "2026-11-14T08:45:38.742Z",
+    "formattedTime": "02:15 PM",
+    "formattedDate": "Nov 14",
+    "status": "sent",
+    "replyTo": null
   }
 ]

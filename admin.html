@@ -254,9 +254,9 @@
           <div id="admin-status-pill" class="text-xs text-emerald-300 bg-emerald-500/15 border border-emerald-500/30 px-3 py-1 rounded-full font-semibold">
             ✅ Authenticated as Rakesh
           </div>
-          <a href="/?anniv=1" target="_blank" class="px-3.5 py-2 text-xs font-bold rounded-xl bg-gradient-to-r from-rose-500/25 to-amber-500/25 border border-rose-400/50 text-rose-200 hover:text-white hover:border-amber-300 transition-all flex items-center gap-1.5 shadow-md">
-            <span>🎉</span> <span>Preview 17th Oct Anniversary</span>
-          </a>
+          <button onclick="switchTab('nov17preview', document.getElementById('tab-btn-nov17preview'))" class="px-3.5 py-2 text-xs font-bold rounded-xl bg-gradient-to-r from-pink-500/30 via-rose-500/30 to-amber-500/30 border border-pink-400 text-pink-200 hover:text-white hover:border-amber-300 transition-all flex items-center gap-1.5 shadow-lg shadow-pink-950/40 cursor-pointer animate-pulse">
+            <span>🎁</span> <span>17 Nov Anniversary Hub</span>
+          </button>
           <button onclick="refreshDashboard()" class="admin-btn-green px-4 py-2 text-xs font-bold flex items-center gap-1.5">
             🔄 Refresh All
           </button>
@@ -306,6 +306,9 @@
 
       <!-- NAV TABS -->
       <div class="flex flex-wrap gap-2 mb-6">
+        <button class="tab-btn" onclick="switchTab('nov17preview', this)" id="tab-btn-nov17preview" style="background:linear-gradient(135deg,rgba(244,63,94,0.25),rgba(236,72,153,0.25));border-color:rgba(244,63,94,0.6);color:#fbcfe8;font-weight:800;">
+          🎁 17 Nov Anniversary Hub
+        </button>
         <button class="tab-btn active" onclick="switchTab('reels', this)">🎬 Manage Reels</button>
         <button class="tab-btn" onclick="switchTab('messages', this)">💬 Messages</button>
         <button class="tab-btn" onclick="switchTab('deleted', this)" id="tab-btn-deleted">🗑️ Deleted Messages Vault</button>
@@ -314,6 +317,95 @@
         <button class="tab-btn" onclick="switchTab('wishes', this)">🏮 Sky Wishes</button>
         <button class="tab-btn" onclick="switchTab('gallery', this)">🖼️ Gallery & Media</button>
         <button class="tab-btn" onclick="switchTab('settings', this)">⚙️ Settings & Access</button>
+      </div>
+
+      <!-- ===== 17 NOV ANNIVERSARY PREVIEW HUB TAB ===== -->
+      <div id="tab-nov17preview" class="section-panel">
+        <div class="glass-card-rose p-6 border-pink-500/40">
+          <div class="flex flex-wrap items-center justify-between gap-3 mb-6">
+            <div>
+              <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-pink-500/20 border border-pink-400/40 text-pink-300 text-xs font-bold uppercase tracking-wider mb-2">
+                🔒 Locked For Public • Rakesh Private Preview Hub
+              </div>
+              <h2 class="font-cinzel font-bold text-xl text-pink-300 flex items-center gap-2">
+                🎁 17 November 2nd Month Anniversary Hub
+              </h2>
+              <p class="text-xs text-slate-300 mt-1 max-w-2xl leading-relaxed">
+                Yaha se aap 17 November ke saare features ko live review aur test kar sakte hain. Vanshika ke liye ye saare features <strong class="text-amber-300 font-bold">17 November 2026</strong> ko automatic unlock honge. Abhi usko har jagah countdown lock screen dikhegi.
+              </p>
+            </div>
+            <div class="flex gap-2">
+              <a href="/?preview=1" target="_blank" class="px-4 py-2.5 rounded-xl bg-gradient-to-r from-pink-600 to-rose-600 text-white font-black text-xs uppercase tracking-wider shadow-lg shadow-pink-900/50 hover:scale-105 active:scale-95 transition-all flex items-center gap-2">
+                <span>🌐</span> <span>Open Main Site Preview</span>
+              </a>
+            </div>
+          </div>
+
+          <!-- Preview Cards Grid -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6">
+            <!-- Card 1: 12-Scene Two Month Surprise Modal -->
+            <div class="p-5 rounded-2xl bg-slate-950/70 border border-pink-500/30 flex flex-col justify-between shadow-xl">
+              <div>
+                <div class="text-3xl mb-3">✨</div>
+                <h3 class="font-cinzel font-bold text-base text-pink-200 mb-2">Two Month Surprise (12 Scenes)</h3>
+                <p class="text-xs text-slate-400 leading-relaxed mb-4">
+                  Full walk-through: Envelope, Lights, Cake Slice, Bear Wish, Deep "I Love You" English text, Falling Roses, Love Tree with Emoji Infinity Loop, Hand-card vow, and Museum Door.
+                </p>
+                <div class="text-[11px] text-emerald-400 font-semibold mb-3">
+                  Status: 🔒 Locked for public • Preview ready
+                </div>
+              </div>
+              <a href="/?preview=1" target="_blank" class="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-pink-500 to-rose-500 text-white font-bold text-xs flex items-center justify-center gap-2 hover:opacity-90 transition-all text-center no-underline shadow-md">
+                <span>▶️</span> <span>Preview Main Surprise</span>
+              </a>
+            </div>
+
+            <!-- Card 2: Cupid's Storybook -->
+            <div class="p-5 rounded-2xl bg-slate-950/70 border border-pink-500/30 flex flex-col justify-between shadow-xl">
+              <div>
+                <div class="text-3xl mb-3">🏹</div>
+                <h3 class="font-cinzel font-bold text-base text-pink-200 mb-2">Cupid's Storybook Surprise</h3>
+                <p class="text-xs text-slate-400 leading-relaxed mb-4">
+                  Interactive Golden Bow & Arrow shoot, Falling hearts rain shower, Vanshika's rare green eyes, smile photo, royal queen lehenga, couple night photo, and English vow letter.
+                </p>
+                <div class="text-[11px] text-emerald-400 font-semibold mb-3">
+                  Status: 🔒 Locked for public • Preview ready
+                </div>
+              </div>
+              <a href="/storybook.html?preview=1" target="_blank" class="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-rose-500 to-amber-500 text-slate-950 font-black text-xs flex items-center justify-center gap-2 hover:opacity-90 transition-all text-center no-underline shadow-md">
+                <span>📖</span> <span>Preview Cupid Storybook</span>
+              </a>
+            </div>
+
+            <!-- Card 3: Still You. Always You. -->
+            <div class="p-5 rounded-2xl bg-slate-950/70 border border-pink-500/30 flex flex-col justify-between shadow-xl">
+              <div>
+                <div class="text-3xl mb-3">💖</div>
+                <h3 class="font-cinzel font-bold text-base text-pink-200 mb-2">Still You. Always You. (8 Rooms)</h3>
+                <p class="text-xs text-slate-400 leading-relaxed mb-4">
+                  Guided romantic rooms: Intro, Rose petals shower, Polaroid scatter wall, Interactive photo puzzle, Blooming heart tree, Museum gallery, Voice note & handwritten letter, and Proposal finale.
+                </p>
+                <div class="text-[11px] text-emerald-400 font-semibold mb-3">
+                  Status: 🔒 Locked for public • Preview ready
+                </div>
+              </div>
+              <a href="/stillyou.html?preview=1" target="_blank" class="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold text-xs flex items-center justify-center gap-2 hover:opacity-90 transition-all text-center no-underline shadow-md">
+                <span>🚪</span> <span>Preview 8 Sacred Rooms</span>
+              </a>
+            </div>
+          </div>
+
+          <!-- Lock Status Info Banner -->
+          <div class="p-4 rounded-xl bg-slate-900/80 border border-white/10 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-300">
+            <div class="flex items-center gap-2.5">
+              <span class="text-xl">🛡️</span>
+              <span><strong>Automatic Lock Rule:</strong> Date <strong class="text-amber-300">17 November 2026</strong> aate hi website auto-unlock ho jayegi aur Vanshika ko ye saare features open milenge. Abhi usko lock modal dikhega.</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="px-2.5 py-1 rounded-md bg-emerald-500/20 text-emerald-300 font-mono text-[11px] font-bold">Auto-unlock: 17-11-2026</span>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- ===== REELS TAB ===== -->

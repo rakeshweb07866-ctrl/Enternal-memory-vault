@@ -1,0 +1,1491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Still you. Always you. ✦ Vanshika & Rakesh</title>
+
+  <!-- Open Graph Meta Tags for WhatsApp & Social Sharing -->
+  <meta property="og:title" content="Still you. Always you Forever 💕">
+  <meta property="og:description" content="A private room-by-room journey created by Rakesh for Vanshika. Tap to enter our sacred memories ✨">
+  <meta property="og:image" content="assests/latest/couple-night.jpeg">
+  <meta property="og:type" content="website">
+  <meta name="theme-color" content="#fff1f2">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400..700&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Sacramento&display=swap" rel="stylesheet">
+
+  <style>
+    /* ==========================================================
+       RESET & ROOT VARIABLES
+       ========================================================== */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    :root {
+      --bg-gradient: linear-gradient(135deg, #fff7f2 0%, #feeef3 50%, #fde2e8 100%);
+      --text-dark: #2c2527;
+      --text-muted: #7c7275;
+      --accent-pink: #f43f5e;
+      --rose-glow: rgba(244, 63, 94, 0.35);
+      --font-serif: 'Playfair Display', serif;
+      --font-sans: 'Plus Jakarta Sans', sans-serif;
+      --font-hand: 'Caveat', cursive;
+      --font-sacramento: 'Sacramento', cursive;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      height: 100dvh;
+      min-height: -webkit-fill-available;
+      background: #1e191b;
+      font-family: var(--font-sans);
+      color: var(--text-dark);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Mobile First Centered App Frame */
+    .app-frame {
+      width: 100%;
+      max-width: 440px;
+      height: 100%;
+      height: 100dvh;
+      position: relative;
+      background: var(--bg-gradient);
+      overflow: hidden;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.4);
+      border-radius: 30px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    @media (max-width: 540px) {
+      .app-frame {
+        max-width: 100vw;
+        height: 100dvh;
+        border-radius: 0;
+        box-shadow: none;
+      }
+    }
+
+    /* Ambient Background Glow */
+    .ambient-glow {
+      position: absolute;
+      top: -10%;
+      right: -10%;
+      width: 280px;
+      height: 280px;
+      background: radial-gradient(circle, rgba(251, 113, 133, 0.22) 0%, transparent 70%);
+      border-radius: 50%;
+      pointer-events: none;
+      filter: blur(40px);
+      z-index: 1;
+    }
+
+    /* Top Action Bar (Mute Toggle + Chapter Title) */
+    .top-action-bar {
+      position: absolute;
+      top: 16px;
+      left: 20px;
+      right: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 90;
+      pointer-events: auto;
+    }
+    .top-chapter-pill {
+      font-family: var(--font-hand);
+      font-size: 19px;
+      color: #be123c;
+      font-weight: 700;
+      background: rgba(255, 255, 255, 0.65);
+      backdrop-filter: blur(8px);
+      padding: 3px 14px;
+      border-radius: 9999px;
+      border: 1px solid rgba(244, 63, 94, 0.2);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+    .top-audio-btn {
+      width: 36px;
+      height: 36px;
+      background: rgba(255, 255, 255, 0.75);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(244, 63, 94, 0.25);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      cursor: pointer;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.06);
+      transition: transform 0.2s;
+    }
+    .top-audio-btn:active {
+      transform: scale(0.9);
+    }
+
+    /* ==========================================================
+       ROOMS CONTAINER & TRANSITIONS
+       ========================================================== */
+    .rooms-stage {
+      flex: 1;
+      width: 100%;
+      position: relative;
+      overflow: hidden;
+      z-index: 10;
+    }
+
+    .room-scene {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      padding: 70px 22px 100px; /* bottom padding for fixed footer */
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(22px) scale(0.98);
+      transition: opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1), transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+      overflow-y: auto;
+      scrollbar-width: none;
+    }
+    .room-scene::-webkit-scrollbar {
+      display: none;
+    }
+    .room-scene.active {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0) scale(1);
+      z-index: 20;
+    }
+
+    /* Typography */
+    .room-script-title {
+      font-family: var(--font-hand);
+      font-size: 26px;
+      color: #e11d48;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 6px;
+    }
+    .room-serif-heading {
+      font-family: var(--font-serif);
+      font-size: 26px;
+      font-weight: 700;
+      color: #1f1a1c;
+      text-align: center;
+      line-height: 1.25;
+      margin-bottom: 8px;
+    }
+    .room-subtext {
+      font-size: 13.5px;
+      color: var(--text-muted);
+      text-align: center;
+      line-height: 1.5;
+      max-width: 310px;
+    }
+
+    /* ==========================================================
+       FIXED BOTTOM NAVIGATION BAR
+       ========================================================== */
+    .fixed-bottom-bar {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      padding: 12px 20px 18px;
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(14px);
+      border-top: 1px solid rgba(244, 63, 94, 0.15);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      z-index: 100;
+    }
+
+    /* Next Room Pink Gradient Button */
+    .next-room-btn {
+      width: 100%;
+      max-width: 320px;
+      background: linear-gradient(135deg, #f43f5e 0%, #fb7185 50%, #f43f5e 100%);
+      color: #ffffff;
+      font-family: var(--font-sans);
+      font-weight: 700;
+      font-size: 14.5px;
+      letter-spacing: 0.3px;
+      padding: 13px 24px;
+      border-radius: 9999px;
+      border: none;
+      box-shadow: 0 8px 24px var(--rose-glow);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: transform 0.25s, box-shadow 0.25s;
+    }
+    .next-room-btn:hover {
+      transform: scale(1.02);
+      box-shadow: 0 12px 28px var(--rose-glow);
+    }
+    .next-room-btn:active {
+      transform: scale(0.97);
+    }
+
+    /* Circular Progress Dots (8 Rooms) */
+    .progress-dots-row {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .room-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #e2d8db;
+      transition: all 0.35s ease;
+    }
+    .room-dot.completed {
+      background: #fb7185;
+      transform: scale(1.1);
+    }
+    .room-dot.active {
+      width: 22px;
+      border-radius: 12px;
+      background: #e11d48;
+      box-shadow: 0 0 8px var(--rose-glow);
+    }
+
+    .footer-signature {
+      font-size: 11px;
+      color: #a89fa2;
+      font-weight: 500;
+      letter-spacing: 0.3px;
+    }
+
+    /* ==========================================================
+       ROOM 1: INTRO
+       ========================================================== */
+    .intro-art-wrapper {
+      margin-top: 35px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 15px;
+    }
+    .intro-heart-anim {
+      width: 80px;
+      height: 80px;
+      animation: heartbeat 1.8s infinite ease-in-out;
+    }
+    @keyframes heartbeat {
+      0%, 100% { transform: scale(1); }
+      14% { transform: scale(1.18); }
+      28% { transform: scale(1); }
+      42% { transform: scale(1.18); }
+      70% { transform: scale(1); }
+    }
+    .tap-to-enter-hint {
+      font-family: var(--font-hand);
+      font-size: 20px;
+      color: #e11d48;
+      animation: floatPulse 2s infinite ease-in-out;
+    }
+    @keyframes floatPulse {
+      0%, 100% { transform: translateY(0); opacity: 0.8; }
+      50% { transform: translateY(-6px); opacity: 1; }
+    }
+
+    /* ==========================================================
+       ROOM 2: FALLING ROSES
+       ========================================================== */
+    #falling-roses-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      pointer-events: auto;
+    }
+    .falling-rose {
+      position: absolute;
+      font-size: 28px;
+      cursor: pointer;
+      pointer-events: auto;
+      user-select: none;
+      filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));
+      will-change: transform;
+    }
+    .petal-burst-particle {
+      position: absolute;
+      font-size: 16px;
+      pointer-events: none;
+      animation: petalFade 0.9s forwards ease-out;
+    }
+    @keyframes petalFade {
+      0% { transform: translate(0, 0) scale(1) rotate(0deg); opacity: 1; }
+      100% { transform: translate(var(--tx), var(--ty)) scale(0.4) rotate(var(--rot)); opacity: 0; }
+    }
+
+    /* ==========================================================
+       ROOM 3: POLAROID WALL
+       ========================================================== */
+    .polaroid-grid-wall {
+      width: 100%;
+      max-width: 360px;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      margin: 15px auto;
+      padding-bottom: 20px;
+    }
+    .polaroid-card {
+      background: #ffffff;
+      padding: 10px 10px 14px;
+      border-radius: 8px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+      cursor: pointer;
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+    }
+    .polaroid-card:hover, .polaroid-card:active {
+      transform: scale(1.08) rotate(0deg) !important;
+      z-index: 25;
+      box-shadow: 0 16px 35px rgba(244, 63, 94, 0.28);
+    }
+    .polaroid-img-frame {
+      width: 100%;
+      height: 130px;
+      background: #fdf2f4;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .polaroid-img-frame img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .polaroid-caption {
+      font-family: var(--font-hand);
+      font-size: 16px;
+      color: #3b2f32;
+      margin-top: 8px;
+      text-align: center;
+      line-height: 1.1;
+    }
+
+    /* Lightbox Modal for Enlarge */
+    .polaroid-lightbox {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(18, 14, 16, 0.85);
+      backdrop-filter: blur(10px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+      padding: 20px;
+    }
+    .polaroid-lightbox.active {
+      display: flex;
+    }
+    .lightbox-content {
+      background: #fff;
+      padding: 14px 14px 20px;
+      border-radius: 12px;
+      max-width: 340px;
+      width: 100%;
+      box-shadow: 0 20px 45px rgba(0,0,0,0.5);
+      animation: modalPop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+      text-align: center;
+    }
+    @keyframes modalPop {
+      0% { transform: scale(0.8); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .lightbox-content img {
+      width: 100%;
+      max-height: 380px;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+    .lightbox-caption {
+      font-family: var(--font-hand);
+      font-size: 22px;
+      color: #e11d48;
+      margin-top: 12px;
+      font-weight: 700;
+    }
+
+    /* ==========================================================
+       ROOM 4: PHOTO PUZZLE (3x3 SLICED TILE SWAP)
+       ========================================================== */
+    .puzzle-board-container {
+      width: 270px;
+      height: 270px;
+      margin: 15px auto;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: repeat(3, 1fr);
+      gap: 3px;
+      background: #fecdd3;
+      padding: 3px;
+      border-radius: 14px;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+      position: relative;
+    }
+    .puzzle-tile {
+      width: 86px;
+      height: 86px;
+      border-radius: 8px;
+      background-size: 264px 264px;
+      cursor: pointer;
+      position: relative;
+      transition: transform 0.25s, box-shadow 0.25s, filter 0.3s;
+    }
+    .puzzle-tile.selected {
+      transform: scale(0.92);
+      box-shadow: 0 0 0 3px #f43f5e, 0 8px 16px rgba(244, 63, 94, 0.4);
+      z-index: 10;
+    }
+    .puzzle-board-container.solved {
+      box-shadow: 0 0 35px rgba(244, 63, 94, 0.6);
+      animation: goldenGlow 2s infinite alternate ease-in-out;
+    }
+    @keyframes goldenGlow {
+      0% { filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.6)); }
+      100% { filter: drop-shadow(0 0 20px rgba(244, 63, 94, 0.8)); }
+    }
+    .puzzle-solved-badge {
+      font-family: var(--font-hand);
+      font-size: 22px;
+      color: #be123c;
+      font-weight: 700;
+      margin-top: 8px;
+      display: none;
+      text-align: center;
+      animation: floatPulse 1.5s infinite ease-in-out;
+    }
+
+    /* ==========================================================
+       ROOM 5: LOVE TREE
+       ========================================================== */
+    .love-tree-box {
+      width: 280px;
+      height: 300px;
+      position: relative;
+      margin: 10px auto;
+      cursor: pointer;
+    }
+    .love-card-side {
+      position: absolute;
+      top: 15px;
+      left: 10px;
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(8px);
+      padding: 8px 14px;
+      border-radius: 12px;
+      border: 1px solid rgba(244, 63, 94, 0.25);
+      box-shadow: 0 6px 15px rgba(0,0,0,0.06);
+      z-index: 15;
+    }
+    .floating-tree-heart {
+      position: absolute;
+      font-size: 20px;
+      pointer-events: none;
+      animation: treeHeartRise 2s forwards ease-out;
+    }
+    @keyframes treeHeartRise {
+      0% { transform: translateY(0) scale(0.6); opacity: 1; }
+      100% { transform: translateY(-120px) scale(1.4) rotate(20deg); opacity: 0; }
+    }
+
+    /* ==========================================================
+       ROOM 6: GALLERY WALK (MUSEUM STYLE)
+       ========================================================== */
+    .gallery-museum-frame {
+      width: 280px;
+      background: linear-gradient(135deg, #d4af37, #f3e5ab, #aa771c, #d4af37);
+      padding: 10px;
+      border-radius: 12px;
+      box-shadow: 0 16px 40px rgba(0,0,0,0.22);
+      position: relative;
+      margin: 10px auto 14px;
+    }
+    .gallery-photo-inner {
+      width: 100%;
+      height: 290px;
+      border-radius: 6px;
+      overflow: hidden;
+      background: #000;
+    }
+    .gallery-photo-inner img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: opacity 0.4s ease;
+    }
+    /* Museum Plaque */
+    .museum-plaque {
+      background: #fdf8f4;
+      border: 1px solid #d4af37;
+      border-radius: 8px;
+      padding: 8px 16px;
+      margin-top: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+      text-align: center;
+      max-width: 290px;
+    }
+    .museum-plaque-title {
+      font-family: var(--font-serif);
+      font-size: 13.5px;
+      font-weight: 700;
+      color: #3b2d18;
+    }
+    .museum-plaque-sub {
+      font-size: 11px;
+      color: #78716c;
+      margin-top: 2px;
+    }
+    .gallery-nav-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 18px;
+      margin-top: 10px;
+    }
+    .gallery-arrow-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: #fff;
+      border: 1px solid rgba(244, 63, 94, 0.2);
+      font-size: 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+    }
+    .gallery-counter-pill {
+      font-family: var(--font-hand);
+      font-size: 18px;
+      font-weight: 700;
+      color: #be123c;
+    }
+
+    /* ==========================================================
+       ROOM 7: LETTER + VOICE NOTE PLAYER
+       ========================================================== */
+    .room7-letter-box {
+      width: 100%;
+      max-width: 340px;
+      max-height: 200px;
+      background: #fffdf9;
+      border: 1px solid #fce7f3;
+      border-radius: 14px;
+      padding: 16px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.05);
+      overflow-y: auto;
+      margin-bottom: 14px;
+      font-family: var(--font-hand);
+      font-size: 18px;
+      line-height: 1.5;
+      color: #3f393b;
+    }
+    /* Voice Note Custom Player Card */
+    .voice-note-card {
+      width: 100%;
+      max-width: 340px;
+      background: #ffffff;
+      border-radius: 18px;
+      padding: 14px 18px;
+      box-shadow: 0 10px 25px rgba(244, 63, 94, 0.12);
+      border: 1px solid rgba(244, 63, 94, 0.2);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .vn-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12px;
+      font-weight: 700;
+      color: #be123c;
+    }
+    .vn-controls-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .vn-play-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #f43f5e, #fb7185);
+      border: none;
+      color: #fff;
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(244, 63, 94, 0.4);
+    }
+    .waveform-visualizer {
+      flex: 1;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      gap: 3px;
+    }
+    .wave-bar {
+      flex: 1;
+      height: 8px;
+      background: #fecdd3;
+      border-radius: 3px;
+      transition: height 0.2s ease, background 0.2s;
+    }
+    .voice-playing .wave-bar {
+      background: #f43f5e;
+      animation: waveDance 0.8s infinite alternate ease-in-out;
+    }
+    .voice-playing .wave-bar:nth-child(2n) { animation-delay: 0.15s; }
+    .voice-playing .wave-bar:nth-child(3n) { animation-delay: 0.3s; }
+    .voice-playing .wave-bar:nth-child(4n) { animation-delay: 0.45s; }
+    @keyframes waveDance {
+      0% { height: 6px; }
+      100% { height: 32px; }
+    }
+    .vn-time-text {
+      font-size: 11px;
+      font-weight: 600;
+      color: #881337;
+    }
+
+    /* ==========================================================
+       ROOM 8: FINAL PROPOSAL / SURPRISE
+       ========================================================== */
+    .proposal-card-box {
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(12px);
+      border-radius: 24px;
+      padding: 26px 20px;
+      text-align: center;
+      box-shadow: 0 20px 50px rgba(244, 63, 94, 0.25);
+      border: 2px solid rgba(244, 63, 94, 0.3);
+      max-width: 330px;
+      width: 100%;
+      margin: 10px auto;
+    }
+    .proposal-buttons-row {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 22px;
+    }
+    .proposal-yes-btn {
+      background: linear-gradient(135deg, #f43f5e, #e11d48);
+      color: #fff;
+      font-size: 15px;
+      font-weight: 700;
+      padding: 14px 20px;
+      border-radius: 9999px;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 8px 24px rgba(225, 29, 72, 0.35);
+      transition: transform 0.2s;
+    }
+    .proposal-yes-btn:active {
+      transform: scale(0.96);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Lock Modal for Vanshika before 17 Nov -->
+  <div id="sy-lock-modal" style="display:none;position:fixed;inset:0;z-index:9999;background:#0d080b;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center;color:#fff;">
+    <div style="font-size:52px;margin-bottom:12px;">🔒</div>
+    <h2 style="font-family:'Playfair Display',serif;font-size:24px;font-weight:800;color:#f43f5e;margin-bottom:8px;">Still You. Always You. • Locked</h2>
+    <p style="font-size:14px;color:#d6d3d1;max-width:320px;line-height:1.6;margin-bottom:20px;">
+      These 8 sacred rooms unlock automatically on <strong style="color:#fbbf24;">17 November 2026</strong> for our 2nd Month Anniversary 💕
+    </p>
+    <a href="/" style="text-decoration:none;background:linear-gradient(135deg,#f43f5e,#fb7185);color:#fff;font-weight:700;font-size:13px;padding:12px 28px;border-radius:9999px;box-shadow:0 8px 20px rgba(244,63,94,.4);">
+      Return to Memory Vault ✦
+    </a>
+  </div>
+  <script>
+    (function checkLock() {
+      const isPreview = window.location.search.includes('preview=1') || window.location.search.includes('anniv=1');
+      const now = new Date();
+      const isNov17 = now.getFullYear() >= 2026 && now.getMonth() >= 10 && now.getDate() >= 17;
+      if (!isNov17 && !isPreview) {
+        window.addEventListener('DOMContentLoaded', () => {
+          const m = document.getElementById('sy-lock-modal');
+          if (m) m.style.display = 'flex';
+          const af = document.getElementById('appFrame');
+          if (af) af.style.display = 'none';
+        });
+      }
+    })();
+  </script>
+
+  <!-- Background Instrumental Audio -->
+  <audio id="bg-audio" loop preload="auto">
+    <source src="music/keshariyaa.mp3" type="audio/mp3">
+  </audio>
+
+  <!-- Dedicated Voice Note / Message Audio -->
+  <audio id="voice-note-audio" preload="auto">
+    <source src="music/love-song.mp3" type="audio/mp3">
+  </audio>
+
+  <div class="app-frame" id="appFrame">
+    <!-- Ambient aura glow -->
+    <div class="ambient-glow"></div>
+
+    <!-- Top Action Bar -->
+    <div class="top-action-bar">
+      <div class="top-chapter-pill" id="roomPill">Room 1 ✦ Intro</div>
+      <button class="top-audio-btn" id="audioToggleBtn" title="Play / Mute Music">
+        🎵
+      </button>
+    </div>
+
+    <!-- Lightbox for Enlarging Polaroids -->
+    <div class="polaroid-lightbox" id="polaroidLightbox" onclick="closeLightbox()">
+      <div class="lightbox-content" onclick="event.stopPropagation()">
+        <img id="lightboxImg" src="" alt="Moment">
+        <div class="lightbox-caption" id="lightboxCaption"></div>
+        <p style="font-size: 11px; color: #94a3b8; margin-top: 6px;">Tap anywhere to close</p>
+      </div>
+    </div>
+
+    <!-- ========================================================
+         ROOMS STAGE
+         ======================================================== -->
+    <div class="rooms-stage">
+
+      <!-- ROOM 1: INTRO -->
+      <section class="room-scene active" id="room-1" onclick="nextRoom()">
+        <div style="text-align: center;">
+          <h1 style="font-family: var(--font-hand); font-size: 44px; color: #be123c; line-height: 1.1; font-weight: 700;">
+            Still you.<br>Always you.
+          </h1>
+          <p style="font-family: var(--font-serif); font-size: 16px; color: #78716c; margin-top: 10px; font-style: italic;">
+            — Rakesh
+          </p>
+        </div>
+
+        <div class="intro-art-wrapper">
+          <div class="intro-heart-anim">
+            <svg viewBox="0 0 100 100" fill="none">
+              <path d="M50 88 C20 62, 5 45, 5 28 C5 12, 18 2, 33 2 C42 2, 47 7, 50 12 C53 7, 58 2, 67 2 C82 2, 95 12, 95 28 C95 45, 80 62, 50 88 Z" fill="#f43f5e"/>
+            </svg>
+          </div>
+          <div class="tap-to-enter-hint">Tap anywhere to enter our journey ✨</div>
+        </div>
+      </section>
+
+      <!-- ROOM 2: FALLING ROSES -->
+      <section class="room-scene" id="room-2">
+        <div id="falling-roses-container"></div>
+        <div style="position: relative; z-index: 20; text-align: center; pointer-events: none; margin-top: auto; margin-bottom: 25px;">
+          <div class="room-script-title">Gentle Petals of Love</div>
+          <h2 class="room-serif-heading" style="font-size: 22px;">"Every day with you feels like this."</h2>
+          <p class="room-subtext" style="font-size: 12px; margin-top: 4px;">Tap the falling roses to watch them bloom into petals 💕</p>
+        </div>
+      </section>
+
+      <!-- ROOM 3: POLAROID WALL -->
+      <section class="room-scene" id="room-3">
+        <div style="text-align: center;">
+          <div class="room-script-title" id="room3ScriptTitle">See what Rakesh built for you</div>
+          <p class="room-subtext">8 memories locked in time. Tap any photo to enlarge.</p>
+        </div>
+
+        <div class="polaroid-grid-wall" id="polaroidWall">
+          <!-- Injected dynamically from config -->
+        </div>
+      </section>
+
+      <!-- ROOM 4: PHOTO PUZZLE (3x3 SLICED MEMORY) -->
+      <section class="room-scene" id="room-4">
+        <div style="text-align: center;">
+          <h2 class="room-serif-heading">This photo fell apart 💔</h2>
+          <p class="room-subtext">Tap two pieces to swap them and put our memory back together.</p>
+        </div>
+
+        <div class="puzzle-board-container" id="puzzleBoard">
+          <!-- 3x3 tiles injected here -->
+        </div>
+
+        <div style="display: flex; gap: 15px; align-items: center; margin-top: 6px;">
+          <span style="font-size: 12px; color: #78716c;" id="puzzleMoveCounter">Moves: 0</span>
+          <button onclick="skipPuzzle()" style="background: none; border: none; color: #f43f5e; font-size: 12px; font-weight: 700; text-decoration: underline; cursor: pointer;">
+            Skip Puzzle →
+          </button>
+        </div>
+        <div class="puzzle-solved-badge" id="puzzleSolvedMsg">
+          ✨ "Some things are always meant to fit."
+        </div>
+      </section>
+
+      <!-- ROOM 5: LOVE TREE -->
+      <section class="room-scene" id="room-5">
+        <div style="text-align: center;">
+          <div class="room-script-title">Growing With Every Heartbeat</div>
+          <p class="room-subtext">Tap the tree to release blooming hearts ✨</p>
+        </div>
+
+        <div class="love-tree-box" id="loveTreeBox" onclick="releaseTreeHearts(event)">
+          <div class="love-card-side" style="text-align: center; border-radius: 18px; padding: 12px 18px; background: rgba(255,255,255,0.94); box-shadow: 0 10px 24px rgba(244,63,94,0.18); border: 1.5px solid rgba(244,63,94,0.35);">
+            <p style="font-size: 11px; color: #e11d48; font-weight: 800; letter-spacing: 0.04em;">💖 Handcrafted From The Depths Of My Heart 💖</p>
+            <div style="display: flex; justify-content: center; align-items: center; gap: 3px; margin: 4px 0; font-size: 14px;">
+              <span>💖</span><span>💕</span><span>💗</span><span style="font-size: 20px; color: #be123c;">♾️</span><span>💗</span><span>💕</span><span>💖</span>
+            </div>
+            <p style="font-family: var(--font-hand); font-size: 21px; color: #be123c; font-weight: 700; line-height: 1.2; margin: 3px 0;">"Until my last breath, I am forever yours."</p>
+            <div style="font-size: 12px; letter-spacing: 2px;">✨ 💕 💍 🌹 ✨</div>
+          </div>
+
+          <!-- SVG Blooming Love Tree -->
+          <svg viewBox="0 0 280 300" style="width: 100%; height: 100%;">
+            <!-- Trunk & Branches -->
+            <path d="M140 280 Q138 210 140 180 Q120 150 90 130 Q125 140 140 170 Q155 140 190 120 Q160 145 140 175" stroke="#854d0e" stroke-width="12" stroke-linecap="round" fill="none"/>
+            <path d="M140 210 Q110 190 80 185" stroke="#854d0e" stroke-width="6" stroke-linecap="round" fill="none"/>
+            <path d="M140 200 Q170 185 200 180" stroke="#854d0e" stroke-width="6" stroke-linecap="round" fill="none"/>
+
+            <!-- Heart Leaves Cluster -->
+            <g id="treeHeartLeaves">
+              <path d="M140 100 C125 80, 100 95, 100 115 C100 135, 140 155, 140 155 C140 155, 180 135, 180 115 C180 95, 155 80, 140 100 Z" fill="#f43f5e"/>
+              <path d="M100 125 C85 105, 60 120, 60 140 C60 160, 100 180, 100 180 C100 180, 140 160, 140 140 C140 120, 115 105, 100 125 Z" fill="#fb7185"/>
+              <path d="M180 120 C165 100, 140 115, 140 135 C140 155, 180 175, 180 175 C180 175, 220 155, 220 135 C220 115, 195 100, 180 120 Z" fill="#e11d48"/>
+              <path d="M140 60 C125 40, 100 55, 100 75 C100 95, 140 115, 140 115 C140 115, 180 95, 180 75 C180 55, 155 40, 140 60 Z" fill="#f472b6"/>
+              <path d="M75 160 C65 145, 45 155, 45 170 C45 185, 75 200, 75 200 C75 200, 105 185, 105 170 C105 155, 85 145, 75 160 Z" fill="#fda4af"/>
+              <path d="M205 155 C195 140, 175 150, 175 165 C175 180, 205 195, 205 195 C205 195, 235 180, 235 165 C235 150, 215 140, 205 155 Z" fill="#fb7185"/>
+            </g>
+          </svg>
+        </div>
+      </section>
+
+      <!-- ROOM 6: GALLERY WALK (MUSEUM STYLE) -->
+      <section class="room-scene" id="room-6">
+        <div style="text-align: center;">
+          <div class="room-script-title">The Masterpiece Gallery</div>
+          <p class="room-subtext">Walking through the greatest museum: our story.</p>
+        </div>
+
+        <div class="gallery-museum-frame">
+          <div class="gallery-photo-inner">
+            <img id="galleryMuseumImg" src="assests/latest/couple-night.jpeg" alt="Exhibition">
+          </div>
+        </div>
+
+        <div class="museum-plaque">
+          <div class="museum-plaque-title" id="museumPlaqueTitle">Untitled — Moment 1</div>
+          <div class="museum-plaque-sub">From the sacred Heart Collection</div>
+        </div>
+
+        <div class="gallery-nav-row">
+          <button class="gallery-arrow-btn" onclick="prevGalleryPhoto()">←</button>
+          <span class="gallery-counter-pill" id="galleryCounter">1 / 8</span>
+          <button class="gallery-arrow-btn" onclick="nextGalleryPhoto()">→</button>
+        </div>
+      </section>
+
+      <!-- ROOM 7: LETTER + VOICE NOTE -->
+      <section class="room-scene" id="room-7">
+        <div style="text-align: center; margin-bottom: 8px;">
+          <div class="room-script-title">My Heart In Words & Voice</div>
+        </div>
+
+        <!-- Scrollable Love Letter -->
+        <div class="room7-letter-box" id="room7Letter">
+          My Dearest Vanshika,<br><br>
+          Every room we just walked through holds a fraction of what you mean to me. I don't just love you, my darling — my very soul belongs to you. I love everything about you: your voice, your precious smile, your quiet days, every tear you've ever cried, your happiness and your sadness, and your beautiful family. I love every single piece of your universe.<br><br>
+          You are my safe harbor, my greatest peace, and I will be yours until my very last breath. I made all of this from the deepest corner of my heart, so you never, ever forget how deeply and completely you are loved.<br><br>
+          Infinity Love Until My Last Breath ♾️❤️<br>
+          <strong style="color: #be123c;">Forever & Always yours, Rakesh 💕</strong>
+        </div>
+
+        <!-- Custom Audio Player Card -->
+        <div class="voice-note-card" id="voiceNoteCard">
+          <div class="vn-header">
+            <span>Hear Rakesh say it 🎙️</span>
+            <span class="vn-time-text" id="voiceTime">0:00 / 0:45</span>
+          </div>
+
+          <div class="vn-controls-row">
+            <button class="vn-play-btn" id="voicePlayBtn" onclick="toggleVoiceNote()">
+              ▶
+            </button>
+            <div class="waveform-visualizer">
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+            </div>
+          </div>
+        </div>
+
+        <div style="font-size: 28px; margin-top: 10px;">🥰</div>
+      </section>
+
+      <!-- ROOM 8: FINAL SURPRISE / PROPOSAL -->
+      <section class="room-scene" id="room-8">
+        <div class="proposal-card-box">
+          <div style="font-size: 38px; margin-bottom: 8px;">💍</div>
+          <div class="room-script-title" style="font-size: 32px; color: #be123c;">Vanshika...</div>
+          <h2 class="room-serif-heading" style="font-size: 22px; margin-top: 6px;">
+            "Will you be mine forever?"
+          </h2>
+          <p class="room-subtext" style="margin-top: 8px; font-size: 13px;">
+            Through every season, every laugh, and every tomorrow.
+          </p>
+
+          <div class="proposal-buttons-row">
+            <button class="proposal-yes-btn" onclick="acceptProposal(1)">
+              Yes! 💖
+            </button>
+            <button class="proposal-yes-btn" style="background: linear-gradient(135deg, #fb7185, #f43f5e);" onclick="acceptProposal(2)">
+              A thousand times YES! 💍✨
+            </button>
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- ========================================================
+         FIXED BOTTOM NAVIGATION
+         ======================================================== -->
+    <div class="fixed-bottom-bar">
+      <button class="next-room-btn" id="nextRoomBtn" onclick="nextRoom()">
+        <span id="nextBtnText">Next Room</span>
+        <span>→</span>
+      </button>
+
+      <!-- 8 Progress Dots -->
+      <div class="progress-dots-row">
+        <div class="room-dot active" data-room="1"></div>
+        <div class="room-dot" data-room="2"></div>
+        <div class="room-dot" data-room="3"></div>
+        <div class="room-dot" data-room="4"></div>
+        <div class="room-dot" data-room="5"></div>
+        <div class="room-dot" data-room="6"></div>
+        <div class="room-dot" data-room="7"></div>
+        <div class="room-dot" data-room="8"></div>
+      </div>
+
+      <div class="footer-signature" id="footerSignature">
+        Made with ❤️ by Rakesh for Vanshika
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Confetti Canvas Particle Engine -->
+  <canvas id="fireworksCanvas" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999;"></canvas>
+
+  <!-- ========================================================
+       CONFIG & SCRIPT CONTROLLER
+       ======================================================== -->
+  <script>
+    /* ========================================================
+       TOP CONFIGURATION OBJECT (EASY TO CUSTOMIZE)
+       ======================================================== */
+    const STILL_CONFIG = {
+      herName: "Vanshika",
+      myName: "Rakesh",
+      photos: [
+        { src: "assests/latest/couple-night.jpeg", caption: "Our quiet midnight laughter" },
+        { src: "assests/latest/vanshika-royal-lehenga.jpeg", caption: "The day you took my breath away" },
+        { src: "assests/latest/couple-night-2.jpeg", caption: "Safe forever in your arms" },
+        { src: "assests/latest/vanshika-blue-dress.jpeg", caption: "Grace, elegance, perfection" },
+        { src: "assests/latest/vanshika-red-elegance.jpeg", caption: "My queen in red" },
+        { src: "assests/latest/vanshika-green-eyes.jpeg", caption: "Those eyes I adore forever" },
+        { src: "assests/latest/vanshika-soft-portrait.jpeg", caption: "The purest smile in this world" },
+        { src: "assests/magical-smile.jpeg", caption: "My favorite sight every day" }
+      ],
+      puzzlePhoto: "assests/latest/couple-night.jpeg",
+      musicUrl: "music/keshariyaa.mp3",
+      voiceNoteUrl: "music/love-song.mp3",
+      roomTitles: [
+        "Room 1 ✦ Intro",
+        "Room 2 ✦ Falling Roses",
+        "Room 3 ✦ Polaroid Wall",
+        "Room 4 ✦ Photo Puzzle",
+        "Room 5 ✦ Love Tree",
+        "Room 6 ✦ Gallery Walk",
+        "Room 7 ✦ Letter & Voice",
+        "Room 8 ✦ Final Surprise"
+      ]
+    };
+
+    /* ========================================================
+       STATE
+       ======================================================== */
+    let currentRoom = 1;
+    const totalRooms = 8;
+    const bgAudio = document.getElementById('bg-audio');
+    const voiceAudio = document.getElementById('voice-note-audio');
+    const audioToggleBtn = document.getElementById('audioToggleBtn');
+
+    // Music Autoplay on first tap
+    function initAudioOnce() {
+      if (bgAudio.paused) {
+        bgAudio.play().catch(() => {});
+      }
+      document.removeEventListener('click', initAudioOnce);
+      document.removeEventListener('touchstart', initAudioOnce);
+    }
+    document.addEventListener('click', initAudioOnce, { once: true });
+    document.addEventListener('touchstart', initAudioOnce, { once: true });
+
+    audioToggleBtn.addEventListener('click', () => {
+      if (bgAudio.paused) {
+        bgAudio.play();
+        audioToggleBtn.textContent = '⏸️';
+      } else {
+        bgAudio.pause();
+        audioToggleBtn.textContent = '🎵';
+      }
+    });
+
+    /* ========================================================
+       ROOM NAVIGATION
+       ======================================================== */
+    function goToRoom(target) {
+      if (target < 1 || target > totalRooms) return;
+
+      const prevEl = document.getElementById(`room-${currentRoom}`);
+      const nextEl = document.getElementById(`room-${target}`);
+
+      if (prevEl) prevEl.classList.remove('active');
+      if (nextEl) nextEl.classList.add('active');
+
+      currentRoom = target;
+
+      // Update room pill & bottom text
+      document.getElementById('roomPill').textContent = STILL_CONFIG.roomTitles[target - 1];
+
+      // Update progress dots
+      document.querySelectorAll('.room-dot').forEach((dot, idx) => {
+        const roomNum = idx + 1;
+        dot.classList.remove('active', 'completed');
+        if (roomNum === target) dot.classList.add('active');
+        else if (roomNum < target) dot.classList.add('completed');
+      });
+
+      // Update button text
+      const nextBtnText = document.getElementById('nextBtnText');
+      if (target === 7) {
+        nextBtnText.textContent = "One last room →";
+      } else if (target === 8) {
+        document.getElementById('nextRoomBtn').style.display = 'none';
+      } else {
+        nextBtnText.textContent = "Next Room";
+      }
+
+      // Room specific activations
+      if (target === 2) startFallingRoses();
+      if (target === 3) populatePolaroidWall();
+      if (target === 4) initPuzzle();
+      if (target === 6) renderGalleryPhoto();
+    }
+
+    function nextRoom() {
+      if (currentRoom < totalRooms) {
+        goToRoom(currentRoom + 1);
+      }
+    }
+
+    /* ========================================================
+       ROOM 2: FALLING ROSES
+       ======================================================== */
+    let rosesInterval = null;
+    function startFallingRoses() {
+      if (rosesInterval) return;
+      const container = document.getElementById('falling-roses-container');
+      const roseEmojis = ['🌹', '🌸', '🌺', '🤍', '🌷'];
+
+      function spawnRose() {
+        if (currentRoom !== 2) return;
+        const rose = document.createElement('div');
+        rose.className = 'falling-rose';
+        rose.textContent = roseEmojis[Math.floor(Math.random() * roseEmojis.length)];
+        rose.style.left = (Math.random() * 85 + 5) + '%';
+        rose.style.top = '-40px';
+
+        const speed = Math.random() * 2 + 3.5; // seconds
+        const rotEnd = Math.random() * 360;
+
+        rose.animate([
+          { transform: 'translateY(0) rotate(0deg)' },
+          { transform: `translateY(${window.innerHeight + 60}px) rotate(${rotEnd}deg)` }
+        ], {
+          duration: speed * 1000,
+          easing: 'linear'
+        }).onfinish = () => rose.remove();
+
+        // Tapping makes it burst into petals
+        rose.addEventListener('pointerdown', (e) => {
+          e.stopPropagation();
+          burstPetals(e.clientX, e.clientY);
+          rose.remove();
+        });
+
+        container.appendChild(rose);
+      }
+
+      rosesInterval = setInterval(spawnRose, 450);
+    }
+
+    function burstPetals(x, y) {
+      const container = document.getElementById('falling-roses-container');
+      const petals = ['🌸', '✨', '💖', '🌹'];
+      for (let i = 0; i < 7; i++) {
+        const p = document.createElement('div');
+        p.className = 'petal-burst-particle';
+        p.textContent = petals[Math.floor(Math.random() * petals.length)];
+        p.style.left = x + 'px';
+        p.style.top = y + 'px';
+        const angle = Math.random() * Math.PI * 2;
+        const dist = Math.random() * 60 + 20;
+        p.style.setProperty('--tx', Math.cos(angle) * dist + 'px');
+        p.style.setProperty('--ty', Math.sin(angle) * dist + 'px');
+        p.style.setProperty('--rot', (Math.random() * 360) + 'deg');
+        container.appendChild(p);
+        setTimeout(() => p.remove(), 900);
+      }
+    }
+
+    /* ========================================================
+       ROOM 3: POLAROID WALL
+       ======================================================== */
+    let polaroidsRendered = false;
+    function populatePolaroidWall() {
+      if (polaroidsRendered) return;
+      polaroidsRendered = true;
+
+      const wall = document.getElementById('polaroidWall');
+      wall.innerHTML = '';
+
+      STILL_CONFIG.photos.forEach((item, index) => {
+        const card = document.createElement('div');
+        card.className = 'polaroid-card';
+        const randomRot = (Math.random() * 8 - 4).toFixed(1);
+        card.style.transform = `rotate(${randomRot}deg)`;
+
+        card.innerHTML = `
+          <div class="polaroid-img-frame">
+            <img src="${item.src}" alt="Vanshika" loading="lazy">
+          </div>
+          <div class="polaroid-caption">${item.caption}</div>
+        `;
+
+        card.onclick = () => openLightbox(item.src, item.caption);
+        wall.appendChild(card);
+      });
+    }
+
+    function openLightbox(src, caption) {
+      document.getElementById('lightboxImg').src = src;
+      document.getElementById('lightboxCaption').textContent = caption;
+      document.getElementById('polaroidLightbox').classList.add('active');
+    }
+    function closeLightbox() {
+      document.getElementById('polaroidLightbox').classList.remove('active');
+    }
+
+    /* ========================================================
+       ROOM 4: 3x3 PHOTO PUZZLE
+       ======================================================== */
+    let puzzleTiles = [0, 1, 2, 3, 4, 5, 6, 7, 8];
+    let selectedTileIndex = null;
+    let puzzleMoves = 0;
+    let puzzleInitialized = false;
+
+    function initPuzzle() {
+      if (puzzleInitialized) return;
+      puzzleInitialized = true;
+
+      // Shuffle tiles (ensure it's solvable by swapping random adjacent pairs)
+      for (let i = 0; i < 12; i++) {
+        const a = Math.floor(Math.random() * 9);
+        const b = Math.floor(Math.random() * 9);
+        [puzzleTiles[a], puzzleTiles[b]] = [puzzleTiles[b], puzzleTiles[a]];
+      }
+
+      renderPuzzleBoard();
+    }
+
+    function renderPuzzleBoard() {
+      const board = document.getElementById('puzzleBoard');
+      board.innerHTML = '';
+
+      puzzleTiles.forEach((tilePos, idx) => {
+        const tile = document.createElement('div');
+        tile.className = 'puzzle-tile';
+        if (selectedTileIndex === idx) tile.classList.add('selected');
+
+        tile.style.backgroundImage = `url("${STILL_CONFIG.puzzlePhoto}")`;
+        const col = tilePos % 3;
+        const row = Math.floor(tilePos / 3);
+        tile.style.backgroundPosition = `-${col * 88}px -${row * 88}px`;
+
+        tile.onclick = () => handleTileClick(idx);
+        board.appendChild(tile);
+      });
+    }
+
+    function handleTileClick(idx) {
+      if (document.getElementById('puzzleBoard').classList.contains('solved')) return;
+
+      if (selectedTileIndex === null) {
+        selectedTileIndex = idx;
+        renderPuzzleBoard();
+      } else {
+        // Swap tiles
+        [puzzleTiles[selectedTileIndex], puzzleTiles[idx]] = [puzzleTiles[idx], puzzleTiles[selectedTileIndex]];
+        puzzleMoves++;
+        document.getElementById('puzzleMoveCounter').textContent = `Moves: ${puzzleMoves}`;
+        selectedTileIndex = null;
+        renderPuzzleBoard();
+
+        // Check victory
+        if (puzzleTiles.every((val, i) => val === i)) {
+          solvePuzzleSuccess();
+        }
+      }
+    }
+
+    function skipPuzzle() {
+      puzzleTiles = [0, 1, 2, 3, 4, 5, 6, 7, 8];
+      selectedTileIndex = null;
+      renderPuzzleBoard();
+      solvePuzzleSuccess();
+    }
+
+    function solvePuzzleSuccess() {
+      const board = document.getElementById('puzzleBoard');
+      board.classList.add('solved');
+      document.getElementById('puzzleSolvedMsg').style.display = 'block';
+      fireConfettiCelebration();
+    }
+
+    /* ========================================================
+       ROOM 5: LOVE TREE EXTRA HEARTS
+       ======================================================== */
+    function releaseTreeHearts(e) {
+      const box = document.getElementById('loveTreeBox');
+      const hearts = ['💖', '💕', '💗', '💓', '✨'];
+      for (let i = 0; i < 6; i++) {
+        const h = document.createElement('div');
+        h.className = 'floating-tree-heart';
+        h.textContent = hearts[Math.floor(Math.random() * hearts.length)];
+        h.style.left = (Math.random() * 200 + 40) + 'px';
+        h.style.top = (Math.random() * 150 + 60) + 'px';
+        box.appendChild(h);
+        setTimeout(() => h.remove(), 2000);
+      }
+    }
+
+    /* ========================================================
+       ROOM 6: GALLERY WALK
+       ======================================================== */
+    let galleryIndex = 0;
+    function renderGalleryPhoto() {
+      const photo = STILL_CONFIG.photos[galleryIndex];
+      const img = document.getElementById('galleryMuseumImg');
+      img.style.opacity = '0';
+      setTimeout(() => {
+        img.src = photo.src;
+        img.style.opacity = '1';
+      }, 200);
+
+      document.getElementById('museumPlaqueTitle').textContent = `${photo.caption} — Moment ${galleryIndex + 1}`;
+      document.getElementById('galleryCounter').textContent = `${galleryIndex + 1} / ${STILL_CONFIG.photos.length}`;
+    }
+    function nextGalleryPhoto() {
+      galleryIndex = (galleryIndex + 1) % STILL_CONFIG.photos.length;
+      renderGalleryPhoto();
+    }
+    function prevGalleryPhoto() {
+      galleryIndex = (galleryIndex - 1 + STILL_CONFIG.photos.length) % STILL_CONFIG.photos.length;
+      renderGalleryPhoto();
+    }
+
+    /* ========================================================
+       ROOM 7: VOICE NOTE AUDIO CONTROLLER
+       ======================================================== */
+    let isVoicePlaying = false;
+    function toggleVoiceNote() {
+      const card = document.getElementById('voiceNoteCard');
+      const btn = document.getElementById('voicePlayBtn');
+
+      if (voiceAudio.paused) {
+        // Pause background music during voice message
+        bgAudio.pause();
+        voiceAudio.play();
+        isVoicePlaying = true;
+        btn.textContent = '⏸';
+        card.classList.add('voice-playing');
+      } else {
+        voiceAudio.pause();
+        isVoicePlaying = false;
+        btn.textContent = '▶';
+        card.classList.remove('voice-playing');
+      }
+    }
+
+    voiceAudio.addEventListener('timeupdate', () => {
+      const cur = Math.floor(voiceAudio.currentTime);
+      const dur = Math.floor(voiceAudio.duration) || 45;
+      const curM = Math.floor(cur / 60);
+      const curS = (cur % 60).toString().padStart(2, '0');
+      const durM = Math.floor(dur / 60);
+      const durS = (dur % 60).toString().padStart(2, '0');
+      document.getElementById('voiceTime').textContent = `${curM}:${curS} / ${durM}:${durS}`;
+    });
+
+    voiceAudio.addEventListener('ended', () => {
+      document.getElementById('voicePlayBtn').textContent = '▶';
+      document.getElementById('voiceNoteCard').classList.remove('voice-playing');
+      bgAudio.play();
+    });
+
+    /* ========================================================
+       ROOM 8: FINAL PROPOSAL & CONFETTI CELEBRATION
+       ======================================================== */
+    function acceptProposal(choice) {
+      fireConfettiCelebration();
+      const card = document.querySelector('.proposal-card-box');
+      card.innerHTML = `
+        <div style="font-size: 46px; margin-bottom: 10px;">💍💖✨</div>
+        <div class="room-script-title" style="font-size: 34px; color: #be123c;">Forever & Always!</div>
+        <h2 class="room-serif-heading" style="font-size: 20px; margin-top: 8px;">
+          You just made me the happiest person in the universe.
+        </h2>
+        <p class="room-subtext" style="margin-top: 10px; font-size: 14px; line-height: 1.6;">
+          Happy 2nd Anniversary, my Vanshika.<br>
+          <strong style="color: #be123c;">I will love you for all of my days.</strong>
+        </p>
+        <div style="margin-top: 20px;">
+          <a href="storybook.html" style="text-decoration: none;">
+            <button class="next-room-btn" style="max-width: 260px; margin: 0 auto; font-size: 13px;">
+              <span>Cupid's Storybook Surprise</span>
+              <span>🏹 💖</span>
+            </button>
+          </a>
+        </div>
+      `;
+    }
+
+    /* ========================================================
+       FIREWORKS & PARTICLES CANVAS
+       ======================================================== */
+    const fCanvas = document.getElementById('fireworksCanvas');
+    const fCtx = fCanvas.getContext('2d');
+    let fParticles = [];
+
+    function resizeFCanvas() {
+      fCanvas.width = window.innerWidth;
+      fCanvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeFCanvas);
+    resizeFCanvas();
+
+    function fireConfettiCelebration() {
+      for (let burst = 0; burst < 6; burst++) {
+        setTimeout(() => {
+          const rx = Math.random() * window.innerWidth;
+          const ry = Math.random() * (window.innerHeight * 0.6) + 100;
+          createConfettiBurst(rx, ry);
+        }, burst * 300);
+      }
+    }
+
+    function createConfettiBurst(x, y) {
+      const colors = ['#f43f5e', '#fb7185', '#fbbf24', '#fbcfe8', '#ffffff', '#38bdf8', '#c084fc'];
+      for (let i = 0; i < 50; i++) {
+        fParticles.push({
+          x: x,
+          y: y,
+          vx: (Math.random() - 0.5) * 10,
+          vy: (Math.random() - 0.5) * 10 - 3,
+          size: Math.random() * 6 + 3,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          alpha: 1,
+          decay: Math.random() * 0.015 + 0.01,
+          rot: Math.random() * 360,
+          vRot: (Math.random() - 0.5) * 12
+        });
+      }
+    }
+
+    function renderFParticles() {
+      fCtx.clearRect(0, 0, fCanvas.width, fCanvas.height);
+      for (let i = fParticles.length - 1; i >= 0; i--) {
+        const p = fParticles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += 0.15; // gravity
+        p.alpha -= p.decay;
+        p.rot += p.vRot;
+
+        if (p.alpha <= 0) {
+          fParticles.splice(i, 1);
+          continue;
+        }
+
+        fCtx.save();
+        fCtx.globalAlpha = p.alpha;
+        fCtx.translate(p.x, p.y);
+        fCtx.rotate((p.rot * Math.PI) / 180);
+        fCtx.fillStyle = p.color;
+        fCtx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
+        fCtx.restore();
+      }
+      requestAnimationFrame(renderFParticles);
+    }
+    renderFParticles();
+  </script>
+</body>
+</html>

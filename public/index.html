@@ -121,6 +121,16 @@
           💬 Open Live Chat
         </button>
 
+        <!-- New Anniversary Storybook -->
+        <a id="nav-storybook-link" href="storybook.html" target="_blank" class="btn-glass px-3.5 py-2 rounded-full text-xs font-bold text-pink-300 hover:text-white border-pink-500/40 hover:border-pink-400 flex items-center gap-1 shadow-md shadow-pink-950/40 cursor-pointer">
+          <span>📖</span> <span>Anniversary Storybook</span>
+        </a>
+
+        <!-- New Still you. Always you. -->
+        <a id="nav-stillyou-link" href="stillyou.html" target="_blank" class="btn-glass px-3.5 py-2 rounded-full text-xs font-bold text-rose-300 hover:text-white border-rose-500/40 hover:border-rose-400 flex items-center gap-1 shadow-md shadow-rose-950/40 cursor-pointer">
+          <span>💖</span> <span>Still you. Always you Forever. </span>
+        </a>
+
         <!-- Admin Inbox Link -->
         <a href="/admin" target="_blank" class="btn-glass px-3 py-2 rounded-full text-xs font-semibold text-amber-300 hover:text-white">
           📥 Admin Inbox
@@ -239,6 +249,101 @@
       <!-- Telugu cultural quote -->
       <p class="text-[11px] sm:text-xs text-amber-300/80 mt-5 font-mono italic">
         "నా ప్రాణం ఉన్నంతవరకు నిన్ను గుండెల్లో పెట్టుకుని కాపాడుకుంటాను • Until my last breath, I will protect you in my heart"
+      </p>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- GRAND CINEMATIC ANNIVERSARY SCREEN (17 NOV AUTO-LAUNCH)      -->
+    <!-- ============================================================ -->
+    <div id="nov17-grand-cinematic" class="fixed inset-0 z-[200] flex-col items-center justify-center bg-[#060312] overflow-hidden hidden">
+      <canvas id="nov17-cinematic-canvas" class="absolute inset-0 w-full h-full pointer-events-none"></canvas>
+      <div class="absolute inset-0 pointer-events-none overflow-hidden">
+        <div class="nov17-cin-aurora-1"></div>
+        <div class="nov17-cin-aurora-2"></div>
+        <div class="nov17-cin-aurora-3"></div>
+      </div>
+      <div id="nov17-heart-rain" class="absolute inset-0 pointer-events-none overflow-hidden"></div>
+      <div class="relative z-10 flex flex-col items-center justify-center min-h-screen px-6 text-center">
+        <div class="nov17-cin-icon-ring mb-6"><span class="text-5xl">❤️</span></div>
+        <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 border border-white/20 backdrop-blur-md mb-5">
+          <span class="text-pink-400 text-xs font-bold uppercase tracking-widest">Chapter 02 • 17 November 2026</span>
+        </div>
+        <h1 class="nov17-cin-title">Happy 2nd Month<br>Anniversary, Vanshika!</h1>
+        <div class="flex gap-3 my-4 text-2xl nov17-cin-sparkle-row">
+          <span>🎉</span><span>🌹</span><span>✨</span><span>💕</span><span>🌟</span>
+        </div>
+        <p class="nov17-cin-subtitle">From September 17 to November 17 —<br>60 days of choosing you, forever ❤️</p>
+        <div class="flex gap-4 mt-6 mb-8">
+          <div class="nov17-cin-stat-pill">60 Days</div>
+          <div class="nov17-cin-stat-pill">2 Months</div>
+          <div class="nov17-cin-stat-pill">∞ Love</div>
+        </div>
+        <button onclick="openCinematicStory()" class="nov17-cin-cta-btn">
+          <span>Open Our Chapter 2 Story</span>
+          <span class="text-xl">✨</span>
+        </button>
+        <button onclick="closeNov17GrandCinematic()" class="mt-6 text-white/40 text-xs hover:text-white/70 transition-colors underline underline-offset-2 cursor-pointer">
+          Enter Memory Vault
+        </button>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- CHAPTER 02: 17 NOVEMBER 2026 — 2ND MONTH ANNIVERSARY SECTION -->
+    <!-- ============================================================ -->
+    <section id="chapter2-nov17-section" class="my-12 nov17-launcher-card p-6 sm:p-10 text-center max-w-4xl mx-auto relative overflow-hidden">
+      <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-gradient-to-r from-rose-500/20 via-purple-500/20 to-amber-500/20 border border-amber-400/50 text-amber-300 text-[11px] sm:text-xs font-extrabold uppercase tracking-[0.18em] mb-4 shadow-lg">
+        <span class="w-2 h-2 rounded-full bg-amber-300 animate-ping"></span>
+        <span id="nov17-section-badge">Chapter 02 • 17 November 2026</span>
+      </div>
+      <h2 class="font-cinzel text-2xl sm:text-4xl md:text-5xl font-black text-white leading-tight mb-3">
+        Two Months of Us A Lifetime of Loving and Choosing You Until My Last Breath. <span class="text-gradient-rose">Only You</span> ❤️♾️❤️
+      </h2>
+      <p id="nov17-section-subtitle" class="text-slate-200 text-xs sm:text-sm md:text-base max-w-xl mx-auto leading-relaxed mb-7 font-normal">
+        From September 17 to November 17 — Rakesh created a brand-new, mobile-first interactive love story just for your 2nd Month Anniversary, Vanshika.
+      </p>
+      <div id="nov17-countdown-grid" class="grid grid-cols-4 gap-2 sm:gap-4 max-w-lg mx-auto mb-7">
+        <div class="bg-slate-950/75 border border-rose-500/30 rounded-2xl py-3 px-2 shadow-inner">
+          <div id="nov17-cd-days" class="font-cinzel text-2xl sm:text-3xl font-black text-amber-300">06</div>
+          <div class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">Days</div>
+        </div>
+        <div class="bg-slate-950/75 border border-purple-500/30 rounded-2xl py-3 px-2 shadow-inner">
+          <div id="nov17-cd-hours" class="font-cinzel text-2xl sm:text-3xl font-black text-rose-300">00</div>
+          <div class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">Hours</div>
+        </div>
+        <div class="bg-slate-950/75 border border-rose-500/30 rounded-2xl py-3 px-2 shadow-inner">
+          <div id="nov17-cd-mins" class="font-cinzel text-2xl sm:text-3xl font-black text-amber-300">00</div>
+          <div class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">Mins</div>
+        </div>
+        <div class="bg-slate-950/75 border border-purple-500/30 rounded-2xl py-3 px-2 shadow-inner">
+          <div id="nov17-cd-secs" class="font-cinzel text-2xl sm:text-3xl font-black text-rose-300">00</div>
+          <div class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">Secs</div>
+        </div>
+      </div>
+      <div class="flex flex-wrap justify-center gap-2 mb-7 text-[11px] font-semibold">
+        <span class="px-3 py-1 rounded-full bg-white/5 border border-white/10 text-slate-200">📖 Handmade Anniversary Storybook</span>
+        <span class="px-3 py-1 rounded-full bg-white/5 border border-white/10 text-slate-200">💖 Still You. Always You. — 8 Rooms</span>
+        <span class="px-3 py-1 rounded-full bg-white/5 border border-white/10 text-slate-200">🪙 Scratch-Off Secret Letter</span>
+        <span class="px-3 py-1 rounded-full bg-white/5 border border-white/10 text-slate-200">💓 Hold-To-Seal Vow</span>
+        <span class="px-3 py-1 rounded-full bg-white/5 border border-white/10 text-slate-200">📖 60 Reasons I Love You</span>
+      </div>
+      <div class="flex flex-col sm:flex-row items-center justify-center gap-3 flex-wrap">
+        <button id="nov17-launch-btn" onclick="openNov17Chapter2()" class="w-full sm:w-auto px-7 py-3.5 rounded-full bg-gradient-to-r from-rose-500 via-pink-500 to-amber-400 text-slate-950 font-black text-xs sm:text-sm uppercase tracking-wider shadow-[0_12px_35px_rgba(244,63,94,0.45)] hover:scale-105 active:scale-95 transition-all cursor-pointer flex items-center justify-center gap-2">
+          <span>✨</span>
+          <span id="nov17-launch-btn-text">Open Chapter 2 🎉</span>
+          <span>→</span>
+        </button>
+        <a id="btn-chapter2-storybook" href="storybook.html" target="_blank" class="w-full sm:w-auto px-7 py-3.5 rounded-full bg-gradient-to-r from-pink-600 via-rose-500 to-amber-400 text-white font-black text-xs sm:text-sm uppercase tracking-wider shadow-[0_10px_25px_rgba(236,72,153,0.35)] hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer">
+          <span>📖</span>
+          <span>Storybook Surprise ✨</span>
+        </a>
+        <a id="btn-chapter2-stillyou" href="stillyou.html" target="_blank" class="w-full sm:w-auto px-7 py-3.5 rounded-full bg-gradient-to-r from-purple-600 via-pink-600 to-rose-500 text-white font-black text-xs sm:text-sm uppercase tracking-wider shadow-[0_10px_25px_rgba(168,85,247,0.35)] hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer">
+          <span>💖</span>
+          <span>Still You. Always You. →</span>
+        </a>
+      </div>
+      <p id="nov17-lock-hint" class="text-[11px] text-amber-300/80 mt-3 font-medium">
+        Testing mode: unlocked now 🎉
       </p>
     </section>
 
@@ -2921,6 +3026,990 @@
     </div>
   </div>
 
+  <!-- ============================================================ -->
+  <!-- CHAPTER 02 (17 NOV): 6-SLIDE INTERACTIVE STORY OVERLAY      -->
+  <!-- ============================================================ -->
+  <div id="nov17-story-overlay" role="dialog" aria-modal="true" aria-label="2nd Month Anniversary Story"
+       class="fixed inset-0 z-[160] bg-[#060312] hidden items-center justify-center p-0 sm:p-4 overflow-hidden">
+    <div class="nov17-aurora-bg"></div>
+    <canvas id="nov17-stars-canvas" class="absolute inset-0 w-full h-full pointer-events-none z-[1]"></canvas>
+
+    <!-- Phone Shell -->
+    <div class="nov17-phone-shell relative z-10 flex flex-col w-full max-w-[420px] h-full sm:h-[92vh] sm:max-h-[800px] overflow-hidden">
+
+      <!-- Top Bar (Inside Phone Shell) -->
+      <div class="flex items-center justify-between px-3 pt-3 pb-2 flex-shrink-0 z-20">
+        <button onclick="closeNov17Chapter2()" class="p-2 rounded-full bg-white/10 hover:bg-white/20 text-white/80 hover:text-white transition cursor-pointer text-sm" aria-label="Close">✕</button>
+        <div class="flex-1 mx-3 flex gap-1.5" id="nov17-progress-bar">
+          <div class="nov17-progress-seg flex-1" data-slide="0"><div class="nov17-progress-fill"></div></div>
+          <div class="nov17-progress-seg flex-1" data-slide="1"><div class="nov17-progress-fill"></div></div>
+          <div class="nov17-progress-seg flex-1" data-slide="2"><div class="nov17-progress-fill"></div></div>
+          <div class="nov17-progress-seg flex-1" data-slide="3"><div class="nov17-progress-fill"></div></div>
+          <div class="nov17-progress-seg flex-1" data-slide="4"><div class="nov17-progress-fill"></div></div>
+          <div class="nov17-progress-seg flex-1" data-slide="5"><div class="nov17-progress-fill"></div></div>
+        </div>
+        <div class="text-[11px] text-white/60 font-mono" id="nov17-slide-counter">1 / 6</div>
+      </div>
+
+      <!-- SLIDE 0: Opening -->
+      <div class="nov17-slide active" id="nov17-slide-0">
+        <div class="nov17-halo-pulse text-4xl mt-4 mb-2">❤️</div>
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/20 text-[11px] text-pink-300 font-bold uppercase tracking-widest mb-3">Chapter 02 • 17 November 2026</div>
+        <h2 class="font-cinzel text-2xl sm:text-3xl font-black text-white mb-3 leading-snug">Two Months.<br>One Choice.<br><span class="text-gradient-rose">You.</span></h2>
+        <p class="text-slate-300 text-xs sm:text-sm leading-relaxed max-w-xs mx-auto mb-6">From 17 September to 17 November — sixty days of choosing you every single morning. This story is yours, Vanshika.</p>
+        <button onclick="goToNov17Slide(1)" class="w-full max-w-xs py-3.5 rounded-full bg-gradient-to-r from-rose-500 to-pink-500 text-white font-bold text-sm shadow-lg cursor-pointer hover:scale-105 active:scale-95 transition-all mb-4">Begin Our Story →</button>
+      </div>
+
+      <!-- SLIDE 1: 2-Month Wrapped Bento -->
+      <div class="nov17-slide" id="nov17-slide-1">
+        <div class="text-3xl mt-2 mb-1">📊</div>
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/20 text-[11px] text-amber-300 font-bold uppercase tracking-widest mb-3">2-Month Wrapped</div>
+        <h2 class="font-cinzel text-xl font-black text-white mb-4">Our Journey In Numbers</h2>
+        <div class="grid grid-cols-2 gap-3 w-full max-w-xs mx-auto mb-5 text-left">
+          <div class="nov17-bento-card"><div class="text-2xl font-black text-rose-400">60</div><div class="text-[11px] text-slate-400 mt-0.5">Days Together</div></div>
+          <div class="nov17-bento-card"><div class="text-2xl font-black text-amber-300">1,440</div><div class="text-[11px] text-slate-400 mt-0.5">Hours In Love</div></div>
+          <div class="nov17-bento-card"><div class="text-2xl font-black text-purple-400">100+</div><div class="text-[11px] text-slate-400 mt-0.5">Notes Written</div></div>
+          <div class="nov17-bento-card"><div class="text-2xl font-black text-pink-400">100%</div><div class="text-[11px] text-slate-400 mt-0.5">Heart Is Yours</div></div>
+        </div>
+        <button onclick="goToNov17Slide(2)" class="w-full max-w-xs py-3.5 rounded-full bg-gradient-to-r from-amber-400 to-rose-500 text-slate-950 font-bold text-sm cursor-pointer hover:scale-105 active:scale-95 transition-all mb-4">Next →</button>
+      </div>
+
+      <!-- SLIDE 2: What I Love About The Real You -->
+      <div class="nov17-slide" id="nov17-slide-2">
+        <div class="text-3xl mt-2 mb-1">💚</div>
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/20 text-[11px] text-green-300 font-bold uppercase tracking-widest mb-2">The Real You</div>
+        <h2 class="font-cinzel text-xl font-black text-white mb-3">What I Love About You</h2>
+        <div class="w-full max-w-xs mx-auto mb-3">
+          <div class="nov17-bento-card text-center p-4 min-h-[145px] flex flex-col items-center justify-center gap-1.5">
+            <div id="nov17-card-emoji" class="text-3xl">💚</div>
+            <div id="nov17-card-title" class="font-bold text-white text-sm">Your Rare Light-Green Eyes</div>
+            <div id="nov17-card-body" class="text-slate-300 text-xs leading-relaxed">One look into them makes all the noise around me go completely quiet.</div>
+          </div>
+          <div id="nov17-realyou-dots" class="flex justify-center items-center gap-1.5 mt-2.5 mb-2"></div>
+          <div class="flex justify-center gap-3">
+            <button onclick="prevNov17RealYouCard()" class="px-4 py-2 rounded-full bg-white/10 text-white text-xs cursor-pointer hover:bg-white/20 transition">← Prev</button>
+            <button onclick="nextNov17RealYouCard()" class="px-5 py-2 rounded-full bg-gradient-to-r from-rose-500 to-pink-500 text-white text-xs font-bold cursor-pointer hover:scale-105 transition">Next Card →</button>
+          </div>
+        </div>
+        <button onclick="goToNov17Slide(3)" class="w-full max-w-xs py-3 rounded-full bg-gradient-to-r from-green-400 to-teal-500 text-slate-950 font-bold text-sm cursor-pointer hover:scale-105 active:scale-95 transition-all mb-4">Continue →</button>
+      </div>
+
+      <!-- SLIDE 3: Scratch-to-Reveal -->
+      <div class="nov17-slide" id="nov17-slide-3">
+        <div class="text-3xl mt-2 mb-1">🪙</div>
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/20 text-[11px] text-yellow-300 font-bold uppercase tracking-widest mb-2">Secret Letter</div>
+        <h2 class="font-cinzel text-xl font-black text-white mb-3">Scratch To Reveal</h2>
+        <div class="relative w-full max-w-xs mx-auto h-[160px] rounded-2xl overflow-hidden border border-amber-400/40 shadow-xl mb-2">
+          <!-- Secret message underneath -->
+          <div class="absolute inset-0 bg-gradient-to-br from-rose-950/90 via-purple-950/90 to-slate-950/95 p-4 flex flex-col justify-center items-center text-center">
+            <span class="text-2xl mb-1">💌</span>
+            <p class="text-amber-200 font-bold text-[11px] uppercase tracking-wider mb-1">A Secret From Rakesh's Heart</p>
+            <p class="text-slate-100 text-xs leading-relaxed font-medium">
+              "Vanshika, loving you is the easiest and most beautiful choice I make every day. You are my safe place, my peace, and my forever queen ❤️"
+            </p>
+          </div>
+          <!-- Scratch Canvas on top -->
+          <canvas id="nov17-scratch-canvas" class="absolute inset-0 w-full h-full cursor-crosshair z-10"></canvas>
+        </div>
+        <button id="nov17-scratch-instant-btn" onclick="revealNov17ScratchInstant()" class="text-xs text-amber-300/80 hover:text-amber-300 underline cursor-pointer mb-3">
+          Reveal secret instantly ✨
+        </button>
+        <button onclick="goToNov17Slide(4)" class="w-full max-w-xs py-3 rounded-full bg-gradient-to-r from-yellow-400 to-amber-500 text-slate-950 font-bold text-sm cursor-pointer hover:scale-105 active:scale-95 transition-all mb-4">Next →</button>
+      </div>
+
+      <!-- SLIDE 4: Hold-To-Seal Vow -->
+      <div class="nov17-slide" id="nov17-slide-4">
+        <div class="text-3xl mt-2 mb-1">💍</div>
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/20 text-[11px] text-purple-300 font-bold uppercase tracking-widest mb-2">Our Vow</div>
+        <h2 class="font-cinzel text-xl font-black text-white mb-2">Hold To Seal Our Promise</h2>
+        <p class="text-slate-300 text-xs mb-3 max-w-xs mx-auto leading-relaxed">Press and hold the seal ring for 3 seconds to lock our 2-month vow forever.</p>
+        <div class="flex flex-col items-center gap-2 mb-3">
+          <div class="relative w-28 h-28 flex items-center justify-center">
+            <svg class="w-28 h-28 nov17-seal-ring absolute inset-0" viewBox="0 0 120 120">
+              <circle cx="60" cy="60" r="52" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="8"/>
+              <circle id="nov17-seal-circle" class="nov17-seal-ring-progress" cx="60" cy="60" r="52" fill="none" stroke="url(#nov17-seal-grad)" stroke-width="8" stroke-dasharray="326.73" stroke-dashoffset="326.73" stroke-linecap="round"/>
+              <defs>
+                <linearGradient id="nov17-seal-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#f43f5e"/>
+                  <stop offset="100%" stop-color="#fbbf24"/>
+                </linearGradient>
+              </defs>
+            </svg>
+            <div id="nov17-seal-btn" class="absolute inset-0 flex flex-col items-center justify-center cursor-pointer select-none" onmousedown="startNov17SealHold(event)" onmouseup="stopNov17SealHold()" onmouseleave="stopNov17SealHold()" ontouchstart="startNov17SealHold(event)" ontouchend="stopNov17SealHold()">
+              <span class="text-2xl mb-0.5">💍</span>
+              <span id="nov17-seal-pct" class="text-[11px] font-black tracking-widest text-amber-300">HOLD</span>
+            </div>
+          </div>
+          <div id="nov17-seal-instruction" class="text-xs text-slate-400">Hold the ring to seal your vow</div>
+          <div id="nov17-sealed-vows" class="hidden px-4 py-1.5 rounded-xl bg-rose-500/20 border border-rose-400/40 text-rose-200 text-xs font-bold text-center">
+            🔒 Sealed Forever: Rakesh & Vanshika • 17 November 2026 💕
+          </div>
+        </div>
+        <button onclick="goToNov17Slide(5)" class="w-full max-w-xs py-3 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold text-sm cursor-pointer hover:scale-105 active:scale-95 transition-all mb-4">Final Chapter →</button>
+      </div>
+
+      <!-- SLIDE 5: Final Keepsake -->
+      <div class="nov17-slide" id="nov17-slide-5">
+        <div class="text-4xl mt-3 mb-1 animate-bounce">🎉</div>
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-gradient-to-r from-rose-500/30 to-amber-500/30 border border-amber-400/50 text-amber-300 text-[11px] font-bold uppercase tracking-widest mb-2">Chapter 02 Complete</div>
+        <h2 class="font-cinzel text-xl font-black text-white mb-2">Happy 2nd Month ❤️</h2>
+        <p class="text-slate-300 text-xs leading-relaxed max-w-xs mx-auto mb-4">Thank you for two months of laughter, trust, and love. Here is a little keepsake — 60 reasons I love you.</p>
+        <div class="flex flex-col gap-2.5 w-full max-w-xs mx-auto mb-4">
+          <button onclick="openNov17ReasonsSheet()" class="w-full py-3 rounded-full bg-gradient-to-r from-rose-500 to-pink-500 text-white font-bold text-xs sm:text-sm cursor-pointer hover:scale-105 active:scale-95 transition-all">📖 Read 60 Reasons I Love You</button>
+          <button onclick="closeNov17Chapter2()" class="w-full py-2.5 rounded-full bg-white/10 text-white/80 font-semibold text-xs cursor-pointer hover:bg-white/20 transition-all">Back to Memory Vault</button>
+        </div>
+      </div>
+
+    </div><!-- end phone shell -->
+  </div>
+
+  <!-- 60 Reasons Sheet -->
+  <div id="nov17-reasons-sheet" class="fixed inset-0 z-[165] bg-slate-950/95 backdrop-blur-md hidden flex-col overflow-hidden">
+    <div class="flex items-center justify-between px-4 pt-safe pt-4 pb-3 border-b border-white/10 flex-shrink-0">
+      <h2 class="font-cinzel font-bold text-white text-base">60 Reasons I Love You 💕</h2>
+      <button onclick="closeNov17ReasonsSheet()" class="p-2 rounded-full bg-white/10 text-white/70 cursor-pointer">✕</button>
+    </div>
+    <div class="flex-1 overflow-y-auto px-4 py-4">
+      <ol id="nov17-reasons-list" class="space-y-2 text-sm text-slate-300"></ol>
+    </div>
+  </div>
+
+  <!-- Locked Modal (for Vanshika before 17 Nov on live domain) -->
+  <div id="nov17-locked-modal" class="fixed inset-0 z-[170] bg-slate-950/90 backdrop-blur-md hidden items-center justify-center p-6">
+    <div class="glass-box max-w-sm w-full p-8 text-center rounded-3xl border border-rose-500/30">
+      <div class="text-5xl mb-4">🔒</div>
+      <h2 class="font-cinzel text-xl font-black text-white mb-3">Chapter 02 Locked</h2>
+      <p class="text-slate-300 text-sm mb-6">This special story unlocks automatically on <span class="text-amber-300 font-bold">17 November 2026</span> — your 2nd Month Anniversary. Something beautiful is waiting for you that day 💕</p>
+      <button onclick="closeNov17LockedModal()" class="px-6 py-3 rounded-full bg-gradient-to-r from-rose-500 to-pink-500 text-white font-bold cursor-pointer hover:scale-105 transition-all">Close</button>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- INLINE OVERLAY 1: STORYBOOK SURPRISE (6 Scenes)            -->
+  <!-- Opens AFTER the Love Film, BEFORE "Still You. Always You." -->
+  <!-- ============================================================ -->
+  <div id="storybook-overlay" style="
+    display: none;
+    position: fixed; inset: 0; z-index: 300;
+    background: #fdf8f4;
+    font-family: 'Quicksand', 'Plus Jakarta Sans', sans-serif;
+    overflow: hidden;
+  ">
+
+    <!-- Paper texture ambient -->
+    <div style="position:absolute;inset:0;background:radial-gradient(circle at 50% 50%,rgba(254,226,226,.55) 0%,rgba(253,248,244,.95) 100%);pointer-events:none;"></div>
+
+    <!-- Sparkle Canvas -->
+    <canvas id="sb-sparkle-canvas" style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:50;"></canvas>
+
+    <!-- Close button (testing only, will be hidden on Nov 17) -->
+    <button id="sb-close-btn" onclick="closeStorybookOverlay()" style="
+      position:absolute;top:14px;left:14px;z-index:200;
+      background:rgba(255,255,255,.75);backdrop-filter:blur(8px);
+      border:1px solid rgba(244,114,182,.3);border-radius:50%;
+      width:36px;height:36px;display:flex;align-items:center;justify-content:center;
+      font-size:16px;cursor:pointer;color:#be123c;font-weight:900;
+    ">✕</button>
+
+    <!-- Progress Dots -->
+    <div style="position:absolute;top:16px;left:50%;transform:translateX(-50%);display:flex;gap:7px;z-index:95;">
+      <div class="sb-dot active" data-s="1" style="width:22px;height:4px;background:#f43f5e;border-radius:4px;transition:all .4s;box-shadow:0 0 8px rgba(244,114,182,.6);"></div>
+      <div class="sb-dot" data-s="2" style="width:12px;height:4px;background:rgba(0,0,0,.12);border-radius:4px;transition:all .4s;"></div>
+      <div class="sb-dot" data-s="3" style="width:12px;height:4px;background:rgba(0,0,0,.12);border-radius:4px;transition:all .4s;"></div>
+      <div class="sb-dot" data-s="4" style="width:12px;height:4px;background:rgba(0,0,0,.12);border-radius:4px;transition:all .4s;"></div>
+      <div class="sb-dot" data-s="5" style="width:12px;height:4px;background:rgba(0,0,0,.12);border-radius:4px;transition:all .4s;"></div>
+      <div class="sb-dot" data-s="6" style="width:12px;height:4px;background:rgba(0,0,0,.12);border-radius:4px;transition:all .4s;"></div>
+    </div>
+
+    <!-- SCENES WRAPPER -->
+    <div id="sb-scenes-wrapper" style="position:relative;width:100%;height:100%;max-width:440px;margin:0 auto;">
+
+      <!-- SCENE 1: CUPID'S BOW & ARROW -->
+      <div class="sb-scene active" id="sb-scene-1" style="
+        position:absolute;inset:0;padding:65px 20px 30px;
+        display:flex;flex-direction:column;align-items:center;justify-content:space-between;
+        opacity:1;transform:translateY(0) scale(1);transition:opacity .6s cubic-bezier(.16,1,.3,1),transform .6s cubic-bezier(.16,1,.3,1);
+      ">
+        <div style="text-align:center;margin-top:10px;">
+          <div style="font-family:'Caveat',cursive;font-size:22px;color:#e11d48;font-weight:700;">cupid's secret ✦</div>
+          <h1 style="font-family:'Playfair Display',serif;font-size:27px;font-weight:800;color:#1e191b;line-height:1.25;margin:4px 0 6px;">
+            Aim For My Heart
+          </h1>
+          <p style="font-size:13px;color:#78716c;max-width:300px;line-height:1.5;">
+            Tap the golden bow below to release Cupid's arrow straight into my heart...
+          </p>
+        </div>
+
+        <!-- Bow & Target Arena -->
+        <div id="sb-bow-arena" style="position:relative;width:280px;height:260px;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+          <div id="sb-target-heart" style="position:absolute;top:10px;font-size:46px;filter:drop-shadow(0 0 16px rgba(244,63,94,0.6));animation:sbFloatPulse 1.8s infinite ease-in-out;transition:transform .5s ease;">💖</div>
+          <div id="sb-bow-box" onclick="sbShootCupidArrow()" style="position:absolute;bottom:20px;width:140px;height:140px;display:flex;align-items:center;justify-content:center;cursor:pointer;">
+            <svg viewBox="0 0 140 100" style="width:130px;height:90px;filter:drop-shadow(0 4px 12px rgba(217,119,6,0.4));">
+              <path d="M15 85 Q70 15 125 85" stroke="#d97706" stroke-width="6" stroke-linecap="round" fill="none"/>
+              <line x1="15" y1="85" x2="125" y2="85" stroke="#fcd34d" stroke-width="2.5" stroke-dasharray="2,2"/>
+            </svg>
+            <div id="sb-cupid-arrow" style="position:absolute;bottom:35px;width:6px;height:90px;background:linear-gradient(to top,#d97706,#fbbf24,#f59e0b);border-radius:4px;box-shadow:0 0 12px rgba(251,191,36,0.8);transition:transform .6s cubic-bezier(0.16,1,0.3,1),opacity .4s;">
+              <span style="position:absolute;top:-12px;left:-6px;color:#fbbf24;font-size:18px;">▲</span>
+            </div>
+          </div>
+        </div>
+
+        <button id="sb-shoot-btn" onclick="sbShootCupidArrow()" style="
+          background:linear-gradient(135deg,#fb7185,#f43f5e,#ec4899);color:#fff;
+          font-weight:800;font-size:14.5px;padding:14px 32px;border-radius:9999px;border:none;
+          box-shadow:0 10px 25px rgba(244,63,94,.38);cursor:pointer;display:inline-flex;
+          align-items:center;gap:8px;
+        ">
+          <span>Release Cupid's Arrow</span><span>🏹 ✨</span>
+        </button>
+      </div>
+
+      <!-- SCENE 2: HER EYES -->
+      <div class="sb-scene" id="sb-scene-2" style="
+        position:absolute;inset:0;padding:65px 20px 30px;
+        display:flex;flex-direction:column;align-items:center;justify-content:space-between;
+        opacity:0;pointer-events:none;transform:translateY(22px) scale(.98);
+        transition:opacity .6s cubic-bezier(.16,1,.3,1),transform .6s cubic-bezier(.16,1,.3,1);
+      ">
+        <div style="text-align:center;margin-top:10px;">
+          <div style="font-family:'Caveat',cursive;font-size:22px;color:#e11d48;font-weight:700;">my sacred peace ✦</div>
+          <h1 style="font-family:'Playfair Display',serif;font-size:25px;font-weight:800;color:#1e191b;line-height:1.25;margin:4px 0 6px;">Where My Soul Finds Peace</h1>
+          <p style="font-size:12.5px;color:#78716c;max-width:300px;line-height:1.5;">Tap her eyes to feel the peace that quieted all my noise...</p>
+        </div>
+
+        <div onclick="sbBurstSparkles(window.innerWidth/2, window.innerHeight*0.5)" style="width:280px;background:#fff;border-radius:20px;padding:12px 12px 16px;box-shadow:0 16px 40px rgba(244,63,94,0.2);border:1.5px solid rgba(244,63,94,0.3);text-align:center;cursor:pointer;">
+          <div style="width:100%;height:220px;border-radius:14px;overflow:hidden;background:#000;">
+            <img src="assests/latest/vanshika-green-eyes.jpeg" alt="Vanshika's Eyes" style="width:100%;height:100%;object-fit:cover;display:block;">
+          </div>
+          <div style="font-family:'Playfair Display',serif;font-size:16px;font-weight:800;color:#be123c;margin:10px 0 4px;">Your Rare Green Eyes 💚</div>
+          <p style="font-size:12px;color:#4b4547;line-height:1.55;font-weight:500;">
+            "In a world full of chaos, one look into your eyes is the only place my soul finds absolute peace and quiet."
+          </p>
+        </div>
+
+        <button onclick="sbGoToScene(3)" style="
+          background:linear-gradient(135deg,#fb7185,#f43f5e,#ec4899);color:#fff;
+          font-weight:800;font-size:14px;padding:13px 30px;border-radius:9999px;border:none;
+          box-shadow:0 10px 25px rgba(244,63,94,.38);cursor:pointer;
+        "><span>My Real Happiness</span><span>✨ →</span></button>
+      </div>
+
+      <!-- SCENE 3: HER SMILE -->
+      <div class="sb-scene" id="sb-scene-3" style="
+        position:absolute;inset:0;padding:65px 20px 30px;
+        display:flex;flex-direction:column;align-items:center;justify-content:space-between;
+        opacity:0;pointer-events:none;transform:translateY(22px) scale(.98);
+        transition:opacity .6s cubic-bezier(.16,1,.3,1),transform .6s cubic-bezier(.16,1,.3,1);
+      ">
+        <div style="text-align:center;margin-top:10px;">
+          <div style="font-family:'Caveat',cursive;font-size:22px;color:#e11d48;font-weight:700;">the purest light ✦</div>
+          <h1 style="font-family:'Playfair Display',serif;font-size:25px;font-weight:800;color:#1e191b;line-height:1.25;margin:4px 0 6px;">My Real Happiness</h1>
+          <p style="font-size:12.5px;color:#78716c;max-width:300px;line-height:1.5;">Tap her smile to see the reason my days are worth living...</p>
+        </div>
+
+        <div onclick="sbBurstSparkles(window.innerWidth/2, window.innerHeight*0.5)" style="width:280px;background:#fff;border-radius:20px;padding:12px 12px 16px;box-shadow:0 16px 40px rgba(244,63,94,0.2);border:1.5px solid rgba(244,63,94,0.3);text-align:center;cursor:pointer;">
+          <div style="width:100%;height:220px;border-radius:14px;overflow:hidden;background:#000;">
+            <img src="assests/magical-smile.jpeg" alt="Vanshika's Smile" style="width:100%;height:100%;object-fit:cover;display:block;">
+          </div>
+          <div style="font-family:'Playfair Display',serif;font-size:16px;font-weight:800;color:#be123c;margin:10px 0 4px;">Your Unfiltered Laugh 😊</div>
+          <p style="font-size:12px;color:#4b4547;line-height:1.55;font-weight:500;">
+            "Your smile is the purest sunlight in my universe. Keeping this laugh alive is my favorite purpose in life."
+          </p>
+        </div>
+
+        <button onclick="sbGoToScene(4)" style="
+          background:linear-gradient(135deg,#fb7185,#f43f5e,#ec4899);color:#fff;
+          font-weight:800;font-size:14px;padding:13px 30px;border-radius:9999px;border:none;
+          box-shadow:0 10px 25px rgba(244,63,94,.38);cursor:pointer;
+        "><span>My Beautiful Queen</span><span>👑 →</span></button>
+      </div>
+
+      <!-- SCENE 4: ROYAL QUEEN -->
+      <div class="sb-scene" id="sb-scene-4" style="
+        position:absolute;inset:0;padding:65px 20px 30px;
+        display:flex;flex-direction:column;align-items:center;justify-content:space-between;
+        opacity:0;pointer-events:none;transform:translateY(22px) scale(.98);
+        transition:opacity .6s cubic-bezier(.16,1,.3,1),transform .6s cubic-bezier(.16,1,.3,1);
+      ">
+        <div style="text-align:center;margin-top:10px;">
+          <div style="font-family:'Caveat',cursive;font-size:22px;color:#e11d48;font-weight:700;">endless grace ✦</div>
+          <h1 style="font-family:'Playfair Display',serif;font-size:25px;font-weight:800;color:#1e191b;line-height:1.25;margin:4px 0 6px;">My Beautiful Queen</h1>
+          <p style="font-size:12.5px;color:#78716c;max-width:300px;line-height:1.5;">Tap to admire the woman who took my breath away...</p>
+        </div>
+
+        <div onclick="sbBurstSparkles(window.innerWidth/2, window.innerHeight*0.5)" style="width:280px;background:#fff;border-radius:20px;padding:12px 12px 16px;box-shadow:0 16px 40px rgba(244,63,94,0.2);border:1.5px solid rgba(244,63,94,0.3);text-align:center;cursor:pointer;">
+          <div style="width:100%;height:220px;border-radius:14px;overflow:hidden;background:#000;">
+            <img src="assests/latest/vanshika-royal-lehenga.jpeg" alt="Royal Vanshika" style="width:100%;height:100%;object-fit:cover;display:block;">
+          </div>
+          <div style="font-family:'Playfair Display',serif;font-size:16px;font-weight:800;color:#be123c;margin:10px 0 4px;">Grace, Strength & Beauty 🌹</div>
+          <p style="font-size:12px;color:#4b4547;line-height:1.55;font-weight:500;">
+            "You carry the softest heart and the bravest soul. You will always be the queen of my world."
+          </p>
+        </div>
+
+        <button onclick="sbGoToScene(5)" style="
+          background:linear-gradient(135deg,#fb7185,#f43f5e,#ec4899);color:#fff;
+          font-weight:800;font-size:14px;padding:13px 30px;border-radius:9999px;border:none;
+          box-shadow:0 10px 25px rgba(244,63,94,.38);cursor:pointer;
+        "><span>Our Sacred Sanctuary</span><span>💑 →</span></button>
+      </div>
+
+      <!-- SCENE 5: OUR SANCTUARY -->
+      <div class="sb-scene" id="sb-scene-5" style="
+        position:absolute;inset:0;padding:65px 20px 30px;
+        display:flex;flex-direction:column;align-items:center;justify-content:space-between;
+        opacity:0;pointer-events:none;transform:translateY(22px) scale(.98);
+        transition:opacity .6s cubic-bezier(.16,1,.3,1),transform .6s cubic-bezier(.16,1,.3,1);
+      ">
+        <div style="text-align:center;margin-top:10px;">
+          <div style="font-family:'Caveat',cursive;font-size:22px;color:#e11d48;font-weight:700;">home is right here ✦</div>
+          <h1 style="font-family:'Playfair Display',serif;font-size:25px;font-weight:800;color:#1e191b;line-height:1.25;margin:4px 0 6px;">Our Sacred Sanctuary</h1>
+          <p style="font-size:12.5px;color:#78716c;max-width:300px;line-height:1.5;">Two months of laughing in the quiet hours of the night...</p>
+        </div>
+
+        <div onclick="sbBurstSparkles(window.innerWidth/2, window.innerHeight*0.5)" style="width:280px;background:#fff;border-radius:20px;padding:12px 12px 16px;box-shadow:0 16px 40px rgba(244,63,94,0.2);border:1.5px solid rgba(244,63,94,0.3);text-align:center;cursor:pointer;">
+          <div style="width:100%;height:220px;border-radius:14px;overflow:hidden;background:#000;">
+            <img src="assests/latest/couple-night.jpeg" alt="Couple Night" style="width:100%;height:100%;object-fit:cover;display:block;">
+          </div>
+          <div style="font-family:'Playfair Display',serif;font-size:16px;font-weight:800;color:#be123c;margin:10px 0 4px;">Wrapped In Your Arms 🌙</div>
+          <p style="font-size:12px;color:#4b4547;line-height:1.55;font-weight:500;">
+            "Locked in your embrace, I finally feel like I am home. Two months of choosing you, and a lifetime to go."
+          </p>
+        </div>
+
+        <button onclick="sbGoToScene(6)" style="
+          background:linear-gradient(135deg,#fb7185,#f43f5e,#ec4899);color:#fff;
+          font-weight:800;font-size:14px;padding:13px 30px;border-radius:9999px;border:none;
+          box-shadow:0 10px 25px rgba(244,63,94,.38);cursor:pointer;
+        "><span>My Eternal Promise</span><span>💍 →</span></button>
+      </div>
+
+      <!-- SCENE 6: ETERNAL VOW & LETTER -->
+      <div class="sb-scene" id="sb-scene-6" style="
+        position:absolute;inset:0;padding:65px 20px 30px;
+        display:flex;flex-direction:column;align-items:center;justify-content:space-between;
+        opacity:0;pointer-events:none;transform:translateY(22px) scale(.98);
+        transition:opacity .6s cubic-bezier(.16,1,.3,1),transform .6s cubic-bezier(.16,1,.3,1);
+        background:linear-gradient(135deg,#fff7f2 0%,#feeef3 50%,#fde2e8 100%);
+      ">
+        <div style="text-align:center;margin-top:10px;">
+          <div style="font-family:'Caveat',cursive;font-size:22px;color:#e11d48;font-weight:700;">until my last breath ✦</div>
+          <h1 style="font-family:'Playfair Display',serif;font-size:24px;font-weight:800;color:#1e191b;line-height:1.25;margin:4px 0 6px;">Forever & Always Yours</h1>
+        </div>
+
+        <div style="width:100%;max-width:350px;max-height:min(390px,50vh);background:#fffdfa;border:1.5px solid rgba(244,63,94,0.25);border-radius:20px;padding:18px 16px;box-shadow:0 16px 36px rgba(220,160,150,0.18);overflow-y:auto;scrollbar-width:none;">
+          <div style="display:flex;justify-content:center;align-items:center;gap:4px;font-size:16px;margin-bottom:8px;animation:sbFloatPulse 2s infinite ease-in-out;">
+            <span>💖</span><span>💕</span><span>💗</span><span style="font-size:24px;color:#be123c;">♾️</span><span>💗</span><span>💕</span><span>💖</span>
+          </div>
+          <h2 style="font-family:'Sacramento',cursive;font-size:30px;color:#be123c;text-align:center;margin:4px 0 8px;line-height:1.1;">For My Vanshika</h2>
+          <div style="font-size:13px;line-height:1.7;color:#3f393b;font-weight:500;">
+            <p style="margin-bottom:8px;"><strong>My Dearest Vanshika,</strong></p>
+            <p style="margin-bottom:8px;">Happy 2nd Month Anniversary, my darling.</p>
+            <p style="margin-bottom:8px;">I don't just love you — my very soul, my greatest peace, and my entire heart belong to you.</p>
+            <p style="margin-bottom:8px;">I love everything about you: your voice, your precious smile, your quiet days, every tear you've ever shed, your happiness and your sadness, and your beautiful family. I love every single piece of your universe.</p>
+            <p style="margin-bottom:8px;">When you smile, it feels like my entire world stops in quiet gratitude. You are my home, my sanctuary, and my answered prayer.</p>
+            <p style="margin-bottom:10px;">Until my very last breath and beyond — I am forever yours.</p>
+            <p style="text-align:right;font-family:'Caveat',cursive;font-size:22px;color:#be123c;font-weight:700;">— Rakesh 💕</p>
+          </div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:10px;align-items:center;width:100%;">
+          <button onclick="sbFinaleNext()" style="
+            width:100%;max-width:300px;background:linear-gradient(135deg,#f43f5e,#fb7185,#f43f5e);color:#fff;
+            font-weight:800;font-size:14px;padding:14px 24px;border-radius:9999px;border:none;
+            box-shadow:0 8px 24px rgba(244,63,94,.38);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;
+          ">
+            <span>Continue To Still You. Always You.</span><span>💖 →</span>
+          </button>
+        </div>
+      </div>
+
+    </div><!-- end scenes wrapper -->
+  </div><!-- end storybook overlay -->
+
+
+  <!-- ============================================================ -->
+  <!-- INLINE OVERLAY 2: "STILL YOU. ALWAYS YOU." (8 Rooms)        -->
+  <!-- Opens AFTER Storybook, BEFORE existing Chapter 2 Story       -->
+  <!-- ============================================================ -->
+  <div id="stillyou-overlay" style="
+    display:none;position:fixed;inset:0;z-index:310;
+    background:linear-gradient(135deg,#fff7f2 0%,#feeef3 50%,#fde2e8 100%);
+    font-family:'Plus Jakarta Sans','Quicksand',sans-serif;
+    overflow:hidden;
+  ">
+    <!-- Lightbox -->
+    <div id="sy-lightbox" onclick="syCloseLightbox()" style="display:none;position:fixed;inset:0;background:rgba(18,14,16,.85);backdrop-filter:blur(10px);align-items:center;justify-content:center;z-index:999;padding:20px;">
+      <div onclick="event.stopPropagation()" style="background:#fff;padding:14px 14px 20px;border-radius:12px;max-width:340px;width:100%;box-shadow:0 20px 45px rgba(0,0,0,.5);text-align:center;">
+        <img id="sy-lb-img" src="" alt="" style="width:100%;max-height:380px;object-fit:cover;border-radius:8px;">
+        <div id="sy-lb-cap" style="font-family:'Caveat',cursive;font-size:22px;color:#e11d48;margin-top:12px;font-weight:700;"></div>
+        <p style="font-size:11px;color:#94a3b8;margin-top:6px;">Tap anywhere to close</p>
+      </div>
+    </div>
+
+    <!-- Top Bar -->
+    <div style="position:absolute;top:16px;left:20px;right:20px;display:flex;align-items:center;justify-content:space-between;z-index:90;">
+      <div id="sy-room-pill" style="font-family:'Caveat',cursive;font-size:19px;color:#be123c;font-weight:700;background:rgba(255,255,255,.65);backdrop-filter:blur(8px);padding:3px 14px;border-radius:9999px;border:1px solid rgba(244,63,94,.2);">Room 1 ✦ Intro</div>
+      <button id="sy-close-btn" onclick="closeStilyouOverlay()" style="width:36px;height:36px;background:rgba(255,255,255,.75);backdrop-filter:blur(8px);border:1px solid rgba(244,63,94,.25);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;cursor:pointer;color:#be123c;font-weight:900;">✕</button>
+    </div>
+
+    <!-- Rooms Stage -->
+    <div id="sy-rooms-stage" style="position:absolute;top:0;left:0;width:100%;height:100%;overflow:hidden;">
+
+      <!-- ROOM 1 -->
+      <div class="sy-room active" id="sy-room-1" onclick="syNextRoom()" style="position:absolute;inset:0;padding:70px 22px 100px;display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:1;pointer-events:auto;transform:translateY(0) scale(1);transition:opacity .65s cubic-bezier(.16,1,.3,1),transform .65s cubic-bezier(.16,1,.3,1);cursor:pointer;">
+        <div style="text-align:center;">
+          <h1 style="font-family:'Caveat',cursive;font-size:48px;color:#be123c;line-height:1.1;font-weight:700;">Still you.<br>Always you.</h1>
+          <p style="font-family:'Playfair Display',serif;font-size:16px;color:#78716c;margin-top:10px;font-style:italic;">— Rakesh</p>
+        </div>
+        <div style="margin-top:35px;display:flex;flex-direction:column;align-items:center;gap:15px;">
+          <div style="width:80px;height:80px;animation:sbHeatbeat 1.8s infinite ease-in-out;">
+            <svg viewBox="0 0 100 100" fill="none"><path d="M50 88 C20 62, 5 45, 5 28 C5 12, 18 2, 33 2 C42 2, 47 7, 50 12 C53 7, 58 2, 67 2 C82 2, 95 12, 95 28 C95 45, 80 62, 50 88 Z" fill="#f43f5e"/></svg>
+          </div>
+          <div style="font-family:'Caveat',cursive;font-size:20px;color:#e11d48;animation:sbFloatPulse 2s infinite ease-in-out;">Tap anywhere to enter our journey ✨</div>
+        </div>
+      </div>
+
+      <!-- ROOM 2: Falling Roses -->
+      <div class="sy-room" id="sy-room-2" style="position:absolute;inset:0;padding:70px 22px 100px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;opacity:0;pointer-events:none;transform:translateY(22px) scale(.98);transition:opacity .65s cubic-bezier(.16,1,.3,1),transform .65s cubic-bezier(.16,1,.3,1);">
+        <div id="sy-falling-roses-container" style="position:absolute;inset:0;overflow:hidden;"></div>
+        <div style="position:relative;z-index:20;text-align:center;pointer-events:none;margin-bottom:25px;">
+          <div style="font-family:'Caveat',cursive;font-size:24px;color:#e11d48;font-weight:700;">Gentle Petals of Love</div>
+          <h2 style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:#1f1a1c;margin:4px 0 6px;">"Every day with you feels like this."</h2>
+          <p style="font-size:12px;color:#78716c;">Tap the falling roses to watch them bloom 💕</p>
+        </div>
+      </div>
+
+      <!-- ROOM 3: Polaroid Wall -->
+      <div class="sy-room" id="sy-room-3" style="position:absolute;inset:0;padding:70px 12px 100px;display:flex;flex-direction:column;align-items:center;overflow-y:auto;opacity:0;pointer-events:none;transform:translateY(22px) scale(.98);transition:opacity .65s cubic-bezier(.16,1,.3,1),transform .65s cubic-bezier(.16,1,.3,1);scrollbar-width:none;">
+        <div style="text-align:center;margin-bottom:12px;">
+          <div style="font-family:'Caveat',cursive;font-size:22px;color:#e11d48;font-weight:700;">See what Rakesh built for you</div>
+          <p style="font-size:12px;color:#78716c;">Tap any photo to enlarge 💖</p>
+        </div>
+        <div id="sy-polaroid-wall" style="width:100%;max-width:360px;display:grid;grid-template-columns:repeat(2,1fr);gap:14px;padding-bottom:20px;"></div>
+      </div>
+
+      <!-- ROOM 4: Photo Puzzle -->
+      <div class="sy-room" id="sy-room-4" style="position:absolute;inset:0;padding:70px 22px 100px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;opacity:0;pointer-events:none;transform:translateY(22px) scale(.98);transition:opacity .65s cubic-bezier(.16,1,.3,1),transform .65s cubic-bezier(.16,1,.3,1);">
+        <div style="text-align:center;">
+          <h2 style="font-family:'Playfair Display',serif;font-size:22px;font-weight:800;color:#1f1a1c;margin-bottom:4px;">This photo fell apart 💔</h2>
+          <p style="font-size:12.5px;color:#78716c;">Tap two pieces to swap them and put our memory back together.</p>
+        </div>
+        <div id="sy-puzzle-board" style="width:270px;height:270px;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);gap:3px;background:#fecdd3;padding:3px;border-radius:14px;box-shadow:0 12px 30px rgba(0,0,0,.12);"></div>
+        <div style="display:flex;gap:15px;align-items:center;">
+          <span id="sy-puzzle-moves" style="font-size:12px;color:#78716c;">Moves: 0</span>
+          <button onclick="sySkipPuzzle()" style="background:none;border:none;color:#f43f5e;font-size:12px;font-weight:700;text-decoration:underline;cursor:pointer;">Skip →</button>
+        </div>
+        <div id="sy-puzzle-solved-msg" style="font-family:'Caveat',cursive;font-size:22px;color:#be123c;font-weight:700;display:none;text-align:center;animation:sbFloatPulse 1.5s infinite ease-in-out;">✨ "Some things are always meant to fit."</div>
+      </div>
+
+      <!-- ROOM 5: Love Tree -->
+      <div class="sy-room" id="sy-room-5" style="position:absolute;inset:0;padding:70px 22px 100px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;opacity:0;pointer-events:none;transform:translateY(22px) scale(.98);transition:opacity .65s cubic-bezier(.16,1,.3,1),transform .65s cubic-bezier(.16,1,.3,1);">
+        <div style="text-align:center;">
+          <div style="font-family:'Caveat',cursive;font-size:22px;color:#e11d48;font-weight:700;">Growing With Every Heartbeat</div>
+          <p style="font-size:12px;color:#78716c;">Tap the tree to release hearts ✨</p>
+        </div>
+        <div id="sy-love-tree-box" onclick="syReleaseTreeHearts(event)" style="width:280px;height:290px;position:relative;cursor:pointer;">
+          <div style="position:absolute;top:15px;left:10px;background:rgba(255,255,255,.94);backdrop-filter:blur(8px);padding:10px 16px;border-radius:18px;border:1.5px solid rgba(244,63,94,.35);box-shadow:0 8px 20px rgba(244,63,94,.18);z-index:15;text-align:center;">
+            <p style="font-size:11px;color:#e11d48;font-weight:800;letter-spacing:0.04em;">💖 Handcrafted From The Depths Of My Heart 💖</p>
+            <div style="display:flex;justify-content:center;align-items:center;gap:3px;margin:3px 0;font-size:14px;">
+              <span>💖</span><span>💕</span><span>💗</span><span style="font-size:18px;color:#be123c;">♾️</span><span>💗</span><span>💕</span><span>💖</span>
+            </div>
+            <p style="font-family:'Caveat',cursive;font-size:20px;color:#be123c;font-weight:700;line-height:1.2;margin:2px 0;">"Until my last breath, I am forever yours."</p>
+            <div style="font-size:12px;letter-spacing:2px;color:#78716c;">✨ 💕 💍 🌹 ✨</div>
+          </div>
+          <svg viewBox="0 0 280 300" style="width:100%;height:100%;">
+            <path d="M140 280 Q138 210 140 180 Q120 150 90 130 Q125 140 140 170 Q155 140 190 120 Q160 145 140 175" stroke="#854d0e" stroke-width="12" stroke-linecap="round" fill="none"/>
+            <path d="M140 210 Q110 190 80 185" stroke="#854d0e" stroke-width="6" stroke-linecap="round" fill="none"/>
+            <path d="M140 200 Q170 185 200 180" stroke="#854d0e" stroke-width="6" stroke-linecap="round" fill="none"/>
+            <path d="M140 100 C125 80, 100 95, 100 115 C100 135, 140 155, 140 155 C140 155, 180 135, 180 115 C180 95, 155 80, 140 100 Z" fill="#f43f5e"/>
+            <path d="M100 125 C85 105, 60 120, 60 140 C60 160, 100 180, 100 180 C100 180, 140 160, 140 140 C140 120, 115 105, 100 125 Z" fill="#fb7185"/>
+            <path d="M180 120 C165 100, 140 115, 140 135 C140 155, 180 175, 180 175 C180 175, 220 155, 220 135 C220 115, 195 100, 180 120 Z" fill="#e11d48"/>
+            <path d="M140 60 C125 40, 100 55, 100 75 C100 95, 140 115, 140 115 C140 115, 180 95, 180 75 C180 55, 155 40, 140 60 Z" fill="#f472b6"/>
+            <path d="M75 160 C65 145, 45 155, 45 170 C45 185, 75 200, 75 200 C75 200, 105 185, 105 170 C105 155, 85 145, 75 160 Z" fill="#fda4af"/>
+            <path d="M205 155 C195 140, 175 150, 175 165 C175 180, 205 195, 205 195 C205 195, 235 180, 235 165 C235 150, 215 140, 205 155 Z" fill="#fb7185"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- ROOM 6: Gallery Walk -->
+      <div class="sy-room" id="sy-room-6" style="position:absolute;inset:0;padding:70px 22px 100px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;opacity:0;pointer-events:none;transform:translateY(22px) scale(.98);transition:opacity .65s cubic-bezier(.16,1,.3,1),transform .65s cubic-bezier(.16,1,.3,1);">
+        <div style="text-align:center;">
+          <div style="font-family:'Caveat',cursive;font-size:22px;color:#e11d48;font-weight:700;">The Masterpiece Gallery</div>
+          <p style="font-size:12px;color:#78716c;">Walking through the greatest museum: our story.</p>
+        </div>
+        <div style="width:270px;background:linear-gradient(135deg,#d4af37,#f3e5ab,#aa771c,#d4af37);padding:10px;border-radius:12px;box-shadow:0 16px 40px rgba(0,0,0,.22);">
+          <div style="width:100%;height:260px;border-radius:6px;overflow:hidden;background:#000;"><img id="sy-gallery-img" src="assests/latest/couple-night.jpeg" alt="Gallery" style="width:100%;height:100%;object-fit:cover;display:block;transition:opacity .4s ease;"></div>
+        </div>
+        <div style="background:#fffdf9;border:1px solid #d4af37;border-radius:8px;padding:8px 16px;box-shadow:0 4px 12px rgba(0,0,0,.06);text-align:center;max-width:270px;">
+          <div id="sy-museum-title" style="font-family:'Playfair Display',serif;font-size:13px;font-weight:700;color:#3b2d18;"></div>
+          <div style="font-size:11px;color:#78716c;margin-top:2px;">From the sacred Heart Collection</div>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:center;gap:18px;">
+          <button onclick="syPrevGallery()" style="width:36px;height:36px;border-radius:50%;background:#fff;border:1px solid rgba(244,63,94,.2);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 10px rgba(0,0,0,.06);">←</button>
+          <span id="sy-gallery-counter" style="font-family:'Caveat',cursive;font-size:20px;font-weight:700;color:#be123c;">1 / 8</span>
+          <button onclick="syNextGallery()" style="width:36px;height:36px;border-radius:50%;background:#fff;border:1px solid rgba(244,63,94,.2);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 10px rgba(0,0,0,.06);">→</button>
+        </div>
+      </div>
+
+      <!-- ROOM 7: Letter + Voice Note -->
+      <div class="sy-room" id="sy-room-7" style="position:absolute;inset:0;padding:70px 18px 100px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;overflow-y:auto;opacity:0;pointer-events:none;transform:translateY(22px) scale(.98);transition:opacity .65s cubic-bezier(.16,1,.3,1),transform .65s cubic-bezier(.16,1,.3,1);scrollbar-width:none;">
+        <div style="text-align:center;">
+          <div style="font-family:'Caveat',cursive;font-size:22px;color:#e11d48;font-weight:700;">My Heart In Words 💌</div>
+        </div>
+        <div style="width:100%;max-width:340px;max-height:190px;background:#fffdf9;border:1px solid #fce7f3;border-radius:14px;padding:16px;box-shadow:0 8px 24px rgba(0,0,0,.05);overflow-y:auto;font-family:'Caveat',cursive;font-size:18px;line-height:1.55;color:#3f393b;scrollbar-width:none;">
+          My Dearest Vanshika,<br><br>
+          Every room we just walked through holds a fraction of what you mean to me. I don't just love you, my darling — my very soul belongs to you. I love everything about you: your voice, your precious smile, your quiet days, every tear you've ever cried, your happiness and your sadness, and your beautiful family. I love every single piece of your universe.<br><br>
+          You are my safe harbor, my greatest peace, and I will be yours until my very last breath. I made all of this from the deepest corner of my heart, so you never, ever forget how deeply and completely you are loved.<br><br>
+          Infinity Love Until My Last Breath ♾️❤️<br>
+          <strong style="color:#be123c;">Forever & Always yours, Rakesh 💕</strong>
+        </div>
+        <div style="width:100%;max-width:340px;background:#fff;border-radius:18px;padding:14px 18px;box-shadow:0 10px 25px rgba(244,63,94,.12);border:1px solid rgba(244,63,94,.2);">
+          <div style="display:flex;align-items:center;justify-content:space-between;font-size:12px;font-weight:700;color:#be123c;margin-bottom:8px;">
+            <span>Hear Rakesh say it 🎙️</span>
+            <span id="sy-voice-time" style="font-size:11px;font-weight:600;color:#881337;">0:00</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;">
+            <button id="sy-voice-play-btn" onclick="syToggleVoice()" style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#f43f5e,#fb7185);border:none;color:#fff;font-size:18px;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 14px rgba(244,63,94,.4);">▶</button>
+            <div id="sy-waveform" style="flex:1;height:36px;display:flex;align-items:center;gap:3px;"></div>
+          </div>
+        </div>
+        <div style="font-size:28px;">🥰</div>
+      </div>
+
+      <!-- ROOM 8: Final Surprise (leads to existing Chapter 2) -->
+      <div class="sy-room" id="sy-room-8" style="position:absolute;inset:0;padding:70px 22px 100px;display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:0;pointer-events:none;transform:translateY(22px) scale(.98);transition:opacity .65s cubic-bezier(.16,1,.3,1),transform .65s cubic-bezier(.16,1,.3,1);">
+        <div id="sy-proposal-card" style="background:rgba(255,255,255,.92);backdrop-filter:blur(12px);border-radius:24px;padding:26px 20px;text-align:center;box-shadow:0 20px 50px rgba(244,63,94,.25);border:2px solid rgba(244,63,94,.3);max-width:330px;width:100%;">
+          <div style="font-size:38px;margin-bottom:8px;">💍</div>
+          <div style="font-family:'Caveat',cursive;font-size:32px;color:#be123c;font-weight:700;">Vanshika...</div>
+          <h2 style="font-family:'Playfair Display',serif;font-size:20px;font-weight:800;color:#1f1a1c;margin:8px 0 6px;">"Will you be mine forever?"</h2>
+          <p style="font-size:13px;color:#78716c;line-height:1.6;">Through every season, every laugh, and every tomorrow.</p>
+          <div style="display:flex;flex-direction:column;gap:12px;margin-top:22px;">
+            <button onclick="syAcceptProposal()" style="background:linear-gradient(135deg,#f43f5e,#e11d48);color:#fff;font-size:15px;font-weight:700;padding:14px 20px;border-radius:9999px;border:none;cursor:pointer;box-shadow:0 8px 24px rgba(225,29,72,.35);">Yes! 💖</button>
+            <button onclick="syAcceptProposal()" style="background:linear-gradient(135deg,#fb7185,#f43f5e);color:#fff;font-size:15px;font-weight:700;padding:14px 20px;border-radius:9999px;border:none;cursor:pointer;box-shadow:0 8px 24px rgba(244,63,94,.35);">A thousand times YES! 💍✨</button>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- end rooms stage -->
+
+    <!-- Fixed Bottom Navigation Bar -->
+    <div style="position:absolute;bottom:0;left:0;width:100%;padding:12px 20px 18px;background:rgba(255,255,255,.85);backdrop-filter:blur(14px);border-top:1px solid rgba(244,63,94,.15);display:flex;flex-direction:column;align-items:center;gap:10px;z-index:100;">
+      <button id="sy-next-btn" onclick="syNextRoom()" style="width:100%;max-width:320px;background:linear-gradient(135deg,#f43f5e 0%,#fb7185 50%,#f43f5e 100%);color:#fff;font-weight:700;font-size:14.5px;padding:13px 24px;border-radius:9999px;border:none;box-shadow:0 8px 24px rgba(244,63,94,.35);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;">
+        <span id="sy-next-btn-text">Next Room</span><span>→</span>
+      </button>
+      <div style="display:flex;align-items:center;gap:7px;" id="sy-dots-row">
+        <div class="sy-dot" data-r="1" style="width:22px;height:8px;border-radius:12px;background:#e11d48;box-shadow:0 0 8px rgba(244,63,94,.6);transition:all .35s;"></div>
+        <div class="sy-dot" data-r="2" style="width:8px;height:8px;border-radius:50%;background:#e2d8db;transition:all .35s;"></div>
+        <div class="sy-dot" data-r="3" style="width:8px;height:8px;border-radius:50%;background:#e2d8db;transition:all .35s;"></div>
+        <div class="sy-dot" data-r="4" style="width:8px;height:8px;border-radius:50%;background:#e2d8db;transition:all .35s;"></div>
+        <div class="sy-dot" data-r="5" style="width:8px;height:8px;border-radius:50%;background:#e2d8db;transition:all .35s;"></div>
+        <div class="sy-dot" data-r="6" style="width:8px;height:8px;border-radius:50%;background:#e2d8db;transition:all .35s;"></div>
+        <div class="sy-dot" data-r="7" style="width:8px;height:8px;border-radius:50%;background:#e2d8db;transition:all .35s;"></div>
+        <div class="sy-dot" data-r="8" style="width:8px;height:8px;border-radius:50%;background:#e2d8db;transition:all .35s;"></div>
+      </div>
+      <div style="font-size:11px;color:#a89fa2;font-weight:500;">Made with ❤️ by Rakesh for Vanshika</div>
+    </div>
+  </div><!-- end stillyou overlay -->
+
+
+  <!-- =============================================================
+       INLINE STYLES & KEYFRAMES for both overlays
+       ============================================================= -->
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400..700&family=Playfair+Display:ital,wght@0,500..900;1,500..900&family=Sacramento&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap');
+
+    /* Storybook scenes transition */
+    .sb-scene { position:absolute;inset:0;padding:65px 24px 30px;display:flex;flex-direction:column;align-items:center;justify-content:space-between;opacity:0;pointer-events:none;transform:translateY(22px) scale(.98);transition:opacity .6s cubic-bezier(.16,1,.3,1),transform .6s cubic-bezier(.16,1,.3,1); }
+    .sb-scene.active { opacity:1;pointer-events:auto;transform:translateY(0) scale(1); }
+    .sy-room { position:absolute;inset:0;opacity:0;pointer-events:none;transform:translateY(22px) scale(.98);transition:opacity .65s cubic-bezier(.16,1,.3,1),transform .65s cubic-bezier(.16,1,.3,1); }
+    .sy-room.active { opacity:1;pointer-events:auto;transform:translateY(0) scale(1); }
+
+    @keyframes sbSwipeBounce { 0%{transform:translate(-50%,0);opacity:.8}50%{transform:translate(-50%,25px);opacity:1}100%{transform:translate(-50%,0);opacity:.8} }
+    @keyframes sbFloatGentle { 0%{transform:translateY(0) rotate(-2deg)}100%{transform:translateY(-16px) rotate(3deg)} }
+    @keyframes sbFloatPulse { 0%,100%{transform:translateY(0);opacity:.8}50%{transform:translateY(-6px);opacity:1} }
+    @keyframes sbHeatbeat { 0%,100%{transform:scale(1)}14%{transform:scale(1.18)}28%{transform:scale(1)}42%{transform:scale(1.18)} }
+    @keyframes sbTwinkle { 0%{opacity:.2;transform:scale(.8)}100%{opacity:1;transform:scale(1.3)} }
+    @keyframes sbWaveDance { 0%{height:6px}100%{height:32px} }
+    @keyframes sbRiseUp { 0%{transform:translateY(0) scale(.6);opacity:0}20%{opacity:.85}100%{transform:translateY(-750px) scale(1.1);opacity:0} }
+    @keyframes sbWaveArm { 0%,100%{transform:rotate(0deg)}50%{transform:rotate(-28deg)} }
+    .sb-wave-arm { transform-origin:152px 130px; }
+    .sb-waving .sb-wave-arm { animation:sbWaveArm 1.4s infinite ease-in-out; }
+    .sb-flame { animation:sbFlame .8s infinite alternate ease-in-out;transform-origin:center bottom; }
+    @keyframes sbFlame { 0%{transform:scale(.9) skewX(-2deg)}50%{transform:scale(1.1) skewX(2deg)}100%{transform:scale(.95) skewX(-1deg)} }
+  </style>
+
+
+  <!-- =============================================================
+       JAVASCRIPT: Storybook + StillYou Controllers
+       ============================================================= -->
+  <script>
+  /* ================================================================
+     STORYBOOK OVERLAY CONTROLLER
+  ================================================================ */
+  const SB_LETTER = `My Dearest Vanshika,
+
+Happy 2nd Month Anniversary, my darling.
+
+I don't just love you — my very soul, my peace, and my entire heart belong to you.
+
+I love everything about you: your voice, your precious smile, your quiet days, every tear you've ever cried, your happiness and your sadness, and your beautiful family. I love every single piece of your universe.
+
+When you smile, it feels like my entire world lights up. And whenever you feel down, my heart aches to hold you close and remind you that you will never have to face anything alone. I made all of this from the deepest corner of my heart, so you always remember how infinitely precious you are to me.
+
+Two months of choosing you, and I will choose you again in every tomorrow.
+
+Infinity Love Until My Last Breath ♾️❤️
+
+Forever & Always yours,
+Rakesh 💕`;
+
+  let sbCurrentScene = 1;
+  const sbTotalScenes = 6;
+  let sbLetterTyped = false;
+  let sbArrowShot = false;
+  let sbFParticles = [];
+  let sbFCanvasCtx = null;
+
+  function openStorybookOverlay() {
+    const overlay = document.getElementById('storybook-overlay');
+    if (!overlay) return;
+    overlay.style.display = 'block';
+    document.body.style.overflow = 'hidden';
+    sbCurrentScene = 1;
+    sbArrowShot = false;
+    sbGoToScene(1);
+    sbInitCanvas();
+  }
+
+  function closeStorybookOverlay() {
+    const overlay = document.getElementById('storybook-overlay');
+    if (overlay) overlay.style.display = 'none';
+    document.body.style.overflow = '';
+  }
+
+  function sbGoToScene(target) {
+    if (target < 1 || target > sbTotalScenes) return;
+    document.querySelectorAll('.sb-scene').forEach(s => s.classList.remove('active'));
+    const next = document.getElementById(`sb-scene-${target}`);
+    if (next) {
+      next.classList.add('active');
+      next.style.pointerEvents = 'auto';
+    }
+    sbCurrentScene = target;
+
+    // Update progress dots
+    document.querySelectorAll('.sb-dot').forEach(d => {
+      const s = parseInt(d.dataset.s);
+      if (s === target) {
+        d.style.width = '22px'; d.style.background = '#f43f5e';
+        d.style.boxShadow = '0 0 8px rgba(244,114,182,.6)';
+      } else {
+        d.style.width = '12px'; d.style.background = 'rgba(0,0,0,.12)';
+        d.style.boxShadow = 'none';
+      }
+    });
+
+    if (target >= 2 && target <= 5) {
+      sbBurstSparkles(window.innerWidth / 2, window.innerHeight * 0.45, 18);
+    }
+    if (target === 6) {
+      sbTriggerFinaleConfetti();
+    }
+  }
+
+  // Scene 1: Cupid's Arrow Shot
+  function sbShootCupidArrow() {
+    if (sbArrowShot) {
+      sbGoToScene(2);
+      return;
+    }
+    sbArrowShot = true;
+    const arrow = document.getElementById('sb-cupid-arrow');
+    const heart = document.getElementById('sb-target-heart');
+    if (arrow) {
+      arrow.style.transform = 'translateY(-160px) scale(0.6)';
+      arrow.style.opacity = '0';
+    }
+    if (heart) {
+      heart.style.transform = 'scale(1.4) rotate(15deg)';
+    }
+
+    setTimeout(() => {
+      sbBurstSparkles(window.innerWidth / 2, window.innerHeight * 0.35, 50);
+      sbTriggerFinaleConfetti();
+    }, 350);
+
+    const btn = document.getElementById('sb-shoot-btn');
+    if (btn) {
+      btn.innerHTML = '<span>Where My Soul Finds Peace</span><span>💚 →</span>';
+      btn.onclick = () => sbGoToScene(2);
+    }
+  }
+
+  // Scene 6: Finale then open StillYou
+  function sbTriggerFinaleConfetti() {
+    for (let i = 0; i < 6; i++) {
+      setTimeout(() => sbBurstSparkles(Math.random() * window.innerWidth, Math.random() * window.innerHeight * 0.6, 20), i * 250);
+    }
+  }
+
+  function sbFinaleNext() {
+    closeStorybookOverlay();
+    setTimeout(() => openStilyouOverlay(), 300);
+  }
+
+  // Sparkle/Confetti Engine (uses sb-sparkle-canvas)
+  function sbInitCanvas() {
+    const canvas = document.getElementById('sb-sparkle-canvas');
+    if (!canvas) return;
+    canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+    sbFCanvasCtx = canvas.getContext('2d');
+    sbFParticles = [];
+    function loop() {
+      if (!sbFCanvasCtx) return;
+      sbFCanvasCtx.clearRect(0, 0, canvas.width, canvas.height);
+      for (let i = sbFParticles.length-1; i >= 0; i--) {
+        const p = sbFParticles[i];
+        p.x+=p.vx; p.y+=p.vy; p.vy+=.12; p.alpha-=p.decay; p.rot+=p.vRot;
+        if (p.alpha <= 0) { sbFParticles.splice(i,1); continue; }
+        sbFCanvasCtx.save(); sbFCanvasCtx.globalAlpha=p.alpha;
+        sbFCanvasCtx.translate(p.x,p.y); sbFCanvasCtx.rotate(p.rot*Math.PI/180);
+        sbFCanvasCtx.fillStyle=p.color;
+        sbFCanvasCtx.fillRect(-p.sz/2,-p.sz/2,p.sz,p.sz);
+        sbFCanvasCtx.restore();
+      }
+      requestAnimationFrame(loop);
+    }
+    loop();
+  }
+  function sbBurstSparkles(x, y) {
+    const colors=['#f43f5e','#fb7185','#fbbf24','#fbcfe8','#fff','#a855f7'];
+    for(let i=0;i<40;i++) sbFParticles.push({x,y,vx:(Math.random()-.5)*8,vy:(Math.random()-.5)*8-2,sz:Math.random()*5+3,color:colors[Math.floor(Math.random()*colors.length)],alpha:1,decay:Math.random()*.02+.012,rot:Math.random()*360,vRot:(Math.random()-.5)*10});
+  }
+
+  /* ================================================================
+     STILLYOU OVERLAY CONTROLLER
+  ================================================================ */
+  const SY_PHOTOS = [
+    { src:'assests/latest/couple-night.jpeg', caption:'Our quiet midnight laughter' },
+    { src:'assests/latest/vanshika-royal-lehenga.jpeg', caption:'The day you took my breath away' },
+    { src:'assests/latest/couple-night-2.jpeg', caption:'Safe forever in your arms' },
+    { src:'assests/latest/vanshika-blue-dress.jpeg', caption:'Grace, elegance, perfection' },
+    { src:'assests/latest/vanshika-red-elegance.jpeg', caption:'My queen in red 🌹' },
+    { src:'assests/latest/vanshika-green-eyes.jpeg', caption:'Those eyes I adore forever 💚' },
+    { src:'assests/latest/vanshika-soft-portrait.jpeg', caption:'The purest smile in this world' },
+    { src:'assests/magical-smile.jpeg', caption:'My favorite sight every day' }
+  ];
+  const SY_ROOM_TITLES = ['Room 1 ✦ Intro','Room 2 ✦ Falling Roses','Room 3 ✦ Polaroid Wall','Room 4 ✦ Photo Puzzle','Room 5 ✦ Love Tree','Room 6 ✦ Gallery Walk','Room 7 ✦ Letter & Voice','Room 8 ✦ Final Surprise'];
+
+  let syCurrentRoom = 1;
+  let syGalleryIdx = 0;
+  let syRosesInterval = null;
+  let syPolaroidsRendered = false;
+  let syPuzzleTiles = [0,1,2,3,4,5,6,7,8];
+  let sySelectedTile = null;
+  let syPuzzleMoves = 0;
+  let syPuzzleInited = false;
+  let syVoiceAudio = null;
+
+  function openStilyouOverlay() {
+    const overlay = document.getElementById('stillyou-overlay');
+    if (!overlay) return;
+    overlay.style.display = 'block';
+    document.body.style.overflow = 'hidden';
+    syCurrentRoom = 1;
+    syGoToRoom(1);
+    // Build waveform bars
+    const wf = document.getElementById('sy-waveform');
+    if (wf && !wf.children.length) {
+      for (let i=0;i<12;i++) {
+        const b=document.createElement('div');
+        b.style.cssText='flex:1;height:8px;background:#fecdd3;border-radius:3px;transition:height .2s,background .2s;';
+        wf.appendChild(b);
+      }
+    }
+  }
+
+  function closeStilyouOverlay() {
+    const overlay = document.getElementById('stillyou-overlay');
+    if (overlay) overlay.style.display = 'none';
+    document.body.style.overflow = '';
+    if (syVoiceAudio) { syVoiceAudio.pause(); syVoiceAudio=null; }
+    if (syRosesInterval) { clearInterval(syRosesInterval); syRosesInterval=null; }
+  }
+
+  function syGoToRoom(target) {
+    if (target < 1 || target > 8) return;
+    document.querySelectorAll('.sy-room').forEach(r => { r.classList.remove('active'); r.style.pointerEvents='none'; });
+    const next = document.getElementById(`sy-room-${target}`);
+    if (next) { next.classList.add('active'); next.style.pointerEvents='auto'; }
+    syCurrentRoom = target;
+    document.getElementById('sy-room-pill').textContent = SY_ROOM_TITLES[target-1];
+    // Update progress dots
+    document.querySelectorAll('.sy-dot').forEach(d => {
+      const r=parseInt(d.dataset.r);
+      if (r===target) { d.style.width='22px';d.style.borderRadius='12px';d.style.background='#e11d48';d.style.boxShadow='0 0 8px rgba(244,63,94,.6)'; }
+      else if (r<target) { d.style.width='8px';d.style.borderRadius='50%';d.style.background='#fb7185';d.style.boxShadow='none'; }
+      else { d.style.width='8px';d.style.borderRadius='50%';d.style.background='#e2d8db';d.style.boxShadow='none'; }
+    });
+    // Next button
+    const btn=document.getElementById('sy-next-btn'); const btnTxt=document.getElementById('sy-next-btn-text');
+    if (target===8) { btn.style.display='none'; }
+    else { btn.style.display='flex'; btnTxt.textContent= target===7 ? 'One Last Room' : 'Next Room'; }
+    // Activate room features
+    if (target===2) syStartRoses();
+    if (target===3) syBuildPolaroids();
+    if (target===4) syInitPuzzle();
+    if (target===6) syRenderGallery();
+  }
+
+  function syNextRoom() { if (syCurrentRoom < 8) syGoToRoom(syCurrentRoom+1); }
+
+  // Room 2: Falling Roses
+  function syStartRoses() {
+    if (syRosesInterval) return;
+    const c = document.getElementById('sy-falling-roses-container');
+    const emojis=['🌹','🌸','🌺','🤍','🌷'];
+    syRosesInterval = setInterval(() => {
+      if (syCurrentRoom !== 2) return;
+      const r=document.createElement('div');
+      r.style.cssText=`position:absolute;font-size:28px;cursor:pointer;top:-40px;left:${Math.random()*85+5}%;filter:drop-shadow(0 4px 8px rgba(0,0,0,.1));`;
+      r.textContent=emojis[Math.floor(Math.random()*emojis.length)];
+      const sp=Math.random()*2+3.5;
+      r.animate([{transform:'translateY(0) rotate(0deg)'},{transform:`translateY(${window.innerHeight+60}px) rotate(${Math.random()*360}deg)`}],{duration:sp*1000,easing:'linear'}).onfinish=()=>r.remove();
+      r.addEventListener('pointerdown',e=>{e.stopPropagation();syBurstPetals(e.clientX,e.clientY);r.remove();});
+      c.appendChild(r);
+    },450);
+  }
+
+  function syBurstPetals(x,y) {
+    const overlay=document.getElementById('stillyou-overlay');
+    const pts=['🌸','✨','💖','🌹'];
+    for(let i=0;i<7;i++){
+      const p=document.createElement('div');
+      p.style.cssText=`position:fixed;left:${x}px;top:${y}px;font-size:16px;pointer-events:none;z-index:400;animation:sbFloatPulse .9s forwards ease-out;`;
+      p.textContent=pts[Math.floor(Math.random()*pts.length)];
+      const angle=Math.random()*Math.PI*2;const dist=Math.random()*60+20;
+      p.animate([{transform:'translate(0,0) scale(1)',opacity:1},{transform:`translate(${Math.cos(angle)*dist}px,${Math.sin(angle)*dist}px) scale(.4)`,opacity:0}],{duration:900,easing:'ease-out'}).onfinish=()=>p.remove();
+      document.body.appendChild(p);
+    }
+  }
+
+  // Room 3: Polaroid Wall
+  function syBuildPolaroids() {
+    if (syPolaroidsRendered) return;
+    syPolaroidsRendered = true;
+    const wall = document.getElementById('sy-polaroid-wall');
+    wall.innerHTML = '';
+    SY_PHOTOS.forEach(item => {
+      const card=document.createElement('div');
+      const rot=(Math.random()*8-4).toFixed(1);
+      card.style.cssText=`background:#fff;padding:10px 10px 14px;border-radius:8px;box-shadow:0 8px 20px rgba(0,0,0,.08);cursor:pointer;transform:rotate(${rot}deg);display:flex;flex-direction:column;align-items:center;transition:transform .3s cubic-bezier(.34,1.56,.64,1),box-shadow .3s;`;
+      card.innerHTML=`<div style="width:100%;height:130px;border-radius:4px;overflow:hidden;background:#fdf2f4;"><img src="${item.src}" alt="" loading="lazy" style="width:100%;height:100%;object-fit:cover;display:block;"></div><div style="font-family:'Caveat',cursive;font-size:16px;color:#3b2f32;margin-top:8px;text-align:center;">${item.caption}</div>`;
+      card.onmouseenter=()=>card.style.transform='scale(1.08) rotate(0deg)';
+      card.onmouseleave=()=>card.style.transform=`rotate(${rot}deg)`;
+      card.onclick=()=>syOpenLightbox(item.src,item.caption);
+      wall.appendChild(card);
+    });
+  }
+  function syOpenLightbox(src,cap) {
+    const lb=document.getElementById('sy-lightbox');
+    document.getElementById('sy-lb-img').src=src;
+    document.getElementById('sy-lb-cap').textContent=cap;
+    lb.style.display='flex';
+  }
+  function syCloseLightbox() { document.getElementById('sy-lightbox').style.display='none'; }
+
+  // Room 4: Puzzle
+  function syInitPuzzle() {
+    if (syPuzzleInited) return;
+    syPuzzleInited=true;
+    for(let i=0;i<12;i++){const a=Math.floor(Math.random()*9);const b=Math.floor(Math.random()*9);[syPuzzleTiles[a],syPuzzleTiles[b]]=[syPuzzleTiles[b],syPuzzleTiles[a]];}
+    syRenderPuzzle();
+  }
+  function syRenderPuzzle() {
+    const board=document.getElementById('sy-puzzle-board');
+    board.innerHTML='';
+    syPuzzleTiles.forEach((tilePos,idx) => {
+      const tile=document.createElement('div');
+      tile.style.cssText=`width:86px;height:86px;border-radius:8px;background-image:url("assests/latest/couple-night.jpeg");background-size:264px 264px;background-position:-${(tilePos%3)*88}px -${Math.floor(tilePos/3)*88}px;cursor:pointer;transition:transform .25s,box-shadow .25s;`;
+      if(sySelectedTile===idx) tile.style.transform='scale(.92)';
+      tile.onclick=()=>syHandleTile(idx);
+      board.appendChild(tile);
+    });
+  }
+  function syHandleTile(idx) {
+    if (document.getElementById('sy-puzzle-board').classList.contains('solved')) return;
+    if(sySelectedTile===null){sySelectedTile=idx;syRenderPuzzle();}
+    else{[syPuzzleTiles[sySelectedTile],syPuzzleTiles[idx]]=[syPuzzleTiles[idx],syPuzzleTiles[sySelectedTile]];syPuzzleMoves++;document.getElementById('sy-puzzle-moves').textContent=`Moves: ${syPuzzleMoves}`;sySelectedTile=null;syRenderPuzzle();if(syPuzzleTiles.every((v,i)=>v===i))sySolvePuzzle();}
+  }
+  function sySkipPuzzle(){syPuzzleTiles=[0,1,2,3,4,5,6,7,8];sySelectedTile=null;syRenderPuzzle();sySolvePuzzle();}
+  function sySolvePuzzle(){document.getElementById('sy-puzzle-board').classList.add('solved');document.getElementById('sy-puzzle-solved-msg').style.display='block';sbBurstSparkles(window.innerWidth/2,window.innerHeight/2);}
+
+  // Room 5: Love Tree
+  function syReleaseTreeHearts(e) {
+    const box=document.getElementById('sy-love-tree-box');
+    const hearts=['💖','💕','💗','💓','✨'];
+    for(let i=0;i<6;i++){
+      const h=document.createElement('div');
+      h.style.cssText=`position:absolute;font-size:20px;pointer-events:none;z-index:50;left:${Math.random()*200+40}px;top:${Math.random()*150+60}px;`;
+      h.textContent=hearts[Math.floor(Math.random()*hearts.length)];
+      h.animate([{transform:'translateY(0) scale(.6)',opacity:1},{transform:'translateY(-120px) scale(1.4) rotate(20deg)',opacity:0}],{duration:2000,easing:'ease-out'}).onfinish=()=>h.remove();
+      box.appendChild(h);
+    }
+  }
+
+  // Room 6: Gallery
+  function syRenderGallery() {
+    const img=document.getElementById('sy-gallery-img');
+    const ph=SY_PHOTOS[syGalleryIdx];
+    img.style.opacity='0';
+    setTimeout(()=>{img.src=ph.src;img.style.opacity='1';},200);
+    document.getElementById('sy-museum-title').textContent=`${ph.caption} — Moment ${syGalleryIdx+1}`;
+    document.getElementById('sy-gallery-counter').textContent=`${syGalleryIdx+1} / ${SY_PHOTOS.length}`;
+  }
+  function syNextGallery(){syGalleryIdx=(syGalleryIdx+1)%SY_PHOTOS.length;syRenderGallery();}
+  function syPrevGallery(){syGalleryIdx=(syGalleryIdx-1+SY_PHOTOS.length)%SY_PHOTOS.length;syRenderGallery();}
+
+  // Room 7: Voice Note
+  function syToggleVoice() {
+    if (!syVoiceAudio) { syVoiceAudio=new Audio('music/love-song.mp3'); }
+    const btn=document.getElementById('sy-voice-play-btn');
+    const wf=document.getElementById('sy-waveform');
+    if (syVoiceAudio.paused) {
+      syVoiceAudio.play();
+      btn.textContent='⏸';
+      Array.from(wf.children).forEach((b,i)=>{b.style.background='#f43f5e';b.style.animation=`sbWaveDance .8s ${i*.12}s infinite alternate ease-in-out`;});
+      syVoiceAudio.addEventListener('timeupdate',()=>{const c=Math.floor(syVoiceAudio.currentTime);document.getElementById('sy-voice-time').textContent=`${Math.floor(c/60)}:${(c%60).toString().padStart(2,'0')}`;});
+      syVoiceAudio.addEventListener('ended',()=>{btn.textContent='▶';Array.from(wf.children).forEach(b=>{b.style.background='#fecdd3';b.style.animation='none';b.style.height='8px';});});
+    } else {
+      syVoiceAudio.pause();
+      btn.textContent='▶';
+      Array.from(wf.children).forEach(b=>{b.style.background='#fecdd3';b.style.animation='none';b.style.height='8px';});
+    }
+  }
+
+  // Room 8: Proposal → opens existing Chapter 2
+  function syAcceptProposal() {
+    sbBurstSparkles(window.innerWidth/2, window.innerHeight/2);
+    setTimeout(()=>sbBurstSparkles(window.innerWidth*.3, window.innerHeight*.3),300);
+    setTimeout(()=>sbBurstSparkles(window.innerWidth*.7, window.innerHeight*.3),600);
+    const card=document.getElementById('sy-proposal-card');
+    card.innerHTML=`
+      <div style="font-size:46px;margin-bottom:10px;">💍💖✨</div>
+      <div style="font-family:'Caveat',cursive;font-size:34px;color:#be123c;font-weight:700;">Forever & Always!</div>
+      <h2 style="font-family:'Playfair Display',serif;font-size:18px;font-weight:800;color:#1f1a1c;margin:8px 0;">You just made me the happiest person in the universe.</h2>
+      <p style="font-size:13px;color:#78716c;margin-top:6px;line-height:1.6;">Happy 2nd Month Anniversary, my Vanshika.<br><strong style="color:#be123c;">I will love you for all of my days. 💕</strong></p>
+      <button onclick="closeStilyouOverlay();setTimeout(()=>openNov17Chapter2(true),400);" style="margin-top:20px;background:linear-gradient(135deg,#f43f5e,#fb7185);color:#fff;font-size:14px;font-weight:700;padding:13px 24px;border-radius:9999px;border:none;cursor:pointer;box-shadow:0 8px 24px rgba(244,63,94,.35);display:flex;align-items:center;gap:8px;margin:20px auto 0;">
+        <span>Open Chapter 2 Story</span><span>✨ →</span>
+      </button>
+    `;
+    // Hide next button
+    document.getElementById('sy-next-btn').style.display='none';
+  }
+  </script>
+
   <!-- Core Modular Application Scripts -->
   <script src="js/config.js"></script>
   <script src="js/heic2any.min.js"></script>
@@ -2928,6 +4017,8 @@
   <script src="js/chat.js"></script>
   <script src="js/effects.js"></script>
   <script src="js/vault.js"></script>
+  <script src="js/nov17.js"></script>
+  <script src="js/surprise.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>
