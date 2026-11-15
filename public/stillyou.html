@@ -738,12 +738,14 @@
     <p style="font-size:14px;color:#d6d3d1;max-width:320px;line-height:1.6;margin-bottom:20px;">
       These 8 sacred rooms unlock automatically on <strong style="color:#fbbf24;">17 November 2026</strong> for our 2nd Month Anniversary 💕
     </p>
-    <a href="/" style="text-decoration:none;background:linear-gradient(135deg,#f43f5e,#fb7185);color:#fff;font-weight:700;font-size:13px;padding:12px 28px;border-radius:9999px;box-shadow:0 8px 20px rgba(244,63,94,.4);">
+    <a href="/#chapter2-nov17-section" style="text-decoration:none;background:linear-gradient(135deg,#f43f5e,#fb7185);color:#fff;font-weight:700;font-size:13px;padding:12px 28px;border-radius:9999px;box-shadow:0 8px 20px rgba(244,63,94,.4);">
       Return to Memory Vault ✦
     </a>
   </div>
   <script>
     (function checkLock() {
+      // [TEMP TEST UNLOCK ACTIVE]
+      return;
       const isPreview = window.location.search.includes('preview=1') || window.location.search.includes('anniv=1');
       const now = new Date();
       const isNov17 = now.getFullYear() >= 2026 && now.getMonth() >= 10 && now.getDate() >= 17;
@@ -869,10 +871,32 @@
         <div class="love-tree-box" id="loveTreeBox" onclick="releaseTreeHearts(event)">
           <div class="love-card-side" style="text-align: center; border-radius: 18px; padding: 12px 18px; background: rgba(255,255,255,0.94); box-shadow: 0 10px 24px rgba(244,63,94,0.18); border: 1.5px solid rgba(244,63,94,0.35);">
             <p style="font-size: 11px; color: #e11d48; font-weight: 800; letter-spacing: 0.04em;">💖 Handcrafted From The Depths Of My Heart 💖</p>
-            <div style="display: flex; justify-content: center; align-items: center; gap: 3px; margin: 4px 0; font-size: 14px;">
-              <span>💖</span><span>💕</span><span>💗</span><span style="font-size: 20px; color: #be123c;">♾️</span><span>💗</span><span>💕</span><span>💖</span>
+            
+            <!-- V formation of emojis -->
+            <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; margin:6px auto 2px; gap:2px;">
+              <div style="display:flex; justify-content:space-between; width:110px; font-size:15px; line-height:1;">
+                <span>💖</span><span>💖</span>
+              </div>
+              <div style="display:flex; justify-content:space-between; width:80px; font-size:14px; line-height:1;">
+                <span>💕</span><span>💕</span>
+              </div>
+              <div style="display:flex; justify-content:space-between; width:50px; font-size:13px; line-height:1;">
+                <span>💗</span><span>💗</span>
+              </div>
+              <div style="display:flex; justify-content:center; width:25px; font-size:14px; line-height:1;">
+                <span>❤️</span>
+              </div>
             </div>
-            <p style="font-family: var(--font-hand); font-size: 21px; color: #be123c; font-weight: 700; line-height: 1.2; margin: 3px 0;">"Until my last breath, I am forever yours."</p>
+
+            <!-- Vanshika with emojis -->
+            <div style="margin:3px 0 5px; font-family:'Playfair Display',serif; font-size:16px; font-weight:800; color:#be123c; letter-spacing:2px; display:flex; align-items:center; justify-content:center; gap:5px;">
+              <span style="font-size:13px;">👑</span><span style="font-size:12px;">💕</span><span>VANSHIKA</span><span style="font-size:12px;">💕</span><span style="font-size:13px;">👑</span>
+            </div>
+
+            <div style="display: flex; justify-content: center; align-items: center; gap: 3px; margin: 3px 0; font-size: 13px;">
+              <span>💖</span><span style="font-size: 18px; color: #be123c; font-weight: 900;">♾️</span><span>💗</span><span style="font-size: 10px; font-weight: 700; color: #e11d48;">INFINITY LOVE</span><span>💗</span><span style="font-size: 18px; color: #be123c; font-weight: 900;">♾️</span><span>💖</span>
+            </div>
+            <p style="font-family: var(--font-hand); font-size: 20px; color: #be123c; font-weight: 700; line-height: 1.2; margin: 3px 0;">"Until my last breath, I am forever yours."</p>
             <div style="font-size: 12px; letter-spacing: 2px;">✨ 💕 💍 🌹 ✨</div>
           </div>
 

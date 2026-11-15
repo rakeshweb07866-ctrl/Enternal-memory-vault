@@ -105,19 +105,19 @@ let nov17SealCompleted = false;
 let nov17StarsAnimId = null;
 
 function isNov17ActualDay() {
-  // Allow secret admin preview via URL parameter (?preview=1 or ?anniv=1)
+  // [TEMP TEST UNLOCK ACTIVE]
+  return true;
+  /*
   if (typeof window !== 'undefined' && (window.location.search.includes('preview=1') || window.location.search.includes('anniv=1'))) {
     return true;
   }
   const now = new Date();
   return now.getFullYear() >= 2026 && now.getMonth() >= 10 && now.getDate() >= 17;
+  */
 }
 
 function canAccessNov17Chapter2() {
-  if (typeof window !== 'undefined' && (window.location.search.includes('preview=1') || window.location.search.includes('anniv=1'))) {
-    return true;
-  }
-  return isNov17ActualDay();
+  return true;
 }
 
 function initNov17Chapter2() {

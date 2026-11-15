@@ -869,12 +869,35 @@
           <div class="trunk"></div>
           <div class="leaves" id="tree-leaves"></div>
         </div>
-        <div class="hand-card" style="padding:16px 20px; max-width:330px; margin:0 auto 12px; border:1.5px solid rgba(244,63,94,0.35); border-radius:22px; background:rgba(255,255,255,0.96); box-shadow:0 14px 30px rgba(225,29,72,0.18); text-align:center;">
+        <div class="hand-card" style="padding:16px 18px; max-width:335px; margin:0 auto 12px; border:1.5px solid rgba(244,63,94,0.35); border-radius:22px; background:rgba(255,255,255,0.96); box-shadow:0 14px 30px rgba(225,29,72,0.18); text-align:center;">
           <span style="font-size:11px; font-weight:800; letter-spacing:0.08em; color:#e11d48; text-transform:uppercase; display:block;">✨ Handcrafted From The Depths Of My Soul ✨</span>
-          <div style="display:flex; justify-content:center; align-items:center; gap:5px; margin:7px 0; font-size:16px;">
-            <span>💖</span><span>💕</span><span>💗</span><span style="font-size:24px; color:#be123c; margin:0 3px; font-weight:900;">♾️</span><span>💗</span><span>💕</span><span>💖</span>
+
+          <!-- Romantic V Formed From Heart Emojis -->
+          <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; margin:9px auto 3px; gap:2px;">
+            <div style="display:flex; justify-content:space-between; width:126px; font-size:17px; line-height:1;">
+              <span>💖</span><span>💖</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; width:92px; font-size:16px; line-height:1;">
+              <span>💕</span><span>💕</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; width:58px; font-size:15px; line-height:1;">
+              <span>💗</span><span>💗</span>
+            </div>
+            <div style="display:flex; justify-content:center; width:28px; font-size:16px; line-height:1;">
+              <span>❤️</span>
+            </div>
           </div>
-          <strong style="font-family:Fraunces, Georgia, serif; font-size:18px; color:#be123c; display:block; margin:4px 0; line-height:1.35;">
+
+          <!-- Vanshika Written With Emojis -->
+          <div style="margin:4px 0 6px; font-family:'Playfair Display',serif; font-size:18px; font-weight:800; color:#be123c; letter-spacing:3px; display:flex; align-items:center; justify-content:center; gap:6px;">
+            <span style="font-size:15px;">👑</span><span style="font-size:13px;">💕</span><span>VANSHIKA</span><span style="font-size:13px;">💕</span><span style="font-size:15px;">👑</span>
+          </div>
+
+          <div style="display:flex; justify-content:center; align-items:center; gap:4px; margin:2px 0 6px; font-size:13px;">
+            <span>💖</span><span style="font-size:20px; color:#be123c; font-weight:900;">♾️</span><span style="font-size:10.5px; font-weight:700; color:#e11d48; letter-spacing:0.05em; text-transform:uppercase;">Infinity Love Until My Last Breath</span><span style="font-size:20px; color:#be123c; font-weight:900;">♾️</span><span>💖</span>
+          </div>
+
+          <strong style="font-family:Fraunces, Georgia, serif; font-size:17px; color:#be123c; display:block; margin:4px 0; line-height:1.35;">
             "Until my very last breath and beyond,<br>I will forever and always be yours."
           </strong>
           <p style="font-size:12px; color:#4b4547; margin-top:4px; font-weight:600; line-height:1.45;">
@@ -1119,8 +1142,12 @@
     const leaves = document.getElementById('tree-leaves');
     if (!scene || !leaves) return;
     if (!leaves.dataset.built) {
+      // Romantic V formation of heart leaves on the tree canopy
       const spots = [
-        [18, 18], [38, 6], [58, 14], [78, 28], [30, 36], [50, 24], [68, 40], [44, 48], [86, 18], [10, 40]
+        [15, 10], [24, 20], [33, 30], [42, 42],
+        [50, 50],
+        [58, 42], [67, 30], [76, 20], [85, 10],
+        [50, 25], [36, 16], [64, 16]
       ];
       const bits = ['💗', '💖', '🌸', '💛', '💕'];
       spots.forEach((spot, i) => {

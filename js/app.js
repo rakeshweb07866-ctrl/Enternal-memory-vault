@@ -32,15 +32,25 @@ document.addEventListener('DOMContentLoaded', () => {
   fetchLiveChatMessages();
 
   // 5. Strict User Security Login Gate:
-  // Check if active authenticated session exists (survives page refresh in current tab)
-  const sessionSender = sessionStorage.getItem('chat_user_name');
-  const sessionPin = sessionStorage.getItem('chat_user_pin');
+  // Check if active authenticated session exists (supports both sessionStorage & persistent auth)
+  const sessionSender = sessionStorage.getItem('chat_user_name') || localStorage.getItem('chat_user_name');
+  const sessionPin = sessionStorage.getItem('chat_user_pin') || localStorage.getItem('_mv_auth_key');
 
   if (sessionSender && sessionPin) {
-    // User is already logged in for this active tab session (survives page refresh)
+    // User is already logged in! Restore session
+    sessionStorage.setItem('chat_user_name', sessionSender);
+    sessionStorage.setItem('chat_user_pin', sessionPin);
     currentChatSender = sessionSender;
     currentChatPin = sessionPin;
     updateUserBadge();
+
+    let fastGateStyle = document.getElementById('auth-fast-gate');
+    if (!fastGateStyle) {
+      fastGateStyle = document.createElement('style');
+      fastGateStyle.id = 'auth-fast-gate';
+      fastGateStyle.innerHTML = '#name-login-modal { display: none !important; }';
+      document.head.appendChild(fastGateStyle);
+    }
     const modal = document.getElementById('name-login-modal');
     if (modal) {
       modal.classList.add('hidden');
@@ -48,13 +58,9 @@ document.addEventListener('DOMContentLoaded', () => {
       modal.style.display = 'none';
     }
   } else {
-    // New visit / closed tab reopened -> enforce strict security login
     currentChatSender = null;
     currentChatPin = null;
     openNameLoginModal();
-  
-  
-  
   }
 
 

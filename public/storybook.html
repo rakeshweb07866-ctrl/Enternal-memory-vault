@@ -307,10 +307,10 @@
        PHOTO REVEAL CARDS (EYES, SMILE, QUEEN, US)
        ========================================================== */
     .magic-photo-card {
-      width: min(320px, 90vw);
+      width: min(320px, 88vw);
       background: #ffffff;
       border-radius: 22px;
-      padding: 12px 12px 16px;
+      padding: 10px 10px 14px;
       box-shadow: 0 16px 40px rgba(244, 63, 94, 0.2);
       border: 1.5px solid rgba(244, 63, 94, 0.3);
       display: flex;
@@ -327,17 +327,16 @@
     }
     .photo-inner-frame {
       width: 100%;
-      aspect-ratio: 4 / 3;
+      height: min(250px, 35vh);
       border-radius: 14px;
       overflow: hidden;
-      background: #000;
+      background: #0d080a;
       position: relative;
     }
     .photo-inner-frame img {
       width: 100%;
       height: 100%;
       object-fit: cover;
-      object-position: center top;
       display: block;
       transition: transform 0.6s ease, filter 0.6s ease;
     }
@@ -403,12 +402,14 @@
     <p style="font-size:14px;color:#d6d3d1;max-width:320px;line-height:1.6;margin-bottom:20px;">
       This anniversary storybook unlocks automatically on <strong style="color:#fbbf24;">17 November 2026</strong> for our 2nd Month Anniversary 💕
     </p>
-    <a href="/" style="text-decoration:none;background:linear-gradient(135deg,#f43f5e,#fb7185);color:#fff;font-weight:700;font-size:13px;padding:12px 28px;border-radius:9999px;box-shadow:0 8px 20px rgba(244,63,94,.4);">
+    <a href="/#chapter2-nov17-section" style="text-decoration:none;background:linear-gradient(135deg,#f43f5e,#fb7185);color:#fff;font-weight:700;font-size:13px;padding:12px 28px;border-radius:9999px;box-shadow:0 8px 20px rgba(244,63,94,.4);">
       Return to Memory Vault ✦
     </a>
   </div>
   <script>
     (function checkLock() {
+      // [TEMP TEST UNLOCK ACTIVE]
+      return;
       const isPreview = window.location.search.includes('preview=1') || window.location.search.includes('anniv=1');
       const now = new Date();
       const isNov17 = now.getFullYear() >= 2026 && now.getMonth() >= 10 && now.getDate() >= 17;
@@ -492,7 +493,7 @@
 
         <div class="magic-photo-card" onclick="illuminatePhoto(this)">
           <div class="photo-inner-frame">
-            <img src="assests/latest/vanshika-green-eyes.jpeg" alt="Vanshika's Eyes">
+            <img src="assests/latest/vanshika-green-eyes.jpeg" alt="Vanshika's Eyes" style="object-position: center 30%;">
           </div>
           <div class="photo-caption-box">
             <div class="caption-title">Your Rare Green Eyes 💚</div>
@@ -520,7 +521,7 @@
 
         <div class="magic-photo-card" onclick="illuminatePhoto(this)">
           <div class="photo-inner-frame">
-            <img src="assests/magical-smile.jpeg" alt="Vanshika's Magical Smile">
+            <img src="assests/magical-smile.jpeg" alt="Vanshika's Magical Smile" style="object-position: center 25%;">
           </div>
           <div class="photo-caption-box">
             <div class="caption-title">Your Unfiltered Laugh 😊</div>
@@ -548,7 +549,7 @@
 
         <div class="magic-photo-card" onclick="illuminatePhoto(this)">
           <div class="photo-inner-frame">
-            <img src="assests/latest/vanshika-royal-lehenga.jpeg" alt="Royal Vanshika">
+            <img src="assests/latest/vanshika-royal-lehenga.jpeg" alt="Royal Vanshika" style="object-position: center 82%;">
           </div>
           <div class="photo-caption-box">
             <div class="caption-title">Grace, Strength & Beauty 🌹</div>
@@ -576,7 +577,7 @@
 
         <div class="magic-photo-card" onclick="illuminatePhoto(this)">
           <div class="photo-inner-frame">
-            <img src="assests/latest/couple-night.jpeg" alt="Couple Night">
+            <img src="assests/latest/couple-night.jpeg" alt="Couple Night" style="object-position: center 36%;">
           </div>
           <div class="photo-caption-box">
             <div class="caption-title">Wrapped In Your Arms 🌙</div>
@@ -638,9 +639,9 @@
             <span>Shower More Hearts</span>
             <span>💖 ✨</span>
           </button>
-          <a href="/" style="text-decoration: none;">
-            <span style="font-size: 12px; font-weight: 700; color: #be123c; text-decoration: underline;">
-              Back to Main Memory Vault
+          <a href="/#chapter2-nov17-section" style="text-decoration: none;">
+            <span style="font-size: 13px; font-weight: 700; color: #be123c; text-decoration: underline; display: inline-flex; align-items: center; gap: 4px;">
+              ← Back to Main Memory Vault
             </span>
           </a>
         </div>
