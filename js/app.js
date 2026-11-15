@@ -57,6 +57,11 @@ document.addEventListener('DOMContentLoaded', () => {
       modal.classList.remove('flex');
       modal.style.display = 'none';
     }
+
+    // Auto launch 17 Nov Anniversary Reveal if today is Nov 17
+    if (typeof maybeAutoLaunchNov17 === 'function') {
+      setTimeout(maybeAutoLaunchNov17, 800);
+    }
   } else {
     currentChatSender = null;
     currentChatPin = null;

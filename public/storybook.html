@@ -408,11 +408,11 @@
   </div>
   <script>
     (function checkLock() {
-      // [TEMP TEST UNLOCK ACTIVE]
-      return;
       const isPreview = window.location.search.includes('preview=1') || window.location.search.includes('anniv=1');
       const now = new Date();
-      const isNov17 = now.getFullYear() >= 2026 && now.getMonth() >= 10 && now.getDate() >= 17;
+      // Unlocks starting 17 November 2026 12:00 AM midnight throughout the day and onwards
+      const isNov17 = (now.getFullYear() > 2026) || 
+                      (now.getFullYear() === 2026 && (now.getMonth() > 10 || (now.getMonth() === 10 && now.getDate() >= 17)));
       if (!isNov17 && !isPreview) {
         window.addEventListener('DOMContentLoaded', () => {
           const m = document.getElementById('sb-lock-modal');

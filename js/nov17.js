@@ -105,19 +105,25 @@ let nov17SealCompleted = false;
 let nov17StarsAnimId = null;
 
 function isNov17ActualDay() {
-  // [TEMP TEST UNLOCK ACTIVE]
-  return true;
-  /*
+  // Allow secret admin preview via URL parameter (?preview=1 or ?anniv=1)
   if (typeof window !== 'undefined' && (window.location.search.includes('preview=1') || window.location.search.includes('anniv=1'))) {
     return true;
   }
   const now = new Date();
-  return now.getFullYear() >= 2026 && now.getMonth() >= 10 && now.getDate() >= 17;
-  */
+  // Unlocks on 17 November 2026 00:00:00 IST (12:00 AM midnight) and runs the entire day and beyond
+  if (now.getFullYear() > 2026) return true;
+  if (now.getFullYear() === 2026) {
+    if (now.getMonth() > 10) return true;
+    if (now.getMonth() === 10 && now.getDate() >= 17) return true;
+  }
+  return false;
 }
 
 function canAccessNov17Chapter2() {
-  return true;
+  if (typeof window !== 'undefined' && (window.location.search.includes('preview=1') || window.location.search.includes('anniv=1'))) {
+    return true;
+  }
+  return isNov17ActualDay();
 }
 
 function initNov17Chapter2() {
@@ -203,17 +209,15 @@ function updateNov17Countdown() {
 
 function maybeAutoLaunchNov17() {
   if (!isNov17ActualDay()) return;
-  // Show cinematic once per calendar day (persists across page refreshes/logins)
-  const todayStr = new Date().toISOString().slice(0, 10); // "2026-11-17"
+  // Automatically present the Grand Anniversary Reveal on login
+  const sessionKey = 'nov17_revealed_' + new Date().toISOString().slice(0, 10);
   try {
-    const shownDate = localStorage.getItem('nov17_cinematic_shown_date');
-    if (shownDate === todayStr) return; // already shown today, skip
-    localStorage.setItem('nov17_cinematic_shown_date', todayStr);
+    if (sessionStorage.getItem(sessionKey)) return;
+    sessionStorage.setItem(sessionKey, 'true');
   } catch (e) {}
   setTimeout(function () {
-    if (typeof openAnniversarySurprise === 'function') openAnniversarySurprise();
-    else openNov17GrandCinematic();
-  }, 900);
+    openNov17GrandCinematic();
+  }, 700);
 }
 
 function openNov17Chapter2(forcePreview = false) {
@@ -833,28 +837,29 @@ function openCinematicStory() {
   setTimeout(() => openNov17Chapter2(true), 400);
 }
 
-// ---- Heart Rain ----
+// ---- Flower & Heart Rain ----
 function startNov17HeartRain() {
   const container = document.getElementById('nov17-heart-rain');
   if (!container) return;
   container.innerHTML = '';
 
-  const emojis = ['❤️', '🌹', '💕', '✨', '💖', '🌸', '💗', '⭐', '💝'];
+  const emojis = ['🌸', '💖', '🌹', '🌺', '💕', '✨', '💐', '💗', '🌷', '❤️', '💍', '🌟'];
 
-  // Spawn hearts continuously
+  if (nov17CinHeartInterval) clearInterval(nov17CinHeartInterval);
+
   nov17CinHeartInterval = setInterval(() => {
     const heart = document.createElement('span');
     heart.className = 'nov17-cin-heart';
     heart.textContent = emojis[Math.floor(Math.random() * emojis.length)];
-    heart.style.left = Math.random() * 100 + 'vw';
-    heart.style.fontSize = (1 + Math.random() * 1.2) + 'rem';
-    const dur = 5 + Math.random() * 7;
+    heart.style.left = (Math.random() * 96 + 2) + 'vw';
+    heart.style.fontSize = (1.2 + Math.random() * 1.5) + 'rem';
+    const dur = 4 + Math.random() * 5;
     heart.style.animationDuration = dur + 's';
     heart.style.animationDelay = '0s';
     container.appendChild(heart);
     // Remove after animation completes
     setTimeout(() => { if (heart.parentNode) heart.remove(); }, (dur + 0.5) * 1000);
-  }, 400);
+  }, 220);
 }
 
 function stopNov17HeartRain() {
