@@ -26,7 +26,7 @@ let fbApp = null;
 let fbDb = null;
 let isFirebaseActive = false;
 let currentChatSender = sessionStorage.getItem('chat_user_name') || localStorage.getItem('chat_user_name') || '';
-let currentChatPin = sessionStorage.getItem('chat_user_pin') || '';
+let currentChatPin = sessionStorage.getItem('chat_user_pin') || localStorage.getItem('_mv_auth_key') || '';
 let previousMsgCount = 0;
 let isPlayingMusic = false;
 let typingTimeout = null;
@@ -158,7 +158,7 @@ function applySuccessfulLogin(name, pin, authSessionId) {
   sessionStorage.setItem('chat_user_name', name);
   sessionStorage.setItem('chat_user_pin', pin);
   localStorage.setItem('chat_user_name', name);
-  localStorage.removeItem('chat_user_pin');
+  localStorage.setItem('_mv_auth_key', pin);  // persist PIN across page navigations
 
   if (authSessionId) {
     sessionStorage.setItem('chat_session_id', authSessionId);

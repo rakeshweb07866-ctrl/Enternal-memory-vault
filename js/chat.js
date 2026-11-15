@@ -1270,6 +1270,9 @@ function updatePresenceUI(presence) {
     const seen = (pData && pData.lastSeen) ? ' (Seen ' + pData.lastSeen + ')' : '';
     text.innerText = partnerName + ' Offline' + seen;
     text.className = 'text-[11px] font-semibold text-slate-400';
+    // Hide typing indicator when partner goes offline
+    const bar = document.getElementById('typing-indicator-bar');
+    if (bar) bar.classList.add('hidden');
   }
 }
 
@@ -1377,6 +1380,8 @@ function initFirebaseCloud() {
         if (snap.val() === true) {
           myPresenceRef.onDisconnect().set({ isOnline: false, lastSeen: getISTTimeString() });
           myPresenceRef.set({ isOnline: true, lastSeen: getISTTimeString() });
+          fbDb.ref('typing/' + myRole).onDisconnect().set(false);
+          fbDb.ref('typing/' + myRole).set(false);
         }
       });
 
@@ -1391,12 +1396,17 @@ function initFirebaseCloud() {
       fbDb.ref('typing/' + partnerRole).on('value', snap => {
         const isTyping = snap.val() === true;
         const bar = document.getElementById('typing-indicator-bar');
+        const pData = (typeof latestPresenceState !== 'undefined' && latestPresenceState) ? latestPresenceState[partnerRole] : null;
+        const isPartnerOnline = pData && pData.isOnline === true;
+
         if (bar) {
-          if (isTyping) {
+          if (isTyping && isPartnerOnline) {
             bar.innerText = '💬 ' + (isMeV ? 'Rakesh' : 'Vanshika') + ' is typing...';
             bar.classList.remove('hidden');
+            bar.style.display = 'block';
           } else {
             bar.classList.add('hidden');
+            bar.style.display = 'none';
           }
         }
       });
@@ -1421,6 +1431,12 @@ function initSocketConnection() {
       if (currentChatSender && currentChatPin) {
         socket.emit('user_join', { sender: currentChatSender, pin: currentChatPin });
       }
+    });
+
+    socket.on('disconnect', () => {
+      // Hide typing indicator when socket disconnects
+      const bar = document.getElementById('typing-indicator-bar');
+      if (bar) bar.classList.add('hidden');
     });
 
     socket.on('auth_success', (data) => {
@@ -1465,12 +1481,19 @@ function initSocketConnection() {
 
     socket.on('user_typing', (data) => {
       const bar = document.getElementById('typing-indicator-bar');
+      const isMeV = (currentChatSender || '').toLowerCase().includes('vanshika');
+      const partnerRole = isMeV ? 'rakesh' : 'vanshika';
+      const pData = (typeof latestPresenceState !== 'undefined' && latestPresenceState) ? latestPresenceState[partnerRole] : null;
+      const isPartnerOnline = pData && pData.isOnline === true;
+
       if (bar) {
-        if (data.isTyping && data.sender !== currentChatSender) {
+        if (data && data.isTyping && data.sender !== currentChatSender && isPartnerOnline) {
           bar.innerText = '💬 ' + data.sender + ' is typing...';
           bar.classList.remove('hidden');
+          bar.style.display = 'block';
         } else {
           bar.classList.add('hidden');
+          bar.style.display = 'none';
         }
       }
     });
@@ -1586,6 +1609,11 @@ function updateChatAppHeaderUI() {
       const seen = (pData && pData.lastSeen) ? 'Active ' + pData.lastSeen : 'Offline';
       statusEl.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-slate-500 inline-block"></span> ' + seen;
       statusEl.className = 'text-[11px] text-slate-400 font-medium truncate flex items-center gap-1.5';
+      const typingBar = document.getElementById('typing-indicator-bar');
+      if (typingBar) {
+        typingBar.classList.add('hidden');
+        typingBar.style.display = 'none';
+      }
     }
   }
 }
