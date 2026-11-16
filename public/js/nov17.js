@@ -214,9 +214,7 @@ function maybeAutoLaunchNov17() {
     if (sessionStorage.getItem(sessionKey)) return;
     sessionStorage.setItem(sessionKey, 'true');
   } catch (e) {}
-  setTimeout(function () {
-    openNov17GrandCinematic();
-  }, 700);
+  openNov17GrandCinematic();
 }
 
 function openNov17Chapter2(forcePreview = false) {
@@ -795,8 +793,10 @@ function openNov17GrandCinematic() {
   if (!screen) return;
 
   // Show screen
+  screen.scrollTop = 0;
   screen.classList.remove('hidden', 'cin-exit');
   screen.classList.add('cin-visible');
+  requestAnimationFrame(() => { screen.scrollTop = 0; });
 
   // Start effects
   startNov17CinFireworks();

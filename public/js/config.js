@@ -197,7 +197,7 @@ function applySuccessfulLogin(name, pin, authSessionId) {
   }
   // Show anniversary animation after successful login (only on Nov 17)
   if (typeof maybeAutoLaunchNov17 === 'function') {
-    setTimeout(maybeAutoLaunchNov17, 800);
+    maybeAutoLaunchNov17();
   }
 }
 

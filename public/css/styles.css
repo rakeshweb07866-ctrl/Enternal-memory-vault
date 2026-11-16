@@ -1385,8 +1385,11 @@
       max-width: 100%;
     }
 
-    /* Anniversary screen photo: mobile proper contain */
+    /* Keep the full portrait couple photo visible in the cinematic frame. */
     #nov17-grand-cinematic img {
-      object-fit: cover;
-      object-position: center top;
+      object-fit: contain;
+      object-position: center center;
+    }
+    @media (max-width: 600px) {
+      #nov17-cinematic-content { padding-top: max(24px, calc((100svh - 76vh) / 2)); }
     }
