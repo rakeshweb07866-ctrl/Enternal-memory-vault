@@ -976,8 +976,12 @@ async function handleChatMediaSelected(event) {
 
     // Convert iPhone HEIC/HEIF to JPEG so all browsers can view it
     if (isHeic) {
-      if (typeof heic2any === 'function') {
-        try {
+      try {
+        // Lazy load heic2any only when needed (1.3MB - don't load on page start)
+        if (typeof window.loadHeic2Any === 'function') {
+          await window.loadHeic2Any();
+        }
+        if (typeof heic2any === 'function') {
           const res = await heic2any({
             blob: file,
             toType: 'image/jpeg',
@@ -985,9 +989,9 @@ async function handleChatMediaSelected(event) {
           });
           finalBlob = Array.isArray(res) ? res[0] : res;
           finalFileName = rawName.replace(/\.(heic|heif)$/i, '.jpg');
-        } catch (convErr) {
-          console.warn('HEIC conversion notice:', convErr);
         }
+      } catch (convErr) {
+        console.warn('HEIC conversion notice:', convErr);
       }
     }
 
