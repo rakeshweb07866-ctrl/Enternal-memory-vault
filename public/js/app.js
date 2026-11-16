@@ -33,13 +33,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // 5. Strict User Security Login Gate:
   // Check if active authenticated session exists (supports both sessionStorage & persistent auth)
-  const sessionSender = sessionStorage.getItem('chat_user_name') || localStorage.getItem('chat_user_name');
-  const sessionPin = sessionStorage.getItem('chat_user_pin') || localStorage.getItem('_mv_auth_key');
+  // SECURITY: Only use sessionStorage for PIN check on page load.
+  // localStorage only stores username (not PIN) for identity display.
+  // PIN must come from sessionStorage (set only after actual login).
+  const sessionSender = sessionStorage.getItem('chat_user_name');
+  const sessionPin = sessionStorage.getItem('chat_user_pin');
 
   if (sessionSender && sessionPin) {
-    // User is already logged in! Restore session
-    sessionStorage.setItem('chat_user_name', sessionSender);
-    sessionStorage.setItem('chat_user_pin', sessionPin);
+    // User has an active session in this tab - restore it
     currentChatSender = sessionSender;
     currentChatPin = sessionPin;
     updateUserBadge();
@@ -57,12 +58,10 @@ document.addEventListener('DOMContentLoaded', () => {
       modal.classList.remove('flex');
       modal.style.display = 'none';
     }
-
-    // Auto launch 17 Nov Anniversary Reveal if today is Nov 17
-    if (typeof maybeAutoLaunchNov17 === 'function') {
-      setTimeout(maybeAutoLaunchNov17, 800);
-    }
+    // maybeAutoLaunchNov17 NOT called here - only called after fresh login click
+    // This prevents the anniversary animation from showing without proper login
   } else {
+    // No active session - clear any stale data and show login
     currentChatSender = null;
     currentChatPin = null;
     openNameLoginModal();

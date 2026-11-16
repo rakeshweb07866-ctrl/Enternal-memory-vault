@@ -139,9 +139,8 @@ function initNov17Chapter2() {
   initNov17SwipeGestures();
   initNov17SealButton();
 
-  if (isNov17ActualDay() && sessionStorage.getItem('chat_user_name') && sessionStorage.getItem('chat_user_pin')) {
-    setTimeout(maybeAutoLaunchNov17, 1000);
-  }
+  // NOTE: maybeAutoLaunchNov17 is called from applySuccessfulLogin() after login button click
+  // Do NOT call it here on init - it would auto-show animation without actual login
 }
 
 function updateNov17LauncherUI() {

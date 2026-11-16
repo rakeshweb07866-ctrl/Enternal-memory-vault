@@ -26,7 +26,8 @@ let fbApp = null;
 let fbDb = null;
 let isFirebaseActive = false;
 let currentChatSender = sessionStorage.getItem('chat_user_name') || localStorage.getItem('chat_user_name') || '';
-let currentChatPin = sessionStorage.getItem('chat_user_pin') || localStorage.getItem('_mv_auth_key') || '';
+// PIN only from sessionStorage on page load - prevents auto-login bypass without actual login
+let currentChatPin = sessionStorage.getItem('chat_user_pin') || '';
 let previousMsgCount = 0;
 let isPlayingMusic = false;
 let typingTimeout = null;
@@ -157,8 +158,7 @@ function applySuccessfulLogin(name, pin, authSessionId) {
   currentChatPin = pin;
   sessionStorage.setItem('chat_user_name', name);
   sessionStorage.setItem('chat_user_pin', pin);
-  localStorage.setItem('chat_user_name', name);
-  localStorage.setItem('_mv_auth_key', pin);  // persist PIN across page navigations
+  localStorage.setItem('chat_user_name', name);  // save username only (for identity pre-select)
 
   if (authSessionId) {
     sessionStorage.setItem('chat_session_id', authSessionId);
@@ -195,8 +195,9 @@ function applySuccessfulLogin(name, pin, authSessionId) {
   if (typeof updateNov17LauncherUI === 'function') {
     updateNov17LauncherUI();
   }
+  // Show anniversary animation after successful login (only on Nov 17)
   if (typeof maybeAutoLaunchNov17 === 'function') {
-    setTimeout(maybeAutoLaunchNov17, 700);
+    setTimeout(maybeAutoLaunchNov17, 800);
   }
 }
 
