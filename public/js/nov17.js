@@ -105,12 +105,9 @@ let nov17SealCompleted = false;
 let nov17StarsAnimId = null;
 
 function isNov17ActualDay() {
-  if (typeof window !== 'undefined' && (window.location.search.includes('preview=1') || window.location.search.includes('anniv=1'))) {
-    return true;
-  }
-  const now = new Date();
-  // SIRF 17 November 2026 ko hi true hai
-  return (now.getFullYear() === 2026 && now.getMonth() === 10 && now.getDate() === 17);
+  // PERMANENTLY UNLOCKED - Vanshika can always access 2nd anniversary section
+  // Will be updated for 3rd anniversary when that time comes
+  return true;
 }
 
 function canAccessNov17Chapter2() {
