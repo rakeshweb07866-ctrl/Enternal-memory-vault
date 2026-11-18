@@ -18,7 +18,7 @@ function initCanvasHearts() {
   });
 
   const particles = [];
-  const particleCount = 45;
+  const particleCount = 18; // reduced for perf
 
   class Particle {
     constructor() { this.reset(); }
@@ -59,12 +59,22 @@ function initCanvasHearts() {
     particles.push(new Particle());
   }
 
-  function animateParticles() {
+  let _lastF = 0, _paused = false;
+  const _fms = 1000 / 20; // 20fps max (save 66% CPU vs 60fps)
+  // Pause animation while user types passcode
+  const _pin = document.getElementById('login-pin-input');
+  if (_pin) {
+    _pin.addEventListener('focus', () => { _paused = true; }, { passive: true });
+    _pin.addEventListener('blur', () => { _paused = false; }, { passive: true });
+  }
+  function animateParticles(now) {
+    requestAnimationFrame(animateParticles);
+    if (_paused || now - _lastF < _fms) return;
+    _lastF = now;
     ctx.clearRect(0, 0, width, height);
     particles.forEach(p => { p.update(); p.draw(); });
-    requestAnimationFrame(animateParticles);
   }
-  animateParticles();
+  requestAnimationFrame(animateParticles);
 }
 
 // 2. Rose Petals & Golden Confetti Shower

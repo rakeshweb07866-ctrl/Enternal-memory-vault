@@ -105,18 +105,12 @@ let nov17SealCompleted = false;
 let nov17StarsAnimId = null;
 
 function isNov17ActualDay() {
-  // Allow secret admin preview via URL parameter (?preview=1 or ?anniv=1)
   if (typeof window !== 'undefined' && (window.location.search.includes('preview=1') || window.location.search.includes('anniv=1'))) {
     return true;
   }
   const now = new Date();
-  // Unlocks on 17 November 2026 00:00:00 IST (12:00 AM midnight) and runs the entire day and beyond
-  if (now.getFullYear() > 2026) return true;
-  if (now.getFullYear() === 2026) {
-    if (now.getMonth() > 10) return true;
-    if (now.getMonth() === 10 && now.getDate() >= 17) return true;
-  }
-  return false;
+  // SIRF 17 November 2026 ko hi true hai
+  return (now.getFullYear() === 2026 && now.getMonth() === 10 && now.getDate() === 17);
 }
 
 function canAccessNov17Chapter2() {
@@ -207,14 +201,8 @@ function updateNov17Countdown() {
 }
 
 function maybeAutoLaunchNov17() {
-  if (!isNov17ActualDay()) return;
-  // Automatically present the Grand Anniversary Reveal on login
-  const sessionKey = 'nov17_revealed_' + new Date().toISOString().slice(0, 10);
-  try {
-    if (sessionStorage.getItem(sessionKey)) return;
-    sessionStorage.setItem(sessionKey, 'true');
-  } catch (e) {}
-  openNov17GrandCinematic();
+  // AUTO-LAUNCH DISABLED - 17 Nov guzar gaya. Animation sirf manual section visit par.
+  return;
 }
 
 function openNov17Chapter2(forcePreview = false) {
