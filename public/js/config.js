@@ -71,7 +71,7 @@ function openNameLoginModal() {
   if (pinInput) {
     pinInput.value = '';
     pinInput.type = 'password';
-    setTimeout(() => pinInput.focus(), 150);
+    pinInput.focus();
   }
   if (eyeIcon) eyeIcon.innerText = '👁️';
   if (errEl) errEl.classList.add('hidden');
@@ -154,6 +154,9 @@ function getIdentityFromPin(p) {
 }
 
 function applySuccessfulLogin(name, pin, authSessionId) {
+  if (typeof window.initializeVaultDashboard === 'function') {
+    window.initializeVaultDashboard();
+  }
   currentChatSender = name;
   currentChatPin = pin;
   sessionStorage.setItem('chat_user_name', name);

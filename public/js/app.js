@@ -1,49 +1,53 @@
 // ==========================================
-// APPLICATION ENTRY POINT & BOOTSTRAPPER
+// APPLICATION ENTRY POINT & BOOTSTRAPPER (Optimized)
 // ==========================================
 
-document.addEventListener('DOMContentLoaded', () => {
+// Global initialization of vault dashboard - ONLY called upon successful passcode login
+window.initializeVaultDashboard = function() {
+  if (window._vaultDashboardLoaded) return;
+  window._vaultDashboardLoaded = true;
+
   // 1. Instant 0ms Local Cache Hydration (localStorage + IndexedDB)
-  const coldStartMessages = getLocalVaultMessages();
-  if (coldStartMessages.length > 0) {
-    renderChatFeed(coldStartMessages);
+  if (typeof getLocalVaultMessages === 'function') {
+    const coldStartMessages = getLocalVaultMessages();
+    if (coldStartMessages.length > 0 && typeof renderChatFeed === 'function') {
+      renderChatFeed(coldStartMessages);
+    }
   }
   if (typeof loadFromIndexedDB === 'function') {
     loadFromIndexedDB().then(idbMsgs => {
-      if (idbMsgs && idbMsgs.length > 0) {
+      if (idbMsgs && idbMsgs.length > 0 && typeof mergeAndSaveVaultMessages === 'function') {
         const merged = mergeAndSaveVaultMessages(idbMsgs);
-        renderChatFeed(merged);
+        if (typeof renderChatFeed === 'function') {
+          renderChatFeed(merged);
+        }
       }
     });
   }
 
   // 2. Load Gallery & Anniversary Timers
-  loadSavedGalleryData();
-  updateAnniversaryTimer();
+  if (typeof loadSavedGalleryData === 'function') loadSavedGalleryData();
+  if (typeof updateAnniversaryTimer === 'function') updateAnniversaryTimer();
 
   // 3. Start Visual Particles Engine
-  initCanvasHearts();
+  if (typeof initCanvasHearts === 'function') initCanvasHearts();
 
   // 4. Initialize Cloud & Realtime Engines
-  updateUserBadge();
-  initFirebaseCloud();
-  initSocketConnection();
-  startSmartPolling();
-  fetchLiveChatMessages();
+  if (typeof updateUserBadge === 'function') updateUserBadge();
+  if (typeof initFirebaseCloud === 'function') initFirebaseCloud();
+  if (typeof initSocketConnection === 'function') initSocketConnection();
+  if (typeof startSmartPolling === 'function') startSmartPolling();
+  if (typeof fetchLiveChatMessages === 'function') fetchLiveChatMessages();
+};
 
+document.addEventListener('DOMContentLoaded', () => {
   // 5. Strict User Security Login Gate:
-  // Passcode is ALWAYS strictly required on every visit/reload!
-  // No auto-login bypass allowed under any circumstance - user must authenticate.
+  // ZERO background overhead before login - login modal and input are 100% instant & responsive!
   currentChatSender = null;
   currentChatPin = null;
-  openNameLoginModal();
-
-
-
-
-
-
-
+  if (typeof openNameLoginModal === 'function') {
+    openNameLoginModal();
+  }
 
   // 6. Chat Input Keypress Listeners
   const chatInput = document.getElementById('live-chat-input');
@@ -51,35 +55,38 @@ document.addEventListener('DOMContentLoaded', () => {
     chatInput.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' && !e.shiftKey) {
         e.preventDefault();
-        sendLiveChatMessage();
+        if (typeof sendLiveChatMessage === 'function') sendLiveChatMessage();
       }
     });
 
     chatInput.addEventListener('input', () => {
-      handleChatTyping();
+      if (typeof handleChatTyping === 'function') handleChatTyping();
     });
   }
 
   // 7. Network & Visibility Handlers
   window.addEventListener('online', () => {
-    updateSyncPill('⚡ Reconnected Online');
-    // Flush pending offline messages
-    if (offlinePendingQueue && offlinePendingQueue.length > 0) {
+    if (typeof updateSyncPill === 'function') updateSyncPill('⚡ Reconnected Online');
+    if (typeof offlinePendingQueue !== 'undefined' && offlinePendingQueue && offlinePendingQueue.length > 0) {
       const queue = [...offlinePendingQueue];
       offlinePendingQueue = [];
-      queue.forEach(m => dispatchMessageToCloud(m));
+      queue.forEach(m => {
+        if (typeof dispatchMessageToCloud === 'function') dispatchMessageToCloud(m);
+      });
     }
-    fetchLiveChatMessages();
+    if (currentChatPin && typeof fetchLiveChatMessages === 'function') {
+      fetchLiveChatMessages();
+    }
   });
 
   window.addEventListener('offline', () => {
-    updateSyncPill('⚠️ Offline Mode');
+    if (typeof updateSyncPill === 'function') updateSyncPill('⚠️ Offline Mode');
   });
 
   document.addEventListener('visibilitychange', () => {
-    if (!document.hidden) {
-      fetchLiveChatMessages();
-      fetchWishesFromBackend();
+    if (!document.hidden && currentChatPin) {
+      if (typeof fetchLiveChatMessages === 'function') fetchLiveChatMessages();
+      if (typeof fetchWishesFromBackend === 'function') fetchWishesFromBackend();
     }
   });
 });

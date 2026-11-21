@@ -44,7 +44,7 @@
       justify-content: center !important;
       color: #ffffff !important;
       font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif !important;
-      transition: opacity 0.45s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.45s ease !important;
+      transition: opacity 0.22s ease-out, visibility 0.22s ease !important;
       overflow: hidden !important;
       pointer-events: auto !important;
     }
@@ -248,7 +248,7 @@
   </script>
 
   <!-- POPUP NAME LOGIN MODAL (Default Security Gate - Always Visible Until Authenticated) -->
-  <div id="name-login-modal" class="fixed inset-0 z-[200] flex items-center justify-center bg-slate-950/98 backdrop-blur-xl p-4 select-none">
+  <div id="name-login-modal" class="fixed inset-0 z-[200] flex items-center justify-center bg-slate-950/98 backdrop-blur-xl p-4">
     <div class="glass-box p-8 max-w-md w-full border-rose-500/40 text-center relative animate-float shadow-2xl">
       <div class="w-16 h-16 rounded-full bg-gradient-to-tr from-rose-500 to-amber-300 flex items-center justify-center text-3xl mx-auto mb-4 shadow-lg shadow-rose-500/40 animate-bounce">
         💑
@@ -271,7 +271,7 @@
       <div class="mb-4 text-left">
         <label class="text-[11px] font-bold text-amber-300 uppercase tracking-wider block mb-1">Secret Passcode:</label>
         <div class="relative flex items-center">
-          <input type="password" id="login-pin-input" name="secret_passcode_no_autofill" placeholder="Enter Secret Passcode" autocomplete="off" autocomplete="new-password" onkeydown="if(event.key==='Enter') confirmNameLogin()" class="w-full pl-5 pr-12 py-3.5 rounded-full bg-slate-900 border border-rose-500/40 text-sm text-white focus:outline-none focus:border-rose-400 shadow-inner text-center font-mono tracking-widest">
+          <input type="password" id="login-pin-input" name="secret_passcode_no_autofill" placeholder="Enter Secret Passcode" autocomplete="off" autocomplete="new-password" onkeydown="if(event.key==='Enter') confirmNameLogin()" class="w-full pl-5 pr-12 py-3.5 rounded-full bg-slate-900 border border-rose-500/40 text-sm text-white focus:outline-none focus:border-rose-400 shadow-inner text-center font-mono tracking-widest cursor-text" style="user-select:text !important;-webkit-user-select:text !important;touch-action:manipulation;">
           <button type="button" onclick="togglePasscodeVisibility()" class="absolute right-4 text-slate-400 hover:text-amber-300 text-lg transition-colors focus:outline-none" title="Show/Hide Passcode">
             <span id="eye-icon">👁️</span>
           </button>
@@ -4311,7 +4311,7 @@ Rakesh 💕`;
   </script>
   <!-- App bootstrapper: last -->
   <script src="js/app.js" defer></script>
-  <!-- Preloader Controller: Smoothly dismiss once page & styles are ready -->
+  <!-- Preloader Controller: Instant, Responsive Dismiss -->
   <script>
     (function() {
       var dismissed = false;
@@ -4319,31 +4319,34 @@ Rakesh 💕`;
         if (dismissed) return;
         dismissed = true;
         var p = document.getElementById('app-preloader');
-        if (!p) return;
-        p.classList.add('fade-out');
-        setTimeout(function() {
-          if (p && p.parentNode) p.parentNode.removeChild(p);
-        }, 460);
+        if (p) {
+          p.classList.add('fade-out');
+          p.style.pointerEvents = 'none';
+          setTimeout(function() {
+            if (p && p.parentNode) p.parentNode.removeChild(p);
+          }, 260);
+        }
+        // Instant focus on passcode input
+        var pin = document.getElementById('login-pin-input');
+        if (pin) {
+          try { pin.focus(); } catch(e) {}
+        }
       }
 
       var tStart = Date.now();
       function tryDismiss() {
-        // Keep preloader for at least 380ms so the user sees a smooth, intentional polish
         var elapsed = Date.now() - tStart;
-        var wait = Math.max(0, 380 - elapsed);
+        var wait = Math.max(0, 180 - elapsed);
         setTimeout(hidePreloader, wait);
       }
 
-      if (document.readyState === 'complete') {
+      if (document.readyState === 'complete' || document.readyState === 'interactive') {
         tryDismiss();
       } else {
+        document.addEventListener('DOMContentLoaded', tryDismiss);
         window.addEventListener('load', tryDismiss);
-        document.addEventListener('DOMContentLoaded', function() {
-          setTimeout(tryDismiss, 80);
-        });
       }
-      // Safety fallback: never block longer than 1.8s
-      setTimeout(hidePreloader, 1800);
+      setTimeout(hidePreloader, 900);
     })();
   </script>
 </body>
