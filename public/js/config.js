@@ -27,7 +27,7 @@ let fbDb = null;
 let isFirebaseActive = false;
 let currentChatSender = sessionStorage.getItem('chat_user_name') || localStorage.getItem('chat_user_name') || '';
 // PIN only from sessionStorage on page load - prevents auto-login bypass without actual login
-let currentChatPin = sessionStorage.getItem('chat_user_pin') || '';
+let currentChatPin = ''; // Always empty on load - strictly requires password entry
 let previousMsgCount = 0;
 let isPlayingMusic = false;
 let typingTimeout = null;

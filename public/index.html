@@ -235,23 +235,14 @@
   <!-- Interactive Background Canvas for Heart Rain -->
   <canvas id="canvas-container"></canvas>
 
-  <!-- Fast Zero-Flicker Session Check: Prevents login modal popup on page refresh if session is active -->
+  <!-- Strict Security Gate: Passcode ALWAYS Required on Every Load -->
   <script>
     (function() {
       try {
-        // One-time security cleanup: remove old PIN from localStorage (security fix Nov 17)
-        // This prevents auto-login bypass for existing browser sessions
-        if (localStorage.getItem('_mv_auth_key')) {
-          localStorage.removeItem('_mv_auth_key');
-          // Also clear any stale sessionStorage so user must re-login
-          sessionStorage.removeItem('chat_user_pin');
-          sessionStorage.removeItem('chat_user_name');
-        }
-        var sPin = sessionStorage.getItem('chat_user_pin');
-        var sName = sessionStorage.getItem('chat_user_name');
-        if (sPin && sName) {
-          document.write('<style id="auth-fast-gate">#name-login-modal { display: none !important; }</style>');
-        }
+        sessionStorage.removeItem('chat_user_pin');
+        localStorage.removeItem('_mv_auth_key');
+        var fastGate = document.getElementById('auth-fast-gate');
+        if (fastGate) fastGate.remove();
       } catch(e) {}
     })();
   </script>
