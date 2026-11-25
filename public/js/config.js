@@ -19,15 +19,18 @@ const FIREBASE_CONFIG_KEY = 'vault_firebase_config';
 const PLAYLIST_STORAGE_KEY = 'love_vault_playlist';
 const FEATURED_SONG_KEY = 'love_vault_featured_song';
 const VOLUME_KEY = 'love_music_volume';
+const SESSION_PIN_KEY = 'vault_session_pin';
+const SESSION_NAME_KEY = 'vault_session_name';
 
 // Global Engine State Variables
 let socket = null;
 let fbApp = null;
 let fbDb = null;
 let isFirebaseActive = false;
-let currentChatSender = sessionStorage.getItem('chat_user_name') || localStorage.getItem('chat_user_name') || '';
-// PIN only from sessionStorage on page load - prevents auto-login bypass without actual login
-let currentChatPin = ''; // Always empty on load - strictly requires password entry
+let currentChatSender = localStorage.getItem(SESSION_NAME_KEY) || localStorage.getItem('chat_user_name') || '';
+// --- LOGIN PERSISTENCE FIX ---
+// Restore PIN from localStorage so refresh doesn't log the user out
+let currentChatPin = localStorage.getItem(SESSION_PIN_KEY) || '';
 let previousMsgCount = 0;
 let isPlayingMusic = false;
 let typingTimeout = null;
@@ -38,10 +41,32 @@ let latestPresenceState = { vanshika: { isOnline: false }, rakesh: { isOnline: f
 let renderedMsgIds = new Set();
 let renderedDatesSet = new Set();
 
-// Helper: Scroll to element smoothly
+// On page load: if we have a saved valid session, hide login modal immediately (no flicker)
+(function restoreSessionOnLoad() {
+  const savedPin = localStorage.getItem(SESSION_PIN_KEY);
+  const savedName = localStorage.getItem(SESSION_NAME_KEY);
+  if (savedPin && savedName) {
+    // Valid session exists - inject fast-gate style instantly to prevent modal flash
+    const style = document.createElement('style');
+    style.id = 'auth-fast-gate';
+    style.innerHTML = '#name-login-modal { display: none !important; }';
+    document.head.appendChild(style);
+  }
+})();
+
+// Helper: Scroll to element smoothly (mobile + desktop compatible)
 function scrollToElement(id) {
   const el = document.getElementById(id);
-  if (el) el.scrollIntoView({ behavior: 'smooth' });
+  if (!el) return;
+  // Calculate offset accounting for fixed navbar height (~70px) so element is not hidden under navbar
+  const navbarHeight = 70;
+  const rect = el.getBoundingClientRect();
+  const targetY = rect.top + window.pageYOffset - navbarHeight;
+  try {
+    window.scrollTo({ top: targetY, behavior: 'smooth' });
+  } catch (e) {
+    window.scrollTo(0, targetY);
+  }
 }
 
 // Helper: Check user login before chat input focus
@@ -159,9 +184,16 @@ function applySuccessfulLogin(name, pin, authSessionId) {
   }
   currentChatSender = name;
   currentChatPin = pin;
+
+  // --- LOGIN PERSISTENCE FIX ---
+  // Save to localStorage so session survives refresh/reload
+  localStorage.setItem(SESSION_PIN_KEY, pin);
+  localStorage.setItem(SESSION_NAME_KEY, name);
+  localStorage.setItem('chat_user_name', name);
+
+  // Also keep sessionStorage for backward compatibility
   sessionStorage.setItem('chat_user_name', name);
   sessionStorage.setItem('chat_user_pin', pin);
-  localStorage.setItem('chat_user_name', name);  // save username only (for identity pre-select)
 
   if (authSessionId) {
     sessionStorage.setItem('chat_session_id', authSessionId);
