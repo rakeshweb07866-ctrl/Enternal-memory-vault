@@ -20,6 +20,7 @@ const DEFAULT_PRESET_SONGS = [
     artist: 'Rahat Fateh Ali Khan & Tulsi Kumar',
     type: 'audio_url',
     url: 'music/tum-jo-aaye.mp3',
+    fallbackUrl: 'https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=romantic-piano-112199.mp3',
     addedBy: 'Vault Classic ✨',
     isPreset: true
   },
@@ -29,6 +30,7 @@ const DEFAULT_PRESET_SONGS = [
     artist: 'Arijit Singh & Tulsi Kumar',
     type: 'audio_url',
     url: 'music/soch-naa-sake.mp3',
+    fallbackUrl: 'https://cdn.pixabay.com/download/audio/2022/03/15/audio_c8c8a73467.mp3?filename=warm-memories-romantic-emotional-acoustic-guitar-10825.mp3',
     addedBy: 'Vault Classic ✨',
     isPreset: true
   },
@@ -38,6 +40,7 @@ const DEFAULT_PRESET_SONGS = [
     artist: 'Roop Kumar Rathod • Soulful Love',
     type: 'audio_url',
     url: 'music/maula-maula.mp3',
+    fallbackUrl: 'https://cdn.pixabay.com/download/audio/2022/10/14/audio_9939f7956a.mp3?filename=romantic-love-123472.mp3',
     addedBy: 'Vault Classic ✨',
     isPreset: true
   },
@@ -57,6 +60,7 @@ const DEFAULT_PRESET_SONGS = [
     artist: 'Acoustic Guitar Romance',
     type: 'audio_url',
     url: 'https://cdn.pixabay.com/download/audio/2022/03/15/audio_c8c8a73467.mp3?filename=warm-memories-romantic-emotional-acoustic-guitar-10825.mp3',
+    fallbackUrl: 'music/love-song.mp3',
     addedBy: 'Vault Classic ✨',
     isPreset: true
   },
@@ -66,6 +70,7 @@ const DEFAULT_PRESET_SONGS = [
     artist: 'Soft Piano & Cello',
     type: 'audio_url',
     url: 'https://cdn.pixabay.com/download/audio/2022/10/14/audio_9939f7956a.mp3?filename=romantic-love-123472.mp3',
+    fallbackUrl: 'music/keshariyaa.mp3',
     addedBy: 'Vault Classic ✨',
     isPreset: true
   }
@@ -125,10 +130,15 @@ function setActiveLoveSong(songObj, broadcastToCloud = true) {
     }
   }
 
-  // Pre-set audio element source if native audio
+  // Pre-set audio element source if native audio (only if src changed)
   const audio = document.getElementById('bg-music-player');
   if (audio && songObj.type !== 'youtube' && songObj.url) {
-    audio.src = songObj.url;
+    const currentSrc = audio.src || '';
+    const targetSuffix = songObj.url.replace(/^https?:\/\/[^/]+/, '');
+    const srcChanged = !currentSrc.endsWith(songObj.url) && !currentSrc.includes(targetSuffix);
+    if (srcChanged) {
+      audio.src = songObj.url;
+    }
   }
 
   updateMusicUI(isPlayingMusic);
@@ -254,12 +264,16 @@ function openLoveJukeboxModal() {
     renderLoveJukeboxPlaylist();
     updateNowPlayingCard();
     modal.classList.remove('hidden');
+    modal.classList.add('flex');
   }
 }
 
 function closeLoveJukeboxModal() {
   const modal = document.getElementById('love-jukebox-modal');
-  if (modal) modal.classList.add('hidden');
+  if (modal) {
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+  }
 }
 
 function switchJukeboxTab(tab) {
@@ -311,12 +325,12 @@ function renderLoveJukeboxPlaylist() {
     ` : '';
 
     return `
-      <div onclick="playSongByIndex(${idx})" class="p-3 rounded-xl ${isCurrent ? 'bg-gradient-to-r from-rose-950/80 to-slate-900 border-2 border-rose-400/70 shadow-lg' : 'bg-slate-900/80 hover:bg-slate-850 border border-rose-500/20'} flex items-center justify-between gap-3 cursor-pointer transition-all select-none group">
-        <div class="flex items-center gap-3 min-w-0">
-          <button class="w-8 h-8 rounded-full ${isCurrent && isPlayingMusic ? 'bg-rose-500 text-white shadow-md' : 'bg-slate-800 group-hover:bg-rose-600 text-slate-300 group-hover:text-white'} flex items-center justify-center text-xs shrink-0 transition-all cursor-pointer">
+      <div onclick="playSongByIndex(${idx})" class="p-3 rounded-xl ${isCurrent ? 'bg-gradient-to-r from-rose-950/80 to-slate-900 border-2 border-rose-400/70 shadow-lg' : 'bg-slate-900/80 hover:bg-slate-850 border border-rose-500/20'} flex items-center justify-between gap-3 cursor-pointer transition-all select-none group" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;">
+        <div class="flex items-center gap-3 min-w-0 flex-1">
+          <div class="w-9 h-9 sm:w-8 sm:h-8 rounded-full ${isCurrent && isPlayingMusic ? 'bg-rose-500 text-white shadow-md' : 'bg-slate-800 group-hover:bg-rose-600 text-slate-300 group-hover:text-white'} flex items-center justify-center text-xs shrink-0 transition-all shadow-sm pointer-events-none">
             ${isCurrent && isPlayingMusic ? '⏸️' : '▶️'}
-          </button>
-          <div class="min-w-0">
+          </div>
+          <div class="min-w-0 pointer-events-none">
             <div class="flex items-center gap-2 flex-wrap">
               <h5 class="text-xs font-bold ${isCurrent ? 'text-amber-300' : 'text-slate-200 group-hover:text-white'} truncate">${escapeChatHtml(s.title)}</h5>
               ${typeBadge}
@@ -328,7 +342,7 @@ function renderLoveJukeboxPlaylist() {
             </div>
           </div>
         </div>
-        <div class="flex items-center gap-1 shrink-0">
+        <div class="flex items-center gap-1 shrink-0" onclick="event.stopPropagation()">
           ${deleteBtn}
         </div>
       </div>
@@ -343,6 +357,73 @@ function playSongByIndex(idx) {
   playLoveSong(songs[idx]);
 }
 
+// Universal Audio Playback Engine (Desktop Chrome/Firefox + iOS Safari + Android Chrome)
+function playAudioDirect(audio, songUrl, fallbackUrl) {
+  if (!audio) return Promise.reject(new Error('No audio element'));
+
+  audio.setAttribute('playsinline', '');
+  audio.setAttribute('webkit-playsinline', '');
+
+  // Clear any child source tags that interfere on mobile WebKit/Blink
+  while (audio.firstChild) {
+    audio.removeChild(audio.firstChild);
+  }
+
+  const targetUrl = songUrl || 'music/love-song.mp3';
+
+  // Smart source check: compare by filename suffix (works on both mobile & desktop)
+  // audio.src is always absolute on desktop (http://host/path), targetUrl may be relative
+  const currentSrc = audio.src || '';
+  const targetSuffix = targetUrl.replace(/^https?:\/\/[^/]+/, ''); // remove host if absolute
+  const needReload = !currentSrc || (!currentSrc.endsWith(targetUrl) && !currentSrc.includes(targetSuffix));
+
+  if (needReload) {
+    audio.src = targetUrl;
+    try { audio.load(); } catch (e) {}
+  }
+
+  // Always try to play — if paused on same track, just resume
+  const p = audio.play();
+  if (p !== undefined) {
+    return p.then(() => {
+      isPlayingMusic = true;
+      updateMusicUI(true);
+    }).catch(err => {
+      console.warn('Audio play error:', err);
+      // Try fallback URL if primary fails
+      if (fallbackUrl && fallbackUrl !== targetUrl) {
+        audio.src = fallbackUrl;
+        try { audio.load(); } catch (e) {}
+        return audio.play().then(() => {
+          isPlayingMusic = true;
+          updateMusicUI(true);
+        }).catch(e2 => {
+          console.warn('Audio fallback error:', e2);
+          isPlayingMusic = false;
+          updateMusicUI(false);
+        });
+      } else if (targetUrl !== 'music/love-song.mp3') {
+        audio.src = 'music/love-song.mp3';
+        try { audio.load(); } catch (e) {}
+        return audio.play().then(() => {
+          isPlayingMusic = true;
+          updateMusicUI(true);
+        }).catch(e3 => {
+          isPlayingMusic = false;
+          updateMusicUI(false);
+        });
+      } else {
+        isPlayingMusic = false;
+        updateMusicUI(false);
+      }
+    });
+  }
+  // Sync UI for browsers that return undefined from play()
+  isPlayingMusic = !audio.paused;
+  updateMusicUI(!audio.paused);
+  return Promise.resolve();
+}
+
 function playLoveSong(song) {
   if (!song) return;
   setActiveLoveSong(song, true);
@@ -351,13 +432,16 @@ function playLoveSong(song) {
   const dock = document.getElementById('floating-music-dock');
   const ytToggleBtn = document.getElementById('dock-video-toggle-btn');
 
-  if (dock) dock.classList.add('hidden');
-
   if (song.type === 'youtube') {
     if (audio) {
       try { audio.pause(); } catch (e) {}
     }
+    if (dock) dock.classList.remove('hidden');
     if (ytToggleBtn) ytToggleBtn.classList.remove('hidden');
+
+    if (typeof window.loadYouTubeAPI === 'function') {
+      window.loadYouTubeAPI();
+    }
 
     if (ytPlayer && typeof ytPlayer.loadVideoById === 'function') {
       try {
@@ -390,25 +474,11 @@ function playLoveSong(song) {
     if (ytPlayer && typeof ytPlayer.pauseVideo === 'function') {
       try { ytPlayer.pauseVideo(); } catch (e) {}
     }
+    if (dock) dock.classList.add('hidden');
     if (ytToggleBtn) ytToggleBtn.classList.add('hidden');
 
     if (audio) {
-      if (!audio.src || !audio.src.includes(encodeURI(song.url))) {
-        audio.src = song.url;
-      }
-      const playPromise = audio.play();
-      if (playPromise !== undefined) {
-        playPromise.then(() => {
-          isPlayingMusic = true;
-          updateMusicUI(true);
-        }).catch(err => {
-          console.log('Audio playback prevented or error:', err);
-          if (song.fallbackUrl) {
-            audio.src = song.fallbackUrl;
-            audio.play().catch(e => {});
-          }
-        });
-      }
+      playAudioDirect(audio, song.url, song.fallbackUrl);
     }
   }
 
@@ -424,6 +494,9 @@ function toggleRomanticMusic() {
   }
 
   if (currentPlayingSong.type === 'youtube') {
+    if (typeof window.loadYouTubeAPI === 'function') {
+      window.loadYouTubeAPI();
+    }
     if (!ytPlayer || typeof ytPlayer.getPlayerState !== 'function') {
       playLoveSong(currentPlayingSong);
       return;
@@ -435,7 +508,6 @@ function toggleRomanticMusic() {
       if (videoData && videoData.video_id) loadedVideoId = videoData.video_id;
     } catch (e) {}
 
-    // If the video currently loaded in the player does not match the active featured song, load and play it!
     if (!loadedVideoId || loadedVideoId !== currentPlayingSong.videoId) {
       playLoveSong(currentPlayingSong);
       return;
@@ -453,20 +525,14 @@ function toggleRomanticMusic() {
     }
   } else {
     if (!audio) return;
-    if (!isPlayingMusic) {
-      if (!audio.src || audio.src === window.location.href || !audio.src.includes(encodeURI(currentPlayingSong.url))) {
-        audio.src = currentPlayingSong.url || 'music/love-song.mp3';
-      }
-      audio.play().then(() => {
-        isPlayingMusic = true;
-        updateMusicUI(true);
-      }).catch(err => {
-        console.log('Audio play error:', err);
-      });
-    } else {
+    // Check actual audio element state (more reliable than isPlayingMusic flag)
+    const actuallyPlaying = !audio.paused && !audio.ended && audio.readyState > 2;
+    if (actuallyPlaying) {
       audio.pause();
       isPlayingMusic = false;
       updateMusicUI(false);
+    } else {
+      playAudioDirect(audio, currentPlayingSong.url, currentPlayingSong.fallbackUrl);
     }
   }
   updateNowPlayingCard();
