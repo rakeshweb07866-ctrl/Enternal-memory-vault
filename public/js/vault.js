@@ -819,12 +819,14 @@ const REEL_STORAGE_KEY = 'vault_vanshika_reel_data';
 const REELS_PLAYLIST_KEY = 'vanshika_reels_playlist_meta';
 const REEL_DB_NAME = 'VanshikaReelDB';
 const REEL_STORE_NAME = 'reel_store';
+const REELS_FIREBASE_PATH = 'vault_vanshika_reels'; // Firebase RTDB path for cross-device sync
 
 let vanshikaReelsList = [];
 let currentReelIndex = 0;
 let isReelTransitioning = false;
 let reelWheelThrottleTimer = null;
 let reelTouchStartY = 0;
+let _reelFirebaseListenerActive = false; // Prevent duplicate listeners
 
 function openReelDB() {
   return new Promise((resolve) => {
@@ -969,9 +971,17 @@ async function handleReelFileUpload(event) {
     };
     vanshikaReelsList.push(newReel);
 
-    // Save copy to server disk in background
+    // Save copy to server disk in background, then push to Firebase for cross-device sync
     uploadReelToServer(file, `vanshika-reel-${vanshikaReelsList.length}.mp4`).then(serverUrl => {
-      if (serverUrl) newReel.serverUrl = serverUrl;
+      if (serverUrl) {
+        newReel.serverUrl = serverUrl;
+        // Once we have a server URL, update the reel type and push to Firebase
+        newReel.url = serverUrl;
+        newReel.type = 'video_url';
+        pushReelToFirebase(newReel);
+        // Also update in IndexedDB with the server URL
+        saveAllReelsToIndexedDB(vanshikaReelsList).catch(() => {});
+      }
     }).catch(() => {});
   }
 
@@ -1010,6 +1020,9 @@ function openReelLinkPrompt() {
   vanshikaReelsList.push(newReel);
   saveAllReelsToIndexedDB(vanshikaReelsList);
   syncReelsMetadataToLocalStorage();
+
+  // Push to Firebase for cross-device sync
+  pushReelToFirebase(newReel);
 
   currentReelIndex = vanshikaReelsList.length - 1;
   displayActiveReel(currentReelIndex, 'up');
@@ -1399,9 +1412,15 @@ async function deleteCurrentReel(event) {
   const confirmDelete = confirm(`Are you sure you want to remove Reel #${currentReelIndex + 1}?`);
   if (!confirmDelete) return;
 
+  // Get reel ID before splice for Firebase removal
+  const deletedReelId = vanshikaReelsList[currentReelIndex] && vanshikaReelsList[currentReelIndex].id;
+
   vanshikaReelsList.splice(currentReelIndex, 1);
   await saveAllReelsToIndexedDB(vanshikaReelsList);
   syncReelsMetadataToLocalStorage();
+
+  // Remove from Firebase so other devices also lose this reel
+  if (deletedReelId) removeReelFromFirebase(deletedReelId);
 
   if (currentReelIndex >= vanshikaReelsList.length) {
     currentReelIndex = Math.max(0, vanshikaReelsList.length - 1);
@@ -1478,7 +1497,27 @@ function reactToReel(type) {
 async function initVanshikaReel() {
   setupReelScrollInteractions();
 
-  // 1. Try loading from IndexedDB
+  // 1. Try loading from Firebase first (cross-device cloud sync)
+  if (typeof isFirebaseActive !== 'undefined' && isFirebaseActive && typeof fbDb !== 'undefined' && fbDb) {
+    try {
+      const snap = await fbDb.ref(REELS_FIREBASE_PATH).once('value');
+      const val = snap.val();
+      if (val) {
+        const cloudReels = Object.values(val).filter(r => r && r.id && r.url && !r.url.startsWith('blob:'));
+        cloudReels.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+        if (cloudReels.length > 0) {
+          vanshikaReelsList = cloudReels;
+          displayActiveReel(0, 'none', false);
+          setupReelVisibilityObserver();
+          return;
+        }
+      }
+    } catch (e) {
+      console.warn('Firebase reel load error:', e);
+    }
+  }
+
+  // 2. Try loading from IndexedDB (local fallback)
   try {
     const storedList = await loadAllReelsFromIndexedDB();
     if (storedList && Array.isArray(storedList) && storedList.length > 0) {
@@ -1505,7 +1544,7 @@ async function initVanshikaReel() {
     console.warn('IndexedDB reel load error:', e);
   }
 
-  // 2. Check localStorage metadata
+  // 3. Check localStorage metadata
   try {
     const savedMeta = localStorage.getItem(REELS_PLAYLIST_KEY);
     if (savedMeta) {
@@ -1521,7 +1560,7 @@ async function initVanshikaReel() {
     }
   } catch (e) {}
 
-  // 3. Fallback: check static file on server
+  // 4. Fallback: check static file on server
   try {
     const testVideo = document.createElement('video');
     testVideo.src = 'assests/vanshika-reel.mp4';
@@ -1541,6 +1580,80 @@ async function initVanshikaReel() {
 
   updateReelCounter();
   setupReelVisibilityObserver();
+}
+
+// ==========================================
+// FIREBASE REALTIME SYNC FOR REELS (Cross-Device Sync)
+// ==========================================
+function initReelFirebaseSync() {
+  if (!isFirebaseActive || !fbDb) return;
+  if (_reelFirebaseListenerActive) return;
+  _reelFirebaseListenerActive = true;
+
+  // Listen for real-time reel updates from any device
+  fbDb.ref(REELS_FIREBASE_PATH).on('value', (snapshot) => {
+    const val = snapshot.val();
+    if (!val) return;
+
+    const cloudReels = Object.values(val)
+      .filter(r => r && r.id && r.url && !r.url.startsWith('blob:'))
+      .sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+
+    if (cloudReels.length === 0) return;
+
+    // Merge: add any cloud reels not already in local list
+    let changed = false;
+    cloudReels.forEach(cr => {
+      const exists = vanshikaReelsList.some(lr => lr.id === cr.id);
+      if (!exists) {
+        vanshikaReelsList.push(cr);
+        changed = true;
+      }
+    });
+
+    // Also update existing reels that have a serverUrl update
+    cloudReels.forEach(cr => {
+      const idx = vanshikaReelsList.findIndex(lr => lr.id === cr.id);
+      if (idx !== -1 && cr.url && !cr.url.startsWith('blob:')) {
+        if (vanshikaReelsList[idx].url.startsWith('blob:') || !vanshikaReelsList[idx].url) {
+          vanshikaReelsList[idx].url = cr.url;
+          changed = true;
+        }
+      }
+    });
+
+    if (changed) {
+      displayActiveReel(currentReelIndex, 'none', false);
+      updateReelCounter();
+    }
+  });
+}
+
+// Push a reel's metadata to Firebase for cross-device sync
+function pushReelToFirebase(reel) {
+  if (!isFirebaseActive || !fbDb || !reel || !reel.id) return;
+  if (!reel.url || reel.url.startsWith('blob:')) return; // Never push blob URLs to Firebase
+  try {
+    const firebaseReel = {
+      id: reel.id,
+      type: reel.url.includes('youtube') ? 'youtube' : 'video_url',
+      url: reel.url,
+      fileName: reel.fileName || 'vanshika-reel.mp4',
+      title: reel.title || 'Reel',
+      timestamp: reel.timestamp || new Date().toISOString()
+    };
+    fbDb.ref(REELS_FIREBASE_PATH + '/' + reel.id).set(firebaseReel);
+  } catch (e) {
+    console.warn('Firebase reel push error:', e);
+  }
+}
+
+// Remove a reel from Firebase
+function removeReelFromFirebase(reelId) {
+  if (!isFirebaseActive || !fbDb || !reelId) return;
+  try {
+    fbDb.ref(REELS_FIREBASE_PATH + '/' + reelId).remove();
+  } catch (e) {}
 }
 
 // ==========================================

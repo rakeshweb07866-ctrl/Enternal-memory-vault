@@ -1420,6 +1420,11 @@ function initFirebaseCloud() {
     if (typeof initJukeboxFirebaseSync === 'function') {
       initJukeboxFirebaseSync();
     }
+
+    // 4. Initialize Reels Cloud Sync (Cross-Device: Rakesh & Vanshika see same reels)
+    if (typeof initReelFirebaseSync === 'function') {
+      initReelFirebaseSync();
+    }
   } catch (err) {
     console.warn('Firebase init warning:', err);
     isFirebaseActive = false;
