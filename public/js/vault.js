@@ -821,7 +821,21 @@ const REEL_DB_NAME = 'VanshikaReelDB';
 const REEL_STORE_NAME = 'reel_store';
 const REELS_FIREBASE_PATH = 'vault_vanshika_reels'; // Firebase RTDB path for cross-device sync
 
-let vanshikaReelsList = [];
+// Default preset reel (guarantees reels always exist even in fresh incognito mode)
+const DEFAULT_PRESET_REELS = [
+  {
+    id: 'preset_vanshika_special_1',
+    type: 'video_url',
+    url: 'assests/WhatsApp_Video_2026-10-14_at_12.37.29_PM.mp4',
+    fileName: 'WhatsApp_Video_2026-10-14_at_12.37.29_PM.mp4',
+    title: 'Our Queen Vanshika • Special Reel ✨',
+    addedBy: 'Forever Memory ✨',
+    isPreset: true,
+    timestamp: '2026-10-14T12:37:29.000Z'
+  }
+];
+
+let vanshikaReelsList = [...DEFAULT_PRESET_REELS];
 let currentReelIndex = 0;
 let isReelTransitioning = false;
 let reelWheelThrottleTimer = null;
@@ -971,18 +985,31 @@ async function handleReelFileUpload(event) {
     };
     vanshikaReelsList.push(newReel);
 
-    // Save copy to server disk in background, then push to Firebase for cross-device sync
-    uploadReelToServer(file, `vanshika-reel-${vanshikaReelsList.length}.mp4`).then(serverUrl => {
-      if (serverUrl) {
-        newReel.serverUrl = serverUrl;
-        // Once we have a server URL, update the reel type and push to Firebase
-        newReel.url = serverUrl;
-        newReel.type = 'video_url';
-        pushReelToFirebase(newReel);
-        // Also update in IndexedDB with the server URL
-        saveAllReelsToIndexedDB(vanshikaReelsList).catch(() => {});
-      }
-    }).catch(() => {});
+    // Sync to Firebase Cloud across devices (if <= 8MB dataURL, else try server)
+    if (file.size <= 8 * 1024 * 1024) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const cloudReel = {
+          id: newReel.id,
+          type: 'video_url',
+          url: e.target.result,
+          fileName: newReel.fileName,
+          title: newReel.title,
+          timestamp: newReel.timestamp
+        };
+        pushReelToFirebase(cloudReel);
+      };
+      reader.readAsDataURL(file);
+    } else {
+      uploadReelToServer(file, `vanshika-reel-${vanshikaReelsList.length}.mp4`).then(serverUrl => {
+        if (serverUrl) {
+          newReel.serverUrl = serverUrl;
+          newReel.url = serverUrl;
+          newReel.type = 'video_url';
+          pushReelToFirebase(newReel);
+        }
+      }).catch(() => {});
+    }
   }
 
   // Persist into IndexedDB and LocalStorage
@@ -1497,7 +1524,7 @@ function reactToReel(type) {
 async function initVanshikaReel() {
   setupReelScrollInteractions();
 
-  // 1. Try loading from Firebase first (cross-device cloud sync)
+  // 1. Try loading from Firebase first if already connected
   if (typeof isFirebaseActive !== 'undefined' && isFirebaseActive && typeof fbDb !== 'undefined' && fbDb) {
     try {
       const snap = await fbDb.ref(REELS_FIREBASE_PATH).once('value');
@@ -1560,24 +1587,9 @@ async function initVanshikaReel() {
     }
   } catch (e) {}
 
-  // 4. Fallback: check static file on server
-  try {
-    const testVideo = document.createElement('video');
-    testVideo.src = 'assests/vanshika-reel.mp4';
-    testVideo.oncanplay = () => {
-      vanshikaReelsList = [{
-        id: 'reel_default',
-        type: 'video_url',
-        url: 'assests/vanshika-reel.mp4',
-        fileName: 'vanshika-reel-1.mp4',
-        title: 'Reel #1',
-        timestamp: new Date().toISOString()
-      }];
-      displayActiveReel(0, 'none', false);
-      setupReelVisibilityObserver();
-    };
-  } catch (e) {}
-
+  // 4. Default Preset Reel (Ensures reels ALWAYS exist, even on fresh Incognito mode)
+  vanshikaReelsList = [...DEFAULT_PRESET_REELS];
+  displayActiveReel(0, 'none', false);
   updateReelCounter();
   setupReelVisibilityObserver();
 }
@@ -1590,43 +1602,77 @@ function initReelFirebaseSync() {
   if (_reelFirebaseListenerActive) return;
   _reelFirebaseListenerActive = true;
 
-  // Listen for real-time reel updates from any device
+  // Listen for real-time reel updates from any device (Desktop, Mobile, Incognito)
   fbDb.ref(REELS_FIREBASE_PATH).on('value', (snapshot) => {
     const val = snapshot.val();
-    if (!val) return;
+    let cloudReels = [];
+    if (val) {
+      cloudReels = Object.values(val)
+        .filter(r => r && r.id && r.url && !r.url.startsWith('blob:'))
+        .sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+    }
 
-    const cloudReels = Object.values(val)
-      .filter(r => r && r.id && r.url && !r.url.startsWith('blob:'))
-      .sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
-
-    if (cloudReels.length === 0) return;
-
-    // Merge: add any cloud reels not already in local list
-    let changed = false;
-    cloudReels.forEach(cr => {
-      const exists = vanshikaReelsList.some(lr => lr.id === cr.id);
-      if (!exists) {
-        vanshikaReelsList.push(cr);
-        changed = true;
+    if (cloudReels.length > 0) {
+      vanshikaReelsList = cloudReels;
+      saveAllReelsToIndexedDB(vanshikaReelsList).catch(() => {});
+      syncReelsMetadataToLocalStorage();
+      if (currentReelIndex >= vanshikaReelsList.length) {
+        currentReelIndex = Math.max(0, vanshikaReelsList.length - 1);
       }
-    });
-
-    // Also update existing reels that have a serverUrl update
-    cloudReels.forEach(cr => {
-      const idx = vanshikaReelsList.findIndex(lr => lr.id === cr.id);
-      if (idx !== -1 && cr.url && !cr.url.startsWith('blob:')) {
-        if (vanshikaReelsList[idx].url.startsWith('blob:') || !vanshikaReelsList[idx].url) {
-          vanshikaReelsList[idx].url = cr.url;
-          changed = true;
-        }
-      }
-    });
-
-    if (changed) {
       displayActiveReel(currentReelIndex, 'none', false);
       updateReelCounter();
+    } else {
+      // If cloud is empty, migrate any existing local device reels up to cloud
+      migrateLocalReelsToFirebase();
     }
   });
+
+  // Automatically migrate existing local reels from this device (phone or desktop) to Firebase
+  setTimeout(migrateLocalReelsToFirebase, 1000);
+}
+
+// Auto-migrate local reels (from phone/desktop) to Firebase so all devices get them
+function migrateLocalReelsToFirebase() {
+  if (!isFirebaseActive || !fbDb) return;
+  try {
+    const localMeta = localStorage.getItem(REELS_PLAYLIST_KEY);
+    if (localMeta) {
+      const parsed = JSON.parse(localMeta);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        parsed.forEach(r => {
+          if (r && r.id && r.url && !r.url.startsWith('blob:') && !r.id.startsWith('preset_')) {
+            fbDb.ref(REELS_FIREBASE_PATH + '/' + r.id).set({
+              id: r.id,
+              type: r.url.includes('youtube') || r.url.includes('youtu.be') ? 'youtube' : 'video_url',
+              url: r.url,
+              fileName: r.fileName || 'vanshika-reel.mp4',
+              title: r.title || 'Reel',
+              timestamp: r.timestamp || new Date().toISOString()
+            }).catch(() => {});
+          }
+        });
+      }
+    }
+  } catch (e) {}
+
+  if (typeof loadAllReelsFromIndexedDB === 'function') {
+    loadAllReelsFromIndexedDB().then(storedList => {
+      if (storedList && Array.isArray(storedList)) {
+        storedList.forEach(r => {
+          if (r && r.id && r.url && !r.url.startsWith('blob:') && !r.id.startsWith('preset_')) {
+            fbDb.ref(REELS_FIREBASE_PATH + '/' + r.id).set({
+              id: r.id,
+              type: r.url.includes('youtube') || r.url.includes('youtu.be') ? 'youtube' : 'video_url',
+              url: r.url,
+              fileName: r.fileName || 'vanshika-reel.mp4',
+              title: r.title || 'Reel',
+              timestamp: r.timestamp || new Date().toISOString()
+            }).catch(() => {});
+          }
+        });
+      }
+    }).catch(() => {});
+  }
 }
 
 // Push a reel's metadata to Firebase for cross-device sync
@@ -1636,7 +1682,7 @@ function pushReelToFirebase(reel) {
   try {
     const firebaseReel = {
       id: reel.id,
-      type: reel.url.includes('youtube') ? 'youtube' : 'video_url',
+      type: reel.url.includes('youtube') || reel.url.includes('youtu.be') ? 'youtube' : 'video_url',
       url: reel.url,
       fileName: reel.fileName || 'vanshika-reel.mp4',
       title: reel.title || 'Reel',
