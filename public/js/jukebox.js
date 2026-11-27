@@ -10,7 +10,7 @@ const DEFAULT_PRESET_SONGS = [
     artist: 'Arijit Singh • Romantic Hit',
     type: 'audio_url',
     url: 'music/keshariyaa.mp3',
-    fallbackUrl: 'https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=romantic-piano-112199.mp3',
+    fallbackUrl: 'music/love-song.mp3',
     addedBy: 'Vault Classic ✨',
     isPreset: true
   },
@@ -20,7 +20,7 @@ const DEFAULT_PRESET_SONGS = [
     artist: 'Rahat Fateh Ali Khan & Tulsi Kumar',
     type: 'audio_url',
     url: 'music/tum-jo-aaye.mp3',
-    fallbackUrl: 'https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=romantic-piano-112199.mp3',
+    fallbackUrl: 'music/love-song.mp3',
     addedBy: 'Vault Classic ✨',
     isPreset: true
   },
@@ -30,7 +30,7 @@ const DEFAULT_PRESET_SONGS = [
     artist: 'Arijit Singh & Tulsi Kumar',
     type: 'audio_url',
     url: 'music/soch-naa-sake.mp3',
-    fallbackUrl: 'https://cdn.pixabay.com/download/audio/2022/03/15/audio_c8c8a73467.mp3?filename=warm-memories-romantic-emotional-acoustic-guitar-10825.mp3',
+    fallbackUrl: 'music/love-song.mp3',
     addedBy: 'Vault Classic ✨',
     isPreset: true
   },
@@ -40,7 +40,7 @@ const DEFAULT_PRESET_SONGS = [
     artist: 'Roop Kumar Rathod • Soulful Love',
     type: 'audio_url',
     url: 'music/maula-maula.mp3',
-    fallbackUrl: 'https://cdn.pixabay.com/download/audio/2022/10/14/audio_9939f7956a.mp3?filename=romantic-love-123472.mp3',
+    fallbackUrl: 'music/love-song.mp3',
     addedBy: 'Vault Classic ✨',
     isPreset: true
   },
@@ -50,7 +50,7 @@ const DEFAULT_PRESET_SONGS = [
     artist: 'Piano & Romantic Strings',
     type: 'audio_url',
     url: 'music/love-song.mp3',
-    fallbackUrl: 'https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=romantic-piano-112199.mp3',
+    fallbackUrl: 'music/keshariyaa.mp3',
     addedBy: 'Vault Classic ✨',
     isPreset: true
   },
@@ -59,7 +59,7 @@ const DEFAULT_PRESET_SONGS = [
     title: 'Midnight Whispers',
     artist: 'Acoustic Guitar Romance',
     type: 'audio_url',
-    url: 'https://cdn.pixabay.com/download/audio/2022/03/15/audio_c8c8a73467.mp3?filename=warm-memories-romantic-emotional-acoustic-guitar-10825.mp3',
+    url: 'music/sanctuary-song.mp3',
     fallbackUrl: 'music/love-song.mp3',
     addedBy: 'Vault Classic ✨',
     isPreset: true
@@ -69,7 +69,7 @@ const DEFAULT_PRESET_SONGS = [
     title: 'Moonlight Serenade',
     artist: 'Soft Piano & Cello',
     type: 'audio_url',
-    url: 'https://cdn.pixabay.com/download/audio/2022/10/14/audio_9939f7956a.mp3?filename=romantic-love-123472.mp3',
+    url: 'music/love-song.mp3',
     fallbackUrl: 'music/keshariyaa.mp3',
     addedBy: 'Vault Classic ✨',
     isPreset: true
@@ -83,12 +83,20 @@ let isYtDockVisible = false;
 let ytPlayer = null;
 let isYtReady = false;
 
-// 1. Initial Load of Custom Playlist from LocalStorage
+// 1. Initial Load of Custom Playlist from LocalStorage (with auto-sanitization of broken URLs)
 try {
   const savedCustom = localStorage.getItem(PLAYLIST_STORAGE_KEY);
   if (savedCustom) {
-    const parsed = JSON.parse(savedCustom);
-    if (Array.isArray(parsed)) customLoveSongs = parsed;
+    let parsed = JSON.parse(savedCustom);
+    if (Array.isArray(parsed)) {
+      customLoveSongs = parsed.map(s => {
+        if (s && s.url && (s.url.includes('pixabay') || s.url.includes('audio_db6591201e'))) {
+          s.url = 'music/keshariyaa.mp3';
+          s.fallbackUrl = 'music/love-song.mp3';
+        }
+        return s;
+      });
+    }
   }
 } catch (e) {
   customLoveSongs = [];
@@ -100,7 +108,14 @@ function getFeaturedLoveSong() {
     const saved = localStorage.getItem(FEATURED_SONG_KEY);
     if (saved) {
       const parsed = JSON.parse(saved);
-      if (parsed && parsed.id) return parsed;
+      if (parsed && parsed.id) {
+        if (parsed.url && (parsed.url.includes('pixabay') || parsed.url.includes('audio_db6591201e'))) {
+          parsed.url = 'music/keshariyaa.mp3';
+          parsed.fallbackUrl = 'music/love-song.mp3';
+          try { localStorage.setItem(FEATURED_SONG_KEY, JSON.stringify(parsed)); } catch (e) {}
+        }
+        return parsed;
+      }
     }
   } catch (e) {}
 
@@ -116,6 +131,10 @@ currentPlayingSong = getFeaturedLoveSong();
 // Set Active Featured Song & Persist Across Hard Refreshes & Firebase
 function setActiveLoveSong(songObj, broadcastToCloud = true) {
   if (!songObj || !songObj.id) return;
+  if (songObj.url && (songObj.url.includes('pixabay') || songObj.url.includes('audio_db6591201e'))) {
+    songObj.url = 'music/keshariyaa.mp3';
+    songObj.fallbackUrl = 'music/love-song.mp3';
+  }
   currentPlayingSong = songObj;
 
   try {
@@ -133,11 +152,13 @@ function setActiveLoveSong(songObj, broadcastToCloud = true) {
   // Pre-set audio element source if native audio (only if src changed)
   const audio = document.getElementById('bg-music-player');
   if (audio && songObj.type !== 'youtube' && songObj.url) {
+    let safeUrl = songObj.url;
+    if (safeUrl.includes('pixabay') || safeUrl.includes('audio_db6591201e')) safeUrl = 'music/keshariyaa.mp3';
     const currentSrc = audio.src || '';
-    const targetSuffix = songObj.url.replace(/^https?:\/\/[^/]+/, '');
-    const srcChanged = !currentSrc.endsWith(songObj.url) && !currentSrc.includes(targetSuffix);
+    const targetSuffix = safeUrl.replace(/^https?:\/\/[^/]+/, '');
+    const srcChanged = !currentSrc.endsWith(safeUrl) && !currentSrc.includes(targetSuffix);
     if (srcChanged) {
-      audio.src = songObj.url;
+      audio.src = safeUrl;
     }
   }
 
@@ -156,7 +177,13 @@ function syncRemoteLovePlaylist(remoteSongs) {
   if (!Array.isArray(remoteSongs)) return;
   const map = new Map();
   remoteSongs.forEach(s => {
-    if (s && s.id) map.set(s.id, s);
+    if (s && s.id) {
+      if (s.url && (s.url.includes('pixabay') || s.url.includes('audio_db6591201e'))) {
+        s.url = 'music/keshariyaa.mp3';
+        s.fallbackUrl = 'music/love-song.mp3';
+      }
+      map.set(s.id, s);
+    }
   });
   customLoveSongs = Array.from(map.values());
   try {
@@ -184,6 +211,10 @@ function initJukeboxFirebaseSync() {
   fbDb.ref('vault_featured_song').on('value', snapshot => {
     const remoteFeatured = snapshot.val();
     if (remoteFeatured && remoteFeatured.id) {
+      if (remoteFeatured.url && (remoteFeatured.url.includes('pixabay') || remoteFeatured.url.includes('audio_db6591201e'))) {
+        remoteFeatured.url = 'music/keshariyaa.mp3';
+        remoteFeatured.fallbackUrl = 'music/love-song.mp3';
+      }
       const isDifferent = !currentPlayingSong || currentPlayingSong.id !== remoteFeatured.id;
       // Apply featured song without re-broadcasting
       setActiveLoveSong(remoteFeatured, false);
@@ -225,7 +256,15 @@ function initYouTubePlayer() {
           const current = currentPlayingSong || getFeaturedLoveSong();
           if (current && current.type === 'youtube' && current.videoId) {
             try {
-              ytPlayer.cueVideoById(current.videoId);
+              if (window._userRequestedYtPlay) {
+                ytPlayer.loadVideoById(current.videoId);
+                ytPlayer.playVideo();
+                isPlayingMusic = true;
+                updateMusicUI(true);
+                window._userRequestedYtPlay = false;
+              } else {
+                ytPlayer.cueVideoById(current.videoId);
+              }
             } catch (e) {}
           }
         },
@@ -369,18 +408,26 @@ function playAudioDirect(audio, songUrl, fallbackUrl) {
     audio.removeChild(audio.firstChild);
   }
 
-  const targetUrl = songUrl || 'music/love-song.mp3';
+  let targetUrl = songUrl || 'music/keshariyaa.mp3';
+  if (targetUrl.includes('pixabay') || targetUrl.includes('audio_db6591201e')) {
+    targetUrl = 'music/keshariyaa.mp3';
+  }
+  const currentSrc = audio.getAttribute('src') || audio.src || '';
+  const targetSuffix = targetUrl.replace(/^https?:\/\/[^/]+/, '');
 
-  // Smart source check: compare by filename suffix (works on both mobile & desktop)
-  // audio.src is always absolute on desktop (http://host/path), targetUrl may be relative
-  const currentSrc = audio.src || '';
-  const targetSuffix = targetUrl.replace(/^https?:\/\/[^/]+/, ''); // remove host if absolute
-  const needReload = !currentSrc || (!currentSrc.endsWith(targetUrl) && !currentSrc.includes(targetSuffix));
-
-  if (needReload) {
+  // Only change src and reload if source is genuinely different
+  if (!currentSrc || (!currentSrc.endsWith(targetUrl) && !currentSrc.includes(targetSuffix))) {
     audio.src = targetUrl;
     try { audio.load(); } catch (e) {}
   }
+
+  const savedVol = Number(localStorage.getItem(VOLUME_KEY) || 0.8);
+  audio.volume = savedVol;
+  audio.muted = false;
+
+  // Optimistic instant UI update — 0ms lag!
+  isPlayingMusic = true;
+  updateMusicUI(true);
 
   // Always try to play — if paused on same track, just resume
   const p = audio.play();
@@ -389,26 +436,17 @@ function playAudioDirect(audio, songUrl, fallbackUrl) {
       isPlayingMusic = true;
       updateMusicUI(true);
     }).catch(err => {
-      console.warn('Audio play error:', err);
-      // Try fallback URL if primary fails
-      if (fallbackUrl && fallbackUrl !== targetUrl) {
-        audio.src = fallbackUrl;
+      console.warn('Audio play notice:', err);
+      // Try local fallback URL if primary fails
+      const altUrl = (fallbackUrl && fallbackUrl !== targetUrl) ? fallbackUrl : 'music/love-song.mp3';
+      if (altUrl !== targetUrl) {
+        audio.src = altUrl;
         try { audio.load(); } catch (e) {}
         return audio.play().then(() => {
           isPlayingMusic = true;
           updateMusicUI(true);
         }).catch(e2 => {
           console.warn('Audio fallback error:', e2);
-          isPlayingMusic = false;
-          updateMusicUI(false);
-        });
-      } else if (targetUrl !== 'music/love-song.mp3') {
-        audio.src = 'music/love-song.mp3';
-        try { audio.load(); } catch (e) {}
-        return audio.play().then(() => {
-          isPlayingMusic = true;
-          updateMusicUI(true);
-        }).catch(e3 => {
           isPlayingMusic = false;
           updateMusicUI(false);
         });
@@ -453,6 +491,7 @@ function playLoveSong(song) {
         console.warn('YT load failed:', e);
       }
     } else {
+      window._userRequestedYtPlay = true;
       let attempts = 0;
       const retryInterval = setInterval(() => {
         attempts++;
@@ -467,7 +506,7 @@ function playLoveSong(song) {
         } else if (attempts > 20) {
           clearInterval(retryInterval);
         }
-      }, 300);
+      }, 200);
     }
   } else {
     // Native Audio (MP3 / URL / Local Blob)
@@ -514,25 +553,27 @@ function toggleRomanticMusic() {
     }
 
     const state = ytPlayer.getPlayerState();
-    if (state === 1) { // PLAYING -> Pause
+    if (state === 1) {
       ytPlayer.pauseVideo();
       isPlayingMusic = false;
       updateMusicUI(false);
-    } else { // PAUSED / CUED / UNSTARTED -> Play
+    } else {
       ytPlayer.playVideo();
       isPlayingMusic = true;
       updateMusicUI(true);
     }
   } else {
     if (!audio) return;
-    // Check actual audio element state (more reliable than isPlayingMusic flag)
-    const actuallyPlaying = !audio.paused && !audio.ended && audio.readyState > 2;
-    if (actuallyPlaying) {
+
+    // Real state check: if audio is actually playing → pause
+    if (!audio.paused) {
       audio.pause();
       isPlayingMusic = false;
       updateMusicUI(false);
     } else {
-      playAudioDirect(audio, currentPlayingSong.url, currentPlayingSong.fallbackUrl);
+      // Audio is paused → use playAudioDirect (handles load, volume, UI, fallback)
+      const song = currentPlayingSong || getFeaturedLoveSong();
+      playAudioDirect(audio, song.url, song.fallbackUrl);
     }
   }
   updateNowPlayingCard();

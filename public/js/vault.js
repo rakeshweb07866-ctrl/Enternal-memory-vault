@@ -1057,28 +1057,37 @@ function openReelLinkPrompt() {
 }
 
 function pauseBackgroundMusicForReel() {
-  if (typeof isPlayingMusic !== 'undefined' && isPlayingMusic) {
-    if (typeof ytPlayer !== 'undefined' && ytPlayer && typeof ytPlayer.pauseVideo === 'function') {
-      try { ytPlayer.pauseVideo(); } catch (e) {}
-    }
-    const audio = document.getElementById('bg-music-player');
-    if (audio) {
-      try { audio.pause(); } catch (e) {}
-    }
+  if (typeof ytPlayer !== 'undefined' && ytPlayer && typeof ytPlayer.pauseVideo === 'function') {
+    try { ytPlayer.pauseVideo(); } catch (e) {}
+  }
+  const audio = document.getElementById('bg-music-player');
+  if (audio) {
+    try { audio.pause(); } catch (e) {}
+  }
+  if (typeof isPlayingMusic !== 'undefined') {
     isPlayingMusic = false;
-    if (typeof updateMusicUI === 'function') {
-      updateMusicUI(false);
-    }
+  }
+  if (typeof updateMusicUI === 'function') {
+    updateMusicUI(false);
   }
 }
 
 function updateReelCounter() {
   const badge = document.getElementById('reel-counter-badge');
-  if (!badge) return;
-  if (!vanshikaReelsList || vanshikaReelsList.length === 0) {
-    badge.innerText = 'No Reels 🎬';
-  } else {
-    badge.innerText = `Reel ${currentReelIndex + 1} / ${vanshikaReelsList.length} 🎬`;
+  const dedicatedBadge = document.getElementById('dedicated-reel-counter');
+  if (badge) {
+    if (!vanshikaReelsList || vanshikaReelsList.length === 0) {
+      badge.innerText = 'No Reels 🎬';
+    } else {
+      badge.innerText = `Reel ${currentReelIndex + 1} / ${vanshikaReelsList.length} 🎬`;
+    }
+  }
+  if (dedicatedBadge) {
+    if (!vanshikaReelsList || vanshikaReelsList.length === 0) {
+      dedicatedBadge.innerText = '0 / 0';
+    } else {
+      dedicatedBadge.innerText = `${currentReelIndex + 1} / ${vanshikaReelsList.length}`;
+    }
   }
 }
 
@@ -1138,6 +1147,12 @@ function setupReelVisibilityObserver() {
 
       // If user hasn't logged in yet, NEVER play
       if (isLoginOpen) {
+        if (!videoEl.paused) videoEl.pause();
+        return;
+      }
+
+      // If dedicated fullscreen reels view is open, DON'T auto-play inline video (prevents double audio)
+      if (isDedicatedReelsOpen) {
         if (!videoEl.paused) videoEl.pause();
         return;
       }
@@ -1253,21 +1268,25 @@ function displayActiveReel(index, direction = 'up', shouldAutoPlay = false) {
     const playIcon = document.getElementById('reel-center-play-icon');
 
     if (shouldAutoPlay && !isLoginModalOpen) {
-      videoEl.play().then(() => {
-        pauseBackgroundMusicForReel();
-        if (playIndicator) {
-          if (playIcon) playIcon.innerText = '▶️';
-          playIndicator.style.opacity = '1';
-          setTimeout(() => {
-            if (videoEl && !videoEl.paused) playIndicator.style.opacity = '0';
-          }, 400);
-        }
-      }).catch(() => {
-        if (playIndicator) {
-          if (playIcon) playIcon.innerText = '▶️';
-          playIndicator.style.opacity = '1';
-        }
-      });
+      if (typeof isDedicatedReelsOpen !== 'undefined' && isDedicatedReelsOpen) {
+        videoEl.pause();
+      } else {
+        videoEl.play().then(() => {
+          pauseBackgroundMusicForReel();
+          if (playIndicator) {
+            if (playIcon) playIcon.innerText = '▶️';
+            playIndicator.style.opacity = '1';
+            setTimeout(() => {
+              if (videoEl && !videoEl.paused) playIndicator.style.opacity = '0';
+            }, 400);
+          }
+        }).catch(() => {
+          if (playIndicator) {
+            if (playIcon) playIcon.innerText = '▶️';
+            playIndicator.style.opacity = '1';
+          }
+        });
+      }
     } else {
       videoEl.pause();
       if (playIndicator) {
@@ -1275,6 +1294,10 @@ function displayActiveReel(index, direction = 'up', shouldAutoPlay = false) {
         playIndicator.style.opacity = '1';
       }
     }
+  }
+
+  if (typeof isDedicatedReelsOpen !== 'undefined' && isDedicatedReelsOpen) {
+    updateDedicatedReelView(shouldAutoPlay);
   }
 }
 
@@ -1701,6 +1724,371 @@ function removeReelFromFirebase(reelId) {
     fbDb.ref(REELS_FIREBASE_PATH + '/' + reelId).remove();
   } catch (e) {}
 }
+
+// ==========================================
+// DEDICATED FULLSCREEN INSTAGRAM REELS CONTROLLER
+// ==========================================
+let isDedicatedReelsOpen = false;
+let dedicatedLastTapTime = 0;
+let dedicatedTouchStartY = 0;
+let dedicatedTouchStartX = 0;
+
+function handleNavReelClick() {
+  openDedicatedReelsPlayer();
+}
+
+function openDedicatedReelsPlayer() {
+  const modal = document.getElementById('dedicated-reels-modal');
+  if (!modal) return;
+
+  isDedicatedReelsOpen = true;
+  modal.classList.remove('hidden');
+  modal.classList.add('flex');
+  document.body.style.overflow = 'hidden';
+
+  // Pause and mute inline page reel video to avoid ANY double audio
+  const inlineVideo = document.getElementById('vanshika-reel-video');
+  if (inlineVideo) {
+    try {
+      inlineVideo.pause();
+      inlineVideo.muted = true;
+    } catch (e) {}
+  }
+  const inlineEmbed = document.getElementById('vanshika-reel-embed');
+  if (inlineEmbed) {
+    inlineEmbed.innerHTML = '';
+    inlineEmbed.classList.add('hidden');
+  }
+
+  // Pause bg music for reels
+  pauseBackgroundMusicForReel();
+
+  // Push history state so Android/mobile back gesture exits dedicated reels modal
+  try {
+    if (window.location.hash !== '#reels') {
+      history.pushState({ dedicatedReels: true }, '', '#reels');
+    }
+  } catch (e) {}
+
+  // Update view and autoplay dedicated reel
+  updateDedicatedReelView(true);
+  initDedicatedReelsGestures();
+}
+
+function closeDedicatedReelsPlayer(popHistory = true) {
+  const modal = document.getElementById('dedicated-reels-modal');
+  if (!modal) return;
+
+  isDedicatedReelsOpen = false;
+  modal.classList.add('hidden');
+  modal.classList.remove('flex');
+  document.body.style.overflow = '';
+
+  const dedicatedVideo = document.getElementById('dedicated-reel-video');
+  if (dedicatedVideo) {
+    try { dedicatedVideo.pause(); } catch (e) {}
+  }
+  const dedicatedEmbed = document.getElementById('dedicated-reel-embed');
+  if (dedicatedEmbed) {
+    dedicatedEmbed.innerHTML = '';
+    dedicatedEmbed.classList.add('hidden');
+  }
+
+  // Ensure inline video is paused & unmuted when exiting fullscreen
+  const inlineVideo = document.getElementById('vanshika-reel-video');
+  if (inlineVideo) {
+    try {
+      inlineVideo.pause();
+      inlineVideo.muted = false;
+    } catch (e) {}
+  }
+
+  if (popHistory && window.location.hash === '#reels') {
+    try { history.back(); } catch (e) {}
+  }
+}
+
+function updateDedicatedReelView(shouldAutoPlay = true) {
+  const modal = document.getElementById('dedicated-reels-modal');
+  if (!modal || modal.classList.contains('hidden')) return;
+
+  const dedicatedVideo = document.getElementById('dedicated-reel-video');
+  const dedicatedEmbed = document.getElementById('dedicated-reel-embed');
+  const captionEl = document.getElementById('dedicated-reel-caption');
+  const audioNameEl = document.getElementById('dedicated-reel-audio-name');
+  const playIndicator = document.getElementById('dedicated-reel-play-indicator');
+  const playIcon = document.getElementById('dedicated-reel-play-icon');
+
+  updateReelCounter();
+
+  if (!vanshikaReelsList || vanshikaReelsList.length === 0) {
+    if (dedicatedVideo) {
+      dedicatedVideo.pause();
+      dedicatedVideo.classList.add('hidden');
+    }
+    if (dedicatedEmbed) {
+      dedicatedEmbed.innerHTML = '';
+      dedicatedEmbed.classList.add('hidden');
+    }
+    if (captionEl) captionEl.innerText = "No reels available yet. Tap ➕ to upload!";
+    return;
+  }
+
+  const currentReel = vanshikaReelsList[currentReelIndex];
+  if (!currentReel) return;
+
+  if (captionEl) {
+    captionEl.innerText = currentReel.title || "అప్పుడు, ఇప్పుడు, ఎప్పటికీ... నువ్వే నా అందమైన రాణి 👸";
+  }
+  if (audioNameEl) {
+    audioNameEl.innerText = currentReel.fileName || "Original Audio • Vanshika Special";
+  }
+
+  if (currentReel.type === 'youtube') {
+    if (dedicatedVideo) {
+      dedicatedVideo.pause();
+      dedicatedVideo.classList.add('hidden');
+    }
+    const videoId = typeof extractYouTubeVideoId === 'function' ? extractYouTubeVideoId(currentReel.url) : null;
+    if (videoId && dedicatedEmbed) {
+      const autoParam = shouldAutoPlay ? 'autoplay=1' : 'autoplay=0';
+      dedicatedEmbed.innerHTML = `<iframe class="w-full h-full" src="https://www.youtube.com/embed/${videoId}?${autoParam}&loop=1&playlist=${videoId}&playsinline=1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+      dedicatedEmbed.classList.remove('hidden');
+    }
+  } else {
+    if (dedicatedEmbed) {
+      dedicatedEmbed.innerHTML = '';
+      dedicatedEmbed.classList.add('hidden');
+    }
+    if (!dedicatedVideo) return;
+
+    const sourceUrl = currentReel.url || (currentReel.blob ? URL.createObjectURL(currentReel.blob) : '');
+    if (dedicatedVideo.src !== sourceUrl) {
+      dedicatedVideo.src = sourceUrl;
+    }
+    dedicatedVideo.classList.remove('hidden');
+
+    // Attach ended listener for auto-next
+    if (!dedicatedVideo._dedicatedEndedAttached) {
+      dedicatedVideo._dedicatedEndedAttached = true;
+      dedicatedVideo.addEventListener('ended', () => {
+        if (isDedicatedReelsOpen) {
+          if (vanshikaReelsList && vanshikaReelsList.length > 1) {
+            nextDedicatedReel();
+          } else {
+            dedicatedVideo.currentTime = 0;
+            dedicatedVideo.play().catch(() => {});
+          }
+        }
+      });
+      dedicatedVideo.addEventListener('pause', () => {
+        if (!isDedicatedReelsOpen) return;
+        const pi = document.getElementById('dedicated-reel-play-indicator');
+        const piIcon = document.getElementById('dedicated-reel-play-icon');
+        if (pi) {
+          if (piIcon) piIcon.innerText = '⏸️';
+          pi.style.opacity = '1';
+        }
+      });
+      dedicatedVideo.addEventListener('play', () => {
+        if (!isDedicatedReelsOpen) return;
+        const pi = document.getElementById('dedicated-reel-play-indicator');
+        if (pi) {
+          pi.style.opacity = '1';
+          setTimeout(() => {
+            if (dedicatedVideo && !dedicatedVideo.paused && pi) pi.style.opacity = '0';
+          }, 350);
+        }
+      });
+    }
+
+    if (shouldAutoPlay) {
+      pauseBackgroundMusicForReel();
+      dedicatedVideo.play().then(() => {
+        if (playIndicator) {
+          if (playIcon) playIcon.innerText = '▶️';
+          playIndicator.style.opacity = '1';
+          setTimeout(() => {
+            if (dedicatedVideo && !dedicatedVideo.paused) playIndicator.style.opacity = '0';
+          }, 350);
+        }
+      }).catch(() => {
+        if (playIndicator) {
+          if (playIcon) playIcon.innerText = '▶️';
+          playIndicator.style.opacity = '1';
+        }
+      });
+    } else {
+      dedicatedVideo.pause();
+      if (playIndicator) {
+        if (playIcon) playIcon.innerText = '▶️';
+        playIndicator.style.opacity = '1';
+      }
+    }
+  }
+}
+
+function handleDedicatedReelClick(e) {
+  // If clicked on buttons or action elements, ignore
+  if (e && e.target && e.target.closest('button')) {
+    return;
+  }
+
+  const now = Date.now();
+  const timeSinceLast = now - dedicatedLastTapTime;
+
+  if (timeSinceLast < 300 && timeSinceLast > 0) {
+    // Double tap -> Heart like!
+    dedicatedLastTapTime = 0;
+    clearTimeout(window._dedicatedSingleTapTimer);
+    triggerDedicatedReelLike(e);
+    return;
+  }
+
+  dedicatedLastTapTime = now;
+
+  // Delay single tap action so double-tap can cancel it
+  clearTimeout(window._dedicatedSingleTapTimer);
+  window._dedicatedSingleTapTimer = setTimeout(() => {
+    if (Date.now() - dedicatedLastTapTime < 280 && dedicatedLastTapTime !== now) return;
+
+    const dedicatedVideo = document.getElementById('dedicated-reel-video');
+    const playIndicator = document.getElementById('dedicated-reel-play-indicator');
+    const playIcon = document.getElementById('dedicated-reel-play-icon');
+    if (!dedicatedVideo || dedicatedVideo.classList.contains('hidden')) return;
+
+    if (dedicatedVideo.paused) {
+      pauseBackgroundMusicForReel();
+      dedicatedVideo.play().then(() => {
+        if (playIndicator) {
+          if (playIcon) playIcon.innerText = '▶️';
+          playIndicator.style.opacity = '1';
+          setTimeout(() => {
+            if (dedicatedVideo && !dedicatedVideo.paused) playIndicator.style.opacity = '0';
+          }, 350);
+        }
+      }).catch(() => {});
+    } else {
+      dedicatedVideo.pause();
+      // Ensure inline video & all background music are completely stopped when pausing reel
+      const inlineVideo = document.getElementById('vanshika-reel-video');
+      if (inlineVideo && !inlineVideo.paused) {
+        try { inlineVideo.pause(); } catch (err) {}
+      }
+      pauseBackgroundMusicForReel();
+      if (playIndicator) {
+        if (playIcon) playIcon.innerText = '⏸️';
+        playIndicator.style.opacity = '1';
+      }
+    }
+  }, 220);
+}
+
+function toggleDedicatedReelMute(e) {
+  if (e) {
+    try { e.stopPropagation(); } catch (err) {}
+  }
+  const dedicatedVideo = document.getElementById('dedicated-reel-video');
+  const muteBtn = document.getElementById('dedicated-reel-mute-btn');
+  if (!dedicatedVideo) return;
+
+  dedicatedVideo.muted = !dedicatedVideo.muted;
+  if (muteBtn) {
+    muteBtn.innerText = dedicatedVideo.muted ? '🔇' : '🔊';
+  }
+}
+
+function triggerDedicatedReelLike(e) {
+  if (e) {
+    try { e.stopPropagation(); } catch (err) {}
+  }
+  const heartPop = document.getElementById('dedicated-heart-pop');
+  const likeCounter = document.getElementById('dedicated-like-counter');
+  const likeWrapper = document.getElementById('dedicated-like-icon-wrapper');
+
+  if (likeWrapper) {
+    likeWrapper.classList.add('bg-rose-600/80', 'border-rose-400');
+    likeWrapper.style.transform = 'scale(1.3)';
+    setTimeout(() => {
+      if (likeWrapper) likeWrapper.style.transform = 'scale(1)';
+    }, 200);
+  }
+
+  if (heartPop) {
+    heartPop.style.transform = 'scale(1.4)';
+    heartPop.style.opacity = '1';
+    setTimeout(() => {
+      if (heartPop) {
+        heartPop.style.transform = 'scale(0)';
+        heartPop.style.opacity = '0';
+      }
+    }, 650);
+  }
+
+  if (likeCounter) {
+    likeCounter.innerText = 'Liked ❤️';
+  }
+
+  if (typeof triggerHeartBurstAtPointer === 'function' && e && e.clientX) {
+    triggerHeartBurstAtPointer(e.clientX, e.clientY);
+  }
+}
+
+function nextDedicatedReel(e) {
+  if (e) {
+    try { e.stopPropagation(); } catch (err) {}
+  }
+  nextReel();
+}
+
+function prevDedicatedReel(e) {
+  if (e) {
+    try { e.stopPropagation(); } catch (err) {}
+  }
+  prevReel();
+}
+
+// Touch swipe gestures for Instagram Reels experience (Swipe up -> Next, Swipe down -> Prev)
+let _dedicatedGesturesBound = false;
+function initDedicatedReelsGestures() {
+  if (_dedicatedGesturesBound) return;
+  const stage = document.getElementById('dedicated-reels-stage');
+  if (!stage) return;
+  _dedicatedGesturesBound = true;
+
+  stage.addEventListener('touchstart', (e) => {
+    if (e.touches && e.touches.length > 0) {
+      dedicatedTouchStartY = e.touches[0].clientY;
+      dedicatedTouchStartX = e.touches[0].clientX;
+    }
+  }, { passive: true });
+
+  stage.addEventListener('touchend', (e) => {
+    if (!e.changedTouches || e.changedTouches.length === 0) return;
+    const deltaY = e.changedTouches[0].clientY - dedicatedTouchStartY;
+    const deltaX = e.changedTouches[0].clientX - dedicatedTouchStartX;
+
+    // Must be predominantly vertical swipe
+    if (Math.abs(deltaY) > 50 && Math.abs(deltaY) > Math.abs(deltaX)) {
+      if (deltaY < 0) {
+        // Swiped UP -> Next Reel
+        nextDedicatedReel();
+      } else {
+        // Swiped DOWN -> Prev Reel
+        prevDedicatedReel();
+      }
+    }
+  }, { passive: true });
+}
+
+// Listen to popstate for back gesture
+window.addEventListener('popstate', (e) => {
+  const reelsModal = document.getElementById('dedicated-reels-modal');
+  if (reelsModal && !reelsModal.classList.contains('hidden')) {
+    closeDedicatedReelsPlayer(false);
+  }
+});
+
 
 // ==========================================
 // SACRED HEALING SANCTUARY ENGINE (OCT 18 FEATURE)
